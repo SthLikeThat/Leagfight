@@ -1,0 +1,4 @@
+addDefaultCharset utf-8
+Options -Indexes
+Options -Includes
+php_value upload_max_filesize 5M

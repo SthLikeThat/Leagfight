@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Регистрация</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<link rel="stylesheet" href="css/main.css" type="text/css" />
+	<script type="text/javascript" src="lib/jquery-2.1.3.min.js"></script>
+	<script src="lib/scripta.js"></script>
+</head>
+<body>
+
+		<form name="reg" id="reg" accept-charset="utf-8"  autocomplete="on"> 
+		<table cellpadding="11" cellspacing="0" >
+		<tr><td> <div id="mess2"></div> </td></tr>
+		<tr><td> <input type="email" name="email" placeholder="E-mail" autofocus required onblur="losse(this.form)" class="backlight"/> </td></tr>
+		<tr><td> <input type="text" name="login" placeholder="Логин " pattern="{3,16}" required onfocus="loginf()" onblur="lossl(this.form)" class="backlight"/> </td></tr>
+		<tr><td> <input type="password" name="password" placeholder="Пароль " pattern="{6,}" required onfocus="passwordf()" onblur="lossp(this.form)" class="backlight"/> </td></tr>
+		<tr><td><a href="#" onClick="sendreg()" class="knopka" >Зарегистрироваться</a> </td></tr>
+		<tr><td><a href="auth.html" class="knopka" >&emsp; Авторизация &emsp;</a> </td></tr>
+		<tr><td> <div id="mess"></div> </td></tr>
+		</table>
+		</form>
+</body>
+</html>
