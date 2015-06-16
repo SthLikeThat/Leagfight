@@ -1,2 +1,0 @@
-</div>
-<ul>%smth%</ul>
