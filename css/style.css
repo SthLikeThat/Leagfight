@@ -1038,7 +1038,7 @@ input[type="radio"]:checked + label span {
 }
 
 .mail:hover{
-	background-color: rgba(164,205,164,0.2);
+	background-color: rgba(78, 255, 71, 0);
 }
 
 .mail img{

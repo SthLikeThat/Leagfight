@@ -123,6 +123,8 @@ class fightLogContent extends Modules {
 		//Грузим урон и его тип
         $agressorFullDamage = 0;
         $defenderFullDamage = 0;
+        $agressor = unserialize($this->log["agressor"]);
+        $defender = unserialize($this->log["defender"]);
 		$allAgrDamage = unserialize($this->log["allAgrDamage"]);
 		$allDefDamage = unserialize($this->log["allDefDamage"]);
 		$typesAgrDamage = unserialize($this->log["typesAgrDamage"]);
@@ -140,25 +142,19 @@ class fightLogContent extends Modules {
 		
 
 		//грузим оружие бойцов
-		$agrWep = json_decode($this->log["agrPrimaryWeapon"]);
-		$agrSecWep = json_decode($this->log["agrSecondaryWeapon"]);
-		$agrWepDamage = $agrWep->{"damagePhys"};
-		if($agrSecWep->{"id"} < 500)
-			$agrWepDamage += $agrSecWep->{"damagePhys"};
-		
-		$defWep = json_decode($this->log["defPrimaryWeapon"]);
-		$defSecWep = json_decode($this->log["defSecondaryWeapon"]);
-		$defWepDamage = $defWep->{"damagePhys"};
-		if($defSecWep->{"id"} < 500)
-			$defWepDamage += $defSecWep->{"damagePhys"};
+		$agrWepDamage = $agressor["user"]["primaryWeapon"]["damage"];
+
+		if($agressor["user"]["secondaryWeapon"]["id"] < 500)
+			$agrWepDamage += $agressor["user"]["secondaryWeapon"]["damage"];
+		$defWepDamage =  $defender["user"]["primaryWeapon"]["damage"];
+		if($defender["user"]["secondaryWeapon"]["id"] < 500)
+			$defWepDamage += $defender["user"]["secondaryWeapon"]["damage"];
 		
 		//Облегчаем себе работу со статами
-		$agressor = unserialize($this->log["agressor"]);
 		$agrStrengh = $agressor["user"]["Strengh"];
 		$agrDefence = $agressor["user"]["Defence"];
 		$agrAgility = $agressor["user"]["Agility"];
 		$agrMastery = $agressor["user"]["Mastery"];
-		$defender = unserialize($this->log["defender"]);
 		$defStrengh =  $defender["user"]["Strengh"];
 		$defDefence = $defender["user"]["Defence"];
 		$defAgility = $defender["user"]["Agility"];
@@ -195,7 +191,7 @@ class fightLogContent extends Modules {
 		$sr["agrCrit"] = $agrCrit;
 		$sr["defCrit"] = $defCrit;
 		
-		$text .= $this->getReplaceTemplate($sr, "fightLogDamage$who");
+		$text = $this->getReplaceTemplate($sr, "fightLogDamage$who");
 		return $text;
 	}
 	
