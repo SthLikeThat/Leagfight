@@ -961,7 +961,7 @@ class allFunctions extends DataBase{
 	}
 	
 	public static function changeBorderSearchBot(){
-		echo memory_get_usage()/1024 ." - начало";
+        session_start();
 		if($_SESSION["goNextLvl"] == 1 and $_SESSION["botLvl"] < 10){
 			$_SESSION["botLvl"]++;
 			unset($_SESSION["goNextLvl"]);

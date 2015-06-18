@@ -1,21 +1,21 @@
 <div class="allInformation">
 	<div class="smbEquip">
-		<div class="equipItem" onclick="showDetailsLog('agrPrimaryWeapon', %id%)" >
+		<div class="equipItem" onclick="showDetailsLog('agressor|primaryWeapon', %id%)" >
 		<img src="images/cloth/%agrPrimaryWeapon%.png" height="60" />	</div>
 		
-		<div class="equipItem" onclick="showDetailsLog('agrSecondaryWeapon', %id%)">	
+		<div class="equipItem" onclick="showDetailsLog('agressor|secondaryWeapon', %id%)">
 		<img src="images/cloth/%agrSecondaryWeapon%.png" height="60" />	</div>
 		
-		<div class="equipItem" onclick="showDetailsLog('agrHelmet', %id%)">	
+		<div class="equipItem" onclick="showDetailsLog('agressor|helmet', %id%)">
 		<img src="images/cloth/%agrHelmet%.png" height="60" />	</div>
 		
-		<div class="equipItem" onclick="showDetailsLog('agrArmor', %id%)">	
+		<div class="equipItem" onclick="showDetailsLog('agressor|armor', %id%)">
 		<img src="images/cloth/%agrArmor%.png" height="60" />	</div>
 		
-		<div class="equipItem" onclick="showDetailsLog('agrLeggings', %id%)">	
+		<div class="equipItem" onclick="showDetailsLog('agressor|leggings', %id%)">
 		<img src="images/cloth/%agrLeggings%.png" height="60" />	</div>
 		
-		<div class="equipItem" onclick="showDetailsLog('agrBracers', %id%)">	
+		<div class="equipItem" onclick="showDetailsLog('agressor|bracers', %id%)">	
 		<img src="images/cloth/%agrBracers%.png" height="60" />	</div>
 	</div>
 	%fightLogDamageAgr%
@@ -36,22 +36,22 @@
 	</div>
 	%fightLogDamageDef% 
 	<div class="smbEquip">
-		<div class="equipItem" onclick="showDetailsLog('defPrimaryWeapon', %id%)">	
+		<div class="equipItem" onclick="showDetailsLog('defender|primaryWeapon', %id%)">	
 		<img src="images/cloth/%defPrimaryWeapon%.png" height="60" />	</div>
 		
-		<div class="equipItem" onclick="showDetailsLog('defSecondaryWeapon', %id%)">	
+		<div class="equipItem" onclick="showDetailsLog('defender|secondaryWeapon', %id%)">	
 		<img src="images/cloth/%defSecondaryWeapon%.png" height="60" />	</div>
 		
-		<div class="equipItem" onclick="showDetailsLog('defHelmet', %id%)">	
+		<div class="equipItem" onclick="showDetailsLog('defender|helmet', %id%)">	
 		<img src="images/cloth/%defHelmet%.png" height="60" />	</div>
 		
-		<div class="equipItem" onclick="showDetailsLog('defArmor', %id%)">
+		<div class="equipItem" onclick="showDetailsLog('defender|armor', %id%)">
 		<img src="images/cloth/%defArmor%.png" height="60" />	</div>
 		
-		<div class="equipItem" onclick="showDetailsLog('defLeggings', %id%)">	
+		<div class="equipItem" onclick="showDetailsLog('defender|leggings', %id%)">	
 		<img src="images/cloth/%defLeggings%.png" height="60" />	</div>
 		
-		<div class="equipItem" onclick="showDetailsLog('defBracers', %id%)">	
+		<div class="equipItem" onclick="showDetailsLog('defender|bracers', %id%)">	
 		<img src="images/cloth/%defBracers%.png" height="60" />	</div>
 		
 	</div>

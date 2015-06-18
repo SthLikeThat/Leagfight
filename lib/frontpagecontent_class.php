@@ -9,7 +9,8 @@ class FrontPageContent extends Modules {
 	}
 	
 	public function getCenter(){
-		//echo memory_get_usage()." - начало фронта";
+        if(is_null($this->user))
+            return false;
 		$sr["characteristics"] = $this->getCharacteristics();
 		$sr["nick"] = $this->user["login"];
 		$sr["avatar"] = $this->user["avatar"];
@@ -88,7 +89,7 @@ class FrontPageContent extends Modules {
 			$sr["hashLeggings"] = 0;
 		}
         //sadfasdfsad
-		$text .= $this->getReplaceTemplate($sr, "equipment");
+		$text = $this->getReplaceTemplate($sr, "equipment");
 		return $text;
 	}
 	
@@ -136,7 +137,7 @@ class FrontPageContent extends Modules {
 		$sr["physique"] = $physique;
 		$sr["mastery"] = $mastery;
 		$sr["power"] = $this->user["power"];
-		$text .= $this->getReplaceTemplate($sr, "characteristics");
+		$text = $this->getReplaceTemplate($sr, "characteristics");
 		return $text;
 	}
 	

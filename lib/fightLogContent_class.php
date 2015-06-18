@@ -10,30 +10,27 @@ class fightLogContent extends Modules {
 		$this->idLog = $this->data["id"];
 		$this->log = $this->db->getAllOnField("logs","idLog", $this->idLog, "idLog", "");
 		if($this->log == 0) header("Location:?view=notfound");
-		$this->agressor = $this->db->getAllOnField("users", "id",$this->log["idAgressor"] ,"","");
-		if($this->log["typeFight"] == "arenaUser")
-			$this->defender = $this->db->getAllOnField("users", "id",$this->log["idDefender"] ,"",""); 
-		if($this->log["typeFight"] == "arenaBot")
-			$this->defender = $this->db->getAllOnField("arena_bots", "id",$this->log["idDefender"] ,"",""); 
 	}
 	
 	protected function getCenter() {
+        $agressor = unserialize($this->log["agressor"]);
+        $defender = unserialize($this->log["defender"]);
 		$sr["fightLogDamageAgr"] = $this->getLog("Agr");
 		$sr["fightLogDamageDef"] = $this->getLog("Def");
 		$sr["agressorCharacteristics"] = $this->getCharacteristics("agressor");
 		$sr["defenderCharacteristics"] = $this->getCharacteristics("defender");
-		$sr["agressorNick"] = $this->agressor["login"];
-		$sr["idAgressor"] = $this->agressor["id"];
-		$sr["defenderNick"] = $this->defender["login"];
-		$sr["idDefender"] = $this->defender["id"];
-		$sr["agressorAvatar"] = $this->agressor["avatar"];
+		$sr["agressorNick"] = $agressor["user"]["login"];
+		$sr["idAgressor"] = $agressor["user"]["id"];
+		$sr["defenderNick"] = $defender["user"]["login"];
+		$sr["idDefender"] = $defender["user"]["id"];
+		$sr["agressorAvatar"] = $agressor["user"]["avatar"];
 		if($this->log["typeFight"] == "arenaUser")
-			$sr["defenderAvatar"] = $this->defender["avatar"];
+			$sr["defenderAvatar"] = $defender["user"]["avatar"];
 		if($this->log["typeFight"] == "arenaBot")
-			$sr["defenderAvatar"] = "arena_bots/".$this->defender["avatar"].$this->log["avatar"];
+			$sr["defenderAvatar"] = "arena_bots/".$defender["user"]["avatar"].$this->log["avatar"];
 		$sr["prize"] = $this->getPrize();
-		$sr["powerAgr"] = $this->agressor["power"];
-		$sr["powerDef"] = $this->defender["power"];
+		$sr["powerAgr"] = $agressor["user"]["power"];
+		$sr["powerDef"] = $defender["user"]["power"];
 		$sr["onOff"] = "off";
 		
 		//Вывод экипировки

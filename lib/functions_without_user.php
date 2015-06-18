@@ -19,7 +19,11 @@ class someFunctions extends DataBase{
 	
 	public function showDetailsLog($thing, $id){
 		$log = $this->db->getAllOnField("logs", "idLog", $id, "idLog", "");
-		$item = json_decode($log[$thing], true);
+        $pos = strpos($thing, "|");
+        $userType = substr($thing, 0, $pos);
+        $userThing = substr($thing, $pos + 1);
+        $user = unserialize($log[$userType]);
+		$item = $user["user"][$userThing];
 		if($item["id"] != 0){
 			$text = $this->show(0, $item);
 			echo $text;
@@ -29,30 +33,23 @@ class someFunctions extends DataBase{
 	
 	public function show($slot, $invItem ){
 		if($invItem["id"] < 500){
-			$weapon = $this->db->getElementOnID("weapon", $invItem["id"]);
+			$weapon =  $invItem;
 			if($weapon["type"] == 1){ $type="one"; $typeName="Одноручное";}
 			if($weapon["type"] == 2){ $type="two"; $typeName="Двуручное";}
 			if($weapon["type"] == 3){ $type="staff"; $typeName="Древковое";}
 			if($weapon["typedamage"] == 1){ $typedamage="piercing"; $typedamageName="Колющее";}
 			if($weapon["typedamage"] == 2){ $typedamage="cutting"; $typedamageName="Режущее";}
 			if($weapon["typedamage"] == 3){ $typedamage="maces"; $typedamageName="Дробящее";}
-			$damage[0] = $weapon["damage"];
-			$crit[0] = $weapon["crit"];
-			$modificator = 1;
-			for($i = 1; $i <=5; $i++){
-				$modificator += 0.05;
-				$damage[$i] = round($damage[0] * $modificator,2);
-				$crit[$i] = round($crit[0] * $modificator,2);
-			}
+
 			$sr["typeName"] = $typeName;
 			$sr["type"] = $type;
 			$sr["typedamage"] = $typedamage;
-			$sr["damageLvl"] = $invItem["damage"];
-			$sr["critLvl"] = $invItem["crit"];
+			$sr["damageLvl"] = $invItem["damageLvl"];
+			$sr["critLvl"] = $invItem["critLvl"];
 			$sr["typedamageName"] = $typedamageName;
 			$sr["requiredlvl"] = $weapon["requiredlvl"];
-			$sr["damage"] = $damage[$invItem["damage"]];
-			$sr["crit"] = $crit[$invItem["crit"]];
+			$sr["damage"] = $invItem["damage"];
+			$sr["crit"] = $invItem["crit"];
 			
 			$text = $this->getReplaceTemplate($sr, "weaponView");
 			
@@ -66,7 +63,7 @@ class someFunctions extends DataBase{
 		}
 		
 		if($invItem["id"] > 500 and $invItem["id"] < 1000){
-			$armor = $this->db->getElementOnID("armor", $invItem["id"]);
+			$armor = $invItem;
 			if($armor["typeDefence"] == 1){ $type="light"; $typeName="Лёгкая";}
 			if($armor["typeDefence"] == 2){ $type="medium"; $typeName="Средняя";}
 			if($armor["typeDefence"] == 3){ $type="heavy"; $typeName="Тяжелая";}
@@ -80,7 +77,7 @@ class someFunctions extends DataBase{
 			$sr["type"] = $type;
 			$sr["typeName"] = $typeName;
 			$sr["requiredlvl"] = $armor["requiredlvl"];
-			$sr["armor"] = $defence[$invItem["armor"]];
+			$sr["armor"] = $armor["defence"];
 			$sr["armorLvl"] = $invItem["armor"];
 			$text = $this->getReplaceTemplate($sr, "armorView");
 			

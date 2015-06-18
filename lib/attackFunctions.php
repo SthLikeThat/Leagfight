@@ -11,7 +11,7 @@ class attackFunctions extends DataBase{
 	
 	public function getUserInfo($id){
 		if($this->valid->validID($id)){
-			$user = $this->db->getFieldsBetter( "users", "id", $id, array("id", "login", "league", "Strengh", "Defence", "Agility", "Mastery", "Physique",
+			$user = $this->db->getFieldsBetter( "users", "id", $id, array("id", "avatar", "login", "league", "Strengh", "Defence", "Agility", "Mastery", "Physique",
                 "power", "lvl", "helmet", "armor", "bracers", "leggings", "primaryWeapon", "secondaryWeapon", "currentExp", "currentHp"), $sign = "=");
 		    return $user[0];
         }
@@ -60,11 +60,12 @@ class attackFunctions extends DataBase{
         $botInfo["Agility"] = $_SESSION["bot_agility"];
         $botInfo["Physique"] = $_SESSION["bot_physique"];
         $botInfo["Mastery"] = $_SESSION["bot_mastery"];
+        $botInfo["power"] =  round($botInfo["Strengh"] * 2 + $botInfo["Defence"] * 1.7 + $botInfo["Agility"] * 1.6 + $botInfo["Physique"] * 1.85 + $botInfo["Mastery"] * 1.9, 0);
         $botInfo["lvl"] = $_SESSION["botLvl"];
         $botInfo["id"] = $id;
         if(rand(0,1) and $equipment["primaryWeapon"])	$botInfo["primaryWeapon"]["id"] = $equipment["primaryWeapon"];
         else $botInfo["primaryWeapon"] = 0;
-        if(rand(0,1) and $equipment["secondaryWeapon"])	$botInfo["secondaryWeapon"]["id"] = $equipment["secondaryWeapon"];
+        if(rand(0,1) and $equipment["secondaryWeapon"] and $botInfo["primaryWeapon"]["id"])	$botInfo["secondaryWeapon"]["id"] = $equipment["secondaryWeapon"];
         else $botInfo["secondaryWeapon"] = 0;
         if(rand(0,1) and $equipment["armor"])	$botInfo["armor"]["id"] = $equipment["armor"];
         else $botInfo["armor"] = 0;
@@ -80,17 +81,27 @@ class attackFunctions extends DataBase{
         $allArmors = $allArmors[0];
 
         $count = count($allArmors);
-        for($i = 0; $i <= $count; $i++){
-            if($allArmors[$i]["thing"] == 2)
+        for($i = 0; $i <= $count; $i++) {
+            if ($allArmors[$i]["thing"] == 2) {
                 $botInfo["armor"] = $allArmors[$i];
-            if($allArmors[$i]["thing"] == 3)
+                $botInfo["armor"]["armorLvl"] = 0;
+            }
+            if ($allArmors[$i]["thing"] == 3){
                 $botInfo["helmet"] = $allArmors[$i];
-            if($allArmors[$i]["thing"] == 4)
+                $botInfo["helmet"]["armorLvl"] = 0;
+            }
+            if($allArmors[$i]["thing"] == 4) {
                 $botInfo["leggings"] = $allArmors[$i];
-            if($allArmors[$i]["thing"] == 5)
+                $botInfo["leggings"]["armorLvl"] = 0;
+            }
+            if($allArmors[$i]["thing"] == 5) {
                 $botInfo["bracers"] = $allArmors[$i];
-            if($allArmors[$i]["thing"] == 6)
-                $botInfo["secondaryWeapon"]= $allArmors[$i];
+                $botInfo["bracers"]["armorLvl"] = 0;
+            }
+            if($allArmors[$i]["thing"] == 6) {
+                $botInfo["secondaryWeapon"] = $allArmors[$i];
+                $botInfo["secondaryWeapon"]["armorLvl"] = 0;
+            }
         }
         $botTotalArmor = 0;
         $botArmorTypes = array(0,0,0);
@@ -111,11 +122,12 @@ class attackFunctions extends DataBase{
         if($botInfo["secondaryWeapon"] != 0 and $botInfo["secondaryWeapon"]["id"] < 500){
             $botInfo["secondaryWeapon"] = $this->db->getAllOnField("weapon", "id",$botInfo["secondaryWeapon"]["id"] , "", "");
         }
-       /* unset($_SESSION["bot_strengh"]);
+        unset($_SESSION["bot_strengh"]);
         unset($_SESSION["bot_defence"]);
         unset($_SESSION["bot_agility"]);
         unset($_SESSION["bot_physique"]);
-        unset($_SESSION["bot_mastery"]);*/
+        unset($_SESSION["bot_mastery"]);
+        unset($_SESSION["botId"]);
         $user["user"] = $botInfo;
         $user["totalArmor"] = $botTotalArmor;
         $user["armorTypes"] = $botArmorTypes;
@@ -150,26 +162,31 @@ class attackFunctions extends DataBase{
                 $armorLvl =  $user["armor"]["armor"];
                 $user["armor"] = $allArmors[$i];
                 $user["armor"]["defence"] = $this->getBonus($user["armor"]["defence"],  $armorLvl);
+                $user["armor"]["armorLvl"] = $armorLvl;
             }
             if($allArmors[$i]["thing"] == 3){
                 $armorLvl =  $user["helmet"]["armor"];
                 $user["helmet"] = $allArmors[$i];
                 $user["helmet"]["defence"] = $this->getBonus($user["helmet"]["defence"],  $armorLvl);
+                $user["helmet"]["armorLvl"] = $armorLvl;
             }
             if($allArmors[$i]["thing"] == 4){
                 $armorLvl =  $user["leggings"]["armor"];
                 $user["leggings"] = $allArmors[$i];
                 $user["leggings"]["defence"] = $this->getBonus($user["leggings"]["defence"],  $armorLvl);
+                $user["leggings"]["armorLvl"] = $armorLvl;
             }
             if($allArmors[$i]["thing"] == 5){
                 $armorLvl =  $user["bracers"]["armor"];
                 $user["bracers"] = $allArmors[$i];
                 $user["bracers"]["defence"] = $this->getBonus($user["bracers"]["defence"],  $armorLvl);
+                $user["bracers"]["armorLvl"] = $armorLvl;
             }
             if($allArmors[$i]["thing"] == 6){
                 $armorLvl =  $user["secondaryWeapon"]["armor"];
                 $user["secondaryWeapon"]= $allArmors[$i];
                 $user["secondaryWeapon"]["defence"] = $this->getBonus($user["secondaryWeapon"]["defence"],$armorLvl);
+                $user["secondaryWeapon"]["armorLvl"] = $armorLvl;
             }
         }
         if($user["primaryWeapon"] != 0){
@@ -271,11 +288,13 @@ class attackFunctions extends DataBase{
 			$this->mysqli->autocommit(FALSE);
 			if($totalAgrDamage > $totalDefDamage){
 				$winner = $agressor["user"]["id"];
-				$prize = $this->getPrize($agressor["user"], $defender["user"], $type, $agrStatistic, $defStatistic, true, $defender["user"]);
+                $Iwin = true;
+				$prize = $this->getPrize($agressor["user"], $defender["user"], $type, $agrStatistic, $defStatistic, $Iwin, $defender["user"]);
 			}
 			if($totalAgrDamage < $totalDefDamage){
 				$winner = $defender["user"]["id"];
-				$prize = $this->getPrize($defender["user"], $agressor["user"], $type, $defStatistic, $agrStatistic, false, $defender["user"]);
+                $Iwin = false;
+				$prize = $this->getPrize($defender["user"], $agressor["user"], $type, $defStatistic, $agrStatistic, $Iwin, $defender["user"]);
 			}
 			if($totalAgrDamage == $totalDefDamage){
 				$winner = 0;
@@ -343,7 +362,6 @@ class attackFunctions extends DataBase{
 				}
 				$this->mysqli->commit();
 			}
-			//($_SESSION["botId"]);
 			die($idLog);
 	}
 
@@ -425,8 +443,7 @@ class attackFunctions extends DataBase{
             }
         }
         if($winner){
-            if(!$_SESSION["goNextLvl"])
-                $_SESSION["goNextLvl"] = 1;
+            $_SESSION["goNextLvl"] = 1;
             $thisBotStatistic["wins"]++;
             $allBots["wins"]++;
             if($prize["coinBlack"] != 0){
@@ -586,20 +603,21 @@ class attackFunctions extends DataBase{
 	}
 
     private function getDamageBonus($typedamage, $armorTypes){
+        $damageBonus = 1;
         if($typedamage == "1"){
-            if($armorTypes[0] == 1) $damageBonus = 1;
-            if($armorTypes[1] == 1) $damageBonus = 1.25;
-            if($armorTypes[2] == 1) $damageBonus = 0.75;
+            if($armorTypes[0] == 1) $damageBonus += 0;
+            if($armorTypes[1] == 1) $damageBonus += 0.25;
+            if($armorTypes[2] == 1) $damageBonus[] -= 0.25;
         }
         if($typedamage == "2"){
-            if($armorTypes[0] == 1) $damageBonus = 1.25;
-            if($armorTypes[1] == 1) $damageBonus = 1;
-            if($armorTypes[2] == 1) $damageBonus = 0.75;
+            if($armorTypes[0] == 1) $damageBonus -= 0.25;
+            if($armorTypes[1] == 1) $damageBonus += 0;
+            if($armorTypes[2] == 1) $damageBonus -= 0.25;
         }
         if($typedamage == "3"){
-            if($armorTypes[0] == 1) $damageBonus = 0.75;
-            if($armorTypes[1] == 1) $damageBonus = 1;
-            if($armorTypes[2] == 1) $damageBonus = 1.25;
+            if($armorTypes[0] == 1) $damageBonus -= 0.25;
+            if($armorTypes[1] == 1) $damageBonus += 0;
+            if($armorTypes[2] == 1) $damageBonus += 0.25;
         }
         return $damageBonus;
     }

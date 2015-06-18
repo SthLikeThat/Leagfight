@@ -18,7 +18,11 @@ abstract class Modules extends Template{
 		$this->db = $db;
 		$this->valid = new CheckValid($db);
 		$this->data = $this->secureData(array_merge($_POST, $_GET));
-		$this->getAuthUser();
+		if(!$this->getAuthUser()){
+            unset($_SESSION);
+            header("Location: auth.html");
+            return false;
+        }
 		//echo memory_get_usage()." - начало";
 		$this->inventory = $this->db->getAllOnField("user_inventory", "id", $_SESSION["id"], "", "");
 		$this->user = $this->db->selectFromTables(array("users", "user_resources", "user_inventory_potions", "user_settings", "user_statistic"), "id", $_SESSION["id"]);
@@ -118,7 +122,7 @@ abstract class Modules extends Template{
 				$this->db->setField("users", "jobEnd", 0, "id", $user["id"]);
 			}
 			$sr["mda"] = $allSeconds;
-		$text .= $this->getReplaceTemplate($sr, "header");
+		$text = $this->getReplaceTemplate($sr, "header");
 		return $text;
 	}
 	
@@ -135,28 +139,28 @@ abstract class Modules extends Template{
 	
 	final protected function getAuthUser() {
 		if(!$_SESSION["id"]){
-			unset($_SESSION);
-			header("Location: auth.html");
+            return false;
 		}
 		$user = $this->db->getFieldsBetter("users", "id", $_SESSION["id"], array("user_hash", "currentHp", "maxHp", "lastRegen"), "=");
 		$user = $user[0];
-		if($user["lastRegen"] + 3600 < time() and $user["currentHp"] < $user["maxHp"]){
-			$maxCycle = round((time() - $user["lastRegen"])/3600,0);
+        $time = time();
+		if($user["lastRegen"] + 3600 < $time and $user["currentHp"] < $user["maxHp"]){
+			$maxCycle = round(($time - $user["lastRegen"])/3600,0);
 			if($maxCycle > 20)	$maxCycle = 20;
 			for($i = 0; $i < $maxCycle; $i++){
 				$bonusHP += $user["maxHp"]/20;
 			}
 			$bonusHP = round($bonusHP,0);
-			if($user["currentHp"] + $bonusHP > $user["maxHp"]) $this->db->setFieldOnID("users", $user["id"], "currentHp", $user["maxHp"]);
+			if($user["currentHp"] + $bonusHP >= $user["maxHp"])
+                $this->db->setFieldOnID("users", $user["id"], "currentHp", $user["maxHp"]);
 			else $this->db->setFieldOnID("users", $user["id"], "currentHp", $user["currentHp"] + $bonusHP);
-			$this->db->setFieldOnID("users", $user["id"], "lastRegen", time());
+			$this->db->setFieldOnID("users", $user["id"], "lastRegen", $time);
 		}
 		if($_SESSION["hash"] === $user["user_hash"]){
 			return true;
 		}
 		else{
-			unset($_SESSION);
-			header("Location: auth.html");
+            return false;
 		}
 	}
 	
