@@ -7,7 +7,7 @@ class clientContent extends Modules {
 	
 	public function __construct($db) {
 		parent::__construct($db);
-		$this->client_info = $this->client->get($this->data["id"], true);
+		$this->client_info = $this->db->getElementOnID("users", $this->data["id"]);
 		$this->settings = $this->db->getElementOnID("user_settings", $this->data["id"], true);
 		if(!$this->client_info) $this->notFound();
 	}

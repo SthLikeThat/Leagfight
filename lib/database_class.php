@@ -73,7 +73,7 @@ class DataBase extends Template{
 		$query = substr($query, 0, -1);
 		if ($where) {
 			$query .= " WHERE $where ;";
-				return $this->query($query);
+			return $this->query($query);
 		}
 		else return false;
 	}

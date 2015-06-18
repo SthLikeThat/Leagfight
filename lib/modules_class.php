@@ -141,7 +141,7 @@ abstract class Modules extends Template{
 		if(!$_SESSION["id"]){
             return false;
 		}
-		$user = $this->db->getFieldsBetter("users", "id", $_SESSION["id"], array("user_hash", "currentHp", "maxHp", "lastRegen"), "=");
+		$user = $this->db->getFieldsBetter("users", "id", $_SESSION["id"], array("id", "user_hash", "currentHp", "maxHp", "lastRegen"), "=");
 		$user = $user[0];
         $time = time();
 		if($user["lastRegen"] + 3600 < $time and $user["currentHp"] < $user["maxHp"]){
@@ -151,8 +151,9 @@ abstract class Modules extends Template{
 				$bonusHP += $user["maxHp"]/20;
 			}
 			$bonusHP = round($bonusHP,0);
-			if($user["currentHp"] + $bonusHP >= $user["maxHp"])
+			if($user["currentHp"] + $bonusHP >= $user["maxHp"]) {
                 $this->db->setFieldOnID("users", $user["id"], "currentHp", $user["maxHp"]);
+            }
 			else $this->db->setFieldOnID("users", $user["id"], "currentHp", $user["currentHp"] + $bonusHP);
 			$this->db->setFieldOnID("users", $user["id"], "lastRegen", $time);
 		}
