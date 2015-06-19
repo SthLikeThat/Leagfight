@@ -22,22 +22,10 @@ class Auth {
 		return $this->db->query($query);
 	}
 	
-	public function getUserInfo(){
+	private function getUserInfo(){
 			$id = $_SESSION["id"];
 			if(!$id) header("Location: auth.html");
 			return $this->db->getAllOnField("users", "id",$id, "", "");
-	}
-	
-	public function getUserResources(){
-		$mass = $this->getUserInfo();
-		$id = $mass["id"];
-			return $this->db->getAllOnField("user_resources", "id",$id, "", "");
-	}
-	
-	public function getUserInventory(){
-		$mass = $this->getUserInfo();
-		$id = $mass["id"];
-		return $this->db->getAllOnField("user_inventory", "id", $id, "", "");
 	}
 	
 	public function checkAuth($email, $password){

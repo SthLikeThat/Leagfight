@@ -127,6 +127,8 @@ class Ancillary{
         }
         $userTotalArmor = 0;
         $userArmorTypes = array(1 => 0, 2 => 0, 3 => 0);
+        if(is_null($userEquip))
+            return false;
         foreach($userEquip as $key => $value){
             if($key != "secondaryWeapon"){
                 $userTotalArmor += $user[$value]["defence"];

@@ -22,7 +22,8 @@ class Rega{
 	
 	public function checkReg($email, $login, $password){
 		if ($_SERVER['REQUEST_METHOD'] == 'POST'){
-			if($this->valid->checkLogin($login) && $this->valid->checkEmail($email) && $this->valid->checkPassword($password)){
+			$check = $this->valid->checkRegistration($login, $email, $password);
+            if(count($check) == 0){
 				$password = $this->valid->hashPassword($password);
 				$link = $this->getLink();
 				$this->mailMe($email, $link);
@@ -36,11 +37,16 @@ class Rega{
 				$this->query($query3);
 				$this->query($query4);
 				$this->query($query5);
-				$result_set = $this->query($query);
-				$this->db->mysqli->commit();
+				$this->query($query);
+                $result_set = $this->db->mysqli->commit();
 				if($result_set == true){
-					echo ("Location: auth.html");
+                    echo "OK";
 				}
+
+			}
+			else{
+				foreach($check as $error)
+					echo $error."<br/>";
 			}
 		}
 	}
