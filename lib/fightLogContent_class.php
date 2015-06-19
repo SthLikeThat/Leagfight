@@ -158,20 +158,16 @@ class fightLogContent extends Modules {
 		$defMastery =  $defender["user"]["Mastery"];
 		
 		//Расчитываем статистику
-		$agrDamage = $agrWepDamage * $agrStrengh;
-			if($agrWepDamage == 0)	
-				$agrDamage = 0.1 * $agrStrengh;
-		$defDamage =  $defWepDamage * $defStrengh;
-			if($defWepDamage == 0)
-				$defDamage = 0.1 * $defStrengh;
+		$agrDamage = round($agrWepDamage * $agrStrengh, 0);
+		$defDamage =  round($defWepDamage * $defStrengh, 0);
 		
 		$agrDodge = round($defStrengh/($defStrengh + $agrAgility) * 100);
 		if($agrDodge > 100) $agrDodge = 100;
 		$defDodge =  round($agrStrengh/($agrStrengh + $defAgility) * 100);
 		if($defDodge > 100) $defDodge = 100;
 
-		$agrArmorGet = $agressor["totalArmor"] * $agrDefence;
-		$defArmorGet = $defender["totalArmor"] * $defDefence;
+		$agrArmorGet = round($agressor["totalArmor"] * $agrDefence, 0);
+		$defArmorGet = round($defender["totalArmor"] * $defDefence, 0);
 		
 		$agrCrit = round(($agrMastery + $defMastery)/($defMastery/15));
 		if($agrCrit > 100) $agrCrit = 100;

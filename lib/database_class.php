@@ -1,14 +1,17 @@
 <?php
 require_once "template.php";
 require_once "checkvalid_class.php";
+require_once "ancillaryClass.php";
 
 class DataBase extends Template{
 	
-	protected $valid;
-	
+	public $valid;
+	public $ancillary;
+
 	public function __construct() {
 		parent::__construct();
 		$this->valid = new CheckValid($this);
+		$this->ancillary = new Ancillary($this);
 	}
 	
 	public function select($table_name, $fields, $where ="", $order = "", $up = true, $limit = ""){

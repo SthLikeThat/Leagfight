@@ -432,6 +432,17 @@ a:active { background: rgb(119, 136, 153); }
 /*	modules END	*/
 /*	index START	*/
 
+.damageInformation{
+    float:right;
+    border:2px solid white;
+    padding:3px;
+    background: rgba(0,0,0,0.05);
+}
+
+.damageInformation table tr td:first-child{
+    text-align: left;
+}
+
 .displayPutOn{
 	position:absolute;
 	bottom:0;

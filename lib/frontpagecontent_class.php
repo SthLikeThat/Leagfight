@@ -1,9 +1,8 @@
 <?php
 require_once "modules_class.php";
-require_once "libraries/dBug.php";
 
 class FrontPageContent extends Modules {
-	
+
 	public function __construct($db) {
 		parent::__construct($db);
 	}
@@ -21,42 +20,59 @@ class FrontPageContent extends Modules {
 		$sr["inventory"] = $this->getInventory();
 		$sr["equipment"] = $this->getEquipment();
 		$sr["invPotions"] = $this->getPotions();
+		$sr["damageInformation"] = $this->getDamageInformation();
 		return $this->getReplaceTemplate($sr, "center");
 	}
-	
-	protected function getEquipment(){
+
+    private function getDamageInformation(){
+        $user = $this->db->ancillary->getInfo($this->user["id"], array("user" => $this->user, "userInventory" => $this->inventory));
+        $sr["damage"] = round($user["user"]["primaryWeapon"]["damage"] * $user["user"]["Strengh"], 0);
+        $sr["damageHeavy"] = round($this->db->ancillary->getDamageBonus($user["user"]["primaryWeapon"]["typedamage"], array(1 => 0, 2 => 0, 3 => 1) ) * $sr["damage"], 0);
+        $sr["damageMedium"] = round($this->db->ancillary->getDamageBonus($user["user"]["primaryWeapon"]["typedamage"], array(1 => 0, 2 => 1, 3 => 0) ) * $sr["damage"], 0);
+        $sr["damageLight"] = round($this->db->ancillary->getDamageBonus($user["user"]["primaryWeapon"]["typedamage"], array(1 => 1, 2 => 0, 3 => 0) ) * $sr["damage"], 0);
+
+        $sr["armor"] = round($user["totalArmor"] * $user["user"]["Defence"], 0);
+        $sr["armorPiercing"] = round($this->db->ancillary->getDamageBonus("1", $user["armorTypes"]) * $sr["armor"] , 0);
+        $sr["armorCutting"] = round($this->db->ancillary->getDamageBonus("2", $user["armorTypes"]) * $sr["armor"] , 0);
+        $sr["armorMaces"] = round($this->db->ancillary->getDamageBonus("3", $user["armorTypes"]) * $sr["armor"] , 0);
+        return $this->getReplaceTemplate($sr, "damageInformation");
+    }
+
+	private function getEquipment($array = false){
 		for($i = 1; $i < count($this->inventory); $i++){
-			$invItem = unserialize($this->inventory["slot$i"]);
-			if($invItem["hash"] == $this->user["primaryWeapon"]){
-				$sr["primaryWeapon"] = $invItem["id"];
-				$sr["slotPrim"] = $i;
-				$sr["hashPrim"] = $invItem["hash"];
-			}
-			if($invItem["hash"] == $this->user["secondaryWeapon"]){
-				$sr["secondaryWeapon"] = $invItem["id"];
-				$sr["slotSec"] = $i;
-				$sr["hashSec"] = $invItem["hash"];
-			}
-			if($invItem["hash"] == $this->user["armor"]){
-				$sr["armor"] = $invItem["id"];
-				$sr["slotArmor"] = $i;
-				$sr["hashArmor"] = $invItem["hash"];
-			}
-			if($invItem["hash"] == $this->user["helmet"]){
-				$sr["helmet"] = $invItem["id"];
-				$sr["slotHelmet"] = $i;
-				$sr["hashHelmet"] = $invItem["hash"];
-			}
-			if($invItem["hash"] == $this->user["bracers"]){
-				$sr["bracers"] = $invItem["id"];
-				$sr["slotBracers"] = $i;
-				$sr["hashBracers"] = $invItem["hash"];
-			}
-			if($invItem["hash"] == $this->user["leggings"]){
-				$sr["leggings"] = $invItem["id"];
-				$sr["slotLeggings"] = $i;
-				$sr["hashLeggings"] = $invItem["hash"];
-			}
+            if($this->inventory["slot$i"] != "0" and $this->inventory["slot$i"] != "999") {
+                $invItem = unserialize($this->inventory["slot$i"]);
+                if ($invItem["hash"] == $this->user["primaryWeapon"]) {
+                    $sr["primaryWeapon"] = $invItem["id"];
+                    $sr["slotPrim"] = $i;
+                    $sr["hashPrim"] = $invItem["hash"];
+                }
+                if ($invItem["hash"] == $this->user["secondaryWeapon"]) {
+                    $sr["secondaryWeapon"] = $invItem["id"];
+                    $sr["slotSec"] = $i;
+                    $sr["hashSec"] = $invItem["hash"];
+                }
+                if ($invItem["hash"] == $this->user["armor"]) {
+                    $sr["armor"] = $invItem["id"];
+                    $sr["slotArmor"] = $i;
+                    $sr["hashArmor"] = $invItem["hash"];
+                }
+                if ($invItem["hash"] == $this->user["helmet"]) {
+                    $sr["helmet"] = $invItem["id"];
+                    $sr["slotHelmet"] = $i;
+                    $sr["hashHelmet"] = $invItem["hash"];
+                }
+                if ($invItem["hash"] == $this->user["bracers"]) {
+                    $sr["bracers"] = $invItem["id"];
+                    $sr["slotBracers"] = $i;
+                    $sr["hashBracers"] = $invItem["hash"];
+                }
+                if ($invItem["hash"] == $this->user["leggings"]) {
+                    $sr["leggings"] = $invItem["id"];
+                    $sr["slotLeggings"] = $i;
+                    $sr["hashLeggings"] = $invItem["hash"];
+                }
+            }
 		}
 		if($this->user["primaryWeapon"] == "0"){
 			$sr["primaryWeapon"] = "primaryWeapon";
@@ -90,7 +106,10 @@ class FrontPageContent extends Modules {
 		}
         //sadfasdfsad
 		$text = $this->getReplaceTemplate($sr, "equipment");
-		return $text;
+        if(!$array)
+		    return $text;
+        else
+            return $sr;
 	}
 	
 	/*private function dirSmth($dir, $margin){
@@ -118,7 +137,7 @@ class FrontPageContent extends Modules {
 		return $mda;
 	}*/
 	
-	protected function getCharacteristics(){
+	private function getCharacteristics(){
 		$dir = "lib";
 		$strengh = $this->user["Strengh"];
 		$defence = $this->user["Defence"];
@@ -141,16 +160,15 @@ class FrontPageContent extends Modules {
 		return $text;
 	}
 	
-	protected function getInventory(){
-		$count = 0;	
-		$house = $this->db->getAllOnField("user_house", "id", $this->user["id"], "", "");
-		$countInv = $house["warehouse"] * 2;
+	private function getInventory(){
+		//$house = $this->db->getAllOnField("user_house", "id", $this->user["id"], "", "");
 		$inventory = $this->inventory;
 		
 		//Сортировка инвентаря
 		$edit = false; 		//Признак того, что распложение вещей изменилось
-		for($x = 1; $x < count($inventory); $x++){
-			for($i = 1;$i < count($inventory); $i++){
+        $count = count($inventory);
+		for($x = 1; $x < $count; $x++){
+			for($i = 1;$i < $count; $i++){
 				$a = $i + 1;
 				if($inventory["slot$i"] == "0" and $inventory["slot$a"] != "999" and $inventory["slot$a"] != "0" and $i < 24){
 					$inventory["slot$i"] = $inventory["slot$a"];
@@ -171,7 +189,7 @@ class FrontPageContent extends Modules {
 		}
 		
 		//Сам инвентарь
-		for($i = 1; $i < count($inventory); $i++){
+		for($i = 1; $i < $count; $i++){
 			if($inventory["slot$i"] != "0" and $inventory["slot$i"] != "999"){
 				$invItem = unserialize($inventory["slot$i"]);
 				$sr["show"] = 1;
@@ -239,22 +257,5 @@ class FrontPageContent extends Modules {
 			$dlina = round($dlina, 0);
 			return $dlina;
 	}
-}
-//--------------------------------------------------------------------------------------------------------------------------------------------------
-function FizzBuzz($triggers = array("Fizz" => "(\$i % 3 == 0)", "Buzz" => "(\$i % 5 == 0)"), $min = 1, $max = 100 ){
-		for( $i = $min; $i <= $max; $i++){
-			$text = "";
-			foreach($triggers as $key => $value){
-				eval("\$mda =".$value.";");
-				if(is_numeric($text))
-					$text = "";
-				if($mda)
-					$text .= $key;
-				elseif($text == "")
-					$text = $i;
-			}
-			$global .= $text.", ";
-		}
-		echo substr($global,0, -2);
 }
 ?>

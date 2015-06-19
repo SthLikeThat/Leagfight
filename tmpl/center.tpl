@@ -53,6 +53,9 @@
 	<div class="inventory" id="invPotions">
 		%invPotions%
 	</div>
+    <div class="damageInformation">
+        %damageInformation%
+    </div>
 	
 	
 	
