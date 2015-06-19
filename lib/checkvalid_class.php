@@ -138,21 +138,25 @@ class CheckValid{
 		if (strlen($string) > $max_length) return false;
 		return true;
 	}
-	
+
+    public function generatorFilters($objects){
+        foreach($objects as $object)
+            yield $object->errors;
+    }
+
 	public function checkRegistration($login, $email, $password){
         $errors = array();
-
         $checkingSQL = new checkSQL($login, $email, $password);
         $errors = array_merge($errors, $checkingSQL->errors);
         if(count($errors))
             return $errors;
 
-        $checkingLength = new checkLength($login, $email, $password);
-        $errors = array_merge($errors, $checkingLength->errors);
-
-        $otherChecking = new otherChecking($login, $email, $password, $this->db);
-        $errors = array_merge($errors, $otherChecking->errors);
-
+        $filters = array(new checkLength($login, $email, $password),
+            new otherChecking($login, $email, $password, $this->db)
+        );
+        $allFilters = $this->generatorFilters($filters);
+        foreach($allFilters as $newError)
+            $errors = array_merge($errors, $newError);
 		return $errors;
 	}
 }

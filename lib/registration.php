@@ -24,7 +24,7 @@ class Rega{
 		if ($_SERVER['REQUEST_METHOD'] == 'POST'){
 			$check = $this->valid->checkRegistration($login, $email, $password);
             if(count($check) == 0){
-				$password = $this->valid->hashPassword($password);
+				/*$password = $this->valid->hashPassword($password);
 				$link = $this->getLink();
 				$this->mailMe($email, $link);
 				$query = "INSERT INTO `smgys_users` (email, login, password, confirmed) VALUES ('$email', '$login', '$password', '$link')";
@@ -41,8 +41,8 @@ class Rega{
                 $result_set = $this->db->mysqli->commit();
 				if($result_set == true){
                     echo "OK";
-				}
-
+				}*/
+                echo "OK";
 			}
 			else{
 				foreach($check as $error)
