@@ -18,6 +18,7 @@ class Ancillary{
     }
 
     public function getAllArmors($user){
+        //типа изменение
         $where = "";
         $limit = 0;
         if(is_array($user["armor"])){
