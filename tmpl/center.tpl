@@ -8,7 +8,7 @@
 		<div id="addSomeStats" >
 			<form name="characteristics" id="characteristics">
 				<table>
-				<tr><td> Скидка: </td> <td> %discount%% </td> <td colspan="2" > <a href="#" style="width:100%;" onclick="addSomeStats('show')" > Назад </a> </td></tr>
+				<tr><td> Скидка: </td> <td> %discount%% </td> <td colspan="2" > <a href="#" style="width:90%;" onclick="addSomeStats('show')" > Назад </a> </td></tr>
 				
 				<tr><td> <img src="image_char/image/strengh.png" height="20"/> </td>
 				<td> <a href="#" onclick="delInputValue('strengh','max')"> <img src="images/delAll.png" height="20"/> </a> <a href="#" onclick="delInputValue('strengh',10)"><img src="images/del10.png" height="20"/></a> <a href="#" onclick="delInputValue('strengh',1)"> <img src="images/del1.png" height="20"/></a> </td>
@@ -36,22 +36,23 @@
 				<td> <a href="#" onclick="addInputValue('mastery',1)"> <img src="images/pump1.png" height="20"/> </a> <a href="#" onclick="addInputValue('mastery',10)"> <img src="images/pump10.png" height="20"/> </a> <a href="#" onclick="addInputValue('mastery','max')"> <img src="images/pumpAll.png" height="20"/> </a> </td></tr>
 				
 				
-				<tr> <td> <img src="images/coinBlack.png" height="20"/> </td> <td> <div id="pumpPrice"> 0 </div> </td><td colspan="2" ><a href="#" style="width:100%;" onclick="sendChar('yes')"> Тренироваться </a>  </td></tr>
+				<tr> <td> <img src="images/coinBlack.png" height="20"/> </td> <td> <div id="pumpPrice"> 0 </div> </td><td colspan="2" ><a href="#" style="width:90%;" onclick="sendChar('yes')"> Тренироваться </a>  </td></tr>
 				</table>
 			</form>
 		</div>
 	</div>
-	
-	<div class="clothing" id="clothing">
-		%equipment%
-	</div>
-	
-	<div class="inventory" id="inventory">
-		%inventory%
-	</div>
-	
-	<div class="inventory" id="invPotions">
-		%invPotions%
+	<div id ="invBlock">
+		<div class="clothing" id="clothing">
+			%equipment%
+		</div>
+		
+		<div class="inventory" id="inventory">
+			%inventory%
+		</div>
+		
+		<div class="inventory" id="invPotions">
+			%invPotions%
+		</div>
 	</div>
     <div class="damageInformation">
         %damageInformation%

@@ -43,7 +43,7 @@ li{
 /*	modules START	*/
 
 .currentMenuItem{
-	background-color:rgb(140,215,140);
+	background-color:rgb(160, 201, 160);
 }
 
 .wrapper {
@@ -55,9 +55,9 @@ li{
 }
 
 .header {
-	background: rgba(0,0,0,0.2);
+	background: rgb(160, 201, 160);
 	width:96%;
-	height:11.4%;
+	height: 73px;
 	float:right;
 	text-align:center;
 }
@@ -191,7 +191,7 @@ li{
   width:25%;
   color: #fff; 
   text-decoration: none; 
-  background: rgba(190, 190, 190, 0.8); 
+  #background: rgba(190, 190, 190, 0.8); 
   padding: 10%;
   padding-left:25%;
   padding-right: 50%;
@@ -203,6 +203,7 @@ li{
     position: relative; /* Относительное позиционирование */
 	width:100%;
 }
+
 
 .photo:hover:after {
     content: attr(data-title); /* Выводим текст */
@@ -231,7 +232,7 @@ a:active { background: rgb(119, 136, 153); }
 
 .resource{
 	font-size:30px;
-	background-color: rgba(135,180,135,0.7);
+	background-color: white;
 	padding:2px;
 	float:left;
 	margin-top:1%;
@@ -330,29 +331,28 @@ a:active { background: rgb(119, 136, 153); }
 }
 
 .minor{
-	background: rgba(145,180,145,0.9);
 	float:left;
 	width:100%;
 	margin-left:5%;
-	border-radius:10px;
+	border-radius: 0 0 10px 10px;
 	height:70px;
 }
 
 .minorResource{
-	margin-top:4px;
+	margin-top:2px;
 }
 
 .counter{
 	float:left;
 	width:100%;
-	background: rgba(145,180,145,0.9);
+	#background: white;
 	margin-left:5%;
-	border-radius:10px 0 0 10px;
+	border-radius:0 0 0 10px;
 	height:70px;
 }
 
 .counter1{
-	margin-top:4px;
+	margin-top:2px;
 }
 
 .topItem{
@@ -469,6 +469,10 @@ a:active { background: rgb(119, 136, 153); }
 	cursor: default;
 }
 
+.delete:hover, .displayPutOn:hover, .displayPutOff:hover{
+	background-color: black;
+}
+
 .avatarimg{
 	height:100%;
 	width:100%;
@@ -486,8 +490,8 @@ a:active { background: rgb(119, 136, 153); }
 .avatar{
 	float:left;
 	margin-left:4%;
-	background: rgba(0,0,0,0.05);
-	width:18%;
+	border-right:1px solid black;
+	width:17.9%;
 }
 
 #addSomeStats input{
@@ -519,16 +523,10 @@ a:active { background: rgb(119, 136, 153); }
 #addSomeStats a:hover { background: rgb(140, 181, 140); } 
 #addSomeStats a:active { background: rgb(119, 136, 119); }  
 
-.addSomeStatsBigButton a{
-	width:100%;
-}
-
 .clothing{
 	left:0;
 	top:0;
-	float:left;
-	background: rgba(0,0,0,0.05);
-	width:14%;
+	width:17%;
 }
 
 .clothimg{
@@ -542,10 +540,14 @@ a:active { background: rgb(119, 136, 153); }
 	height:60px;
 }
 
+#invBlock{
+	border-bottom:1px solid black;
+	width:78%;
+	float:right;
+}
+
 .inventory{
-	background: rgba(0,0,0,0.05);
-	width:64%;
-	float:left;
+	width:100%;
 	list-style:none;
 }
 
@@ -1348,7 +1350,7 @@ width:60px;
 
 .clanSearch a:hover{
 	background-color: rgba(0,0,0,0);
-	text-decoration: underline; 
+	text-decoration: none; 
 }
 
 .powerSearch{

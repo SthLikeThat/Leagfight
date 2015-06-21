@@ -41,6 +41,9 @@ abstract class Modules extends Template{
 		$sr["menu"] = $this->getFileContent("mainMenu");
 		$sr["header"] = $this->getHeader();
 		$sr["center"] = $this->getCenter();
+		if($this->data["ajax"] == 1)
+			return $this->getReplaceTemplate($sr, "mainWrapper");
+		else
 		return $this->getReplaceTemplate($sr, "main");
 	}
 	
