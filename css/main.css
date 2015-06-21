@@ -9,7 +9,7 @@ table{
     margin: 0 auto;
     color:grey;
     text-align:center;
-    margin-top:10%;
+    margin-top:5%;
     padding: 15px;
 	background-color: rgb(160,201,160);
 }
@@ -24,6 +24,14 @@ table tr td{
     right:0;
     padding:10px;
     position: fixed;
+	display:none;
+}
+
+.errorBlock{
+	margin-top:5px;
+	padding:5px;
+	color: #D63301;
+	background-color: #FFCCBA;
 }
 
 #mess{
@@ -58,14 +66,12 @@ a:hover {
   padding: 10px;
   border: 1px solid #000;
   border-radius: 10px;
-  color: #ccc;
   transition: .5s linear;
 }
 
 .backlight:focus {
   outline: none;
   box-shadow: inset 0 1px 3px 1px  rgba(0,0,0,.5), inset 0 0 0 60px rgba(220,220,220,0), 0 1px rgba(255,255,255,.08);
-  color: rgb(225, 225, 225);
 }
 
 

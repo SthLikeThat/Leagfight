@@ -46,7 +46,7 @@ class Rega{
 			}
 			else{
 				foreach($check as $error)
-					echo $error."<br/>";
+					echo "<div class='errorBlock'><img src='css/validation.png' height=15> ".$error."</div>";
 			}
 		}
 	}
