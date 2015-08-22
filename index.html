@@ -1,0 +1,725 @@
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<title>Главная страницы</title>
+	<link href="css/main_style.css" rel="stylesheet">
+	
+	<link href="css/bootstrap.css" rel="stylesheet">
+	<link href="css/bootstrap_my.css" rel="stylesheet">
+	<link href="css/font-awesome.css" rel="stylesheet">
+	
+	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+	<script src="js/bootstrap.js"></script>
+	<script src="js/scripta.js"></script>
+</head>
+
+<body>
+    <span id="tooltip"></span>
+    <div class="navbar navbar-inverse navbar-static-top leag-navbar">
+		<div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" onclick='$("#responsive-menu").animate({width:"toggle"},350);'>
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+            </div>
+			<div class="collapse navbar-collapse navbar-fixed-left" id="responsive-menu">
+				<ul class="nav navbar-nav leag_navbar_ul">
+					<li data-title="Персонаж">
+						<a href="index.php" >
+							<img src="images/menu_items/user.png">
+						</a>
+					</li>
+					<li data-title="Почта">
+						<a href="/?view=mail&amp;type=0" >
+							<img src="images/menu_items/mail.png" >
+						</a>
+					</li>
+					<li data-title="Поиск">
+						<a href="/?view=search&amp;value=&amp;sort=login&amp;desc=down&amp;clanSort=name&amp;clanDesc=down">
+							<img src="images/menu_items/search.png" >
+						</a>
+					</li>
+					<li data-title="Магазин">
+						<a href="/?view=shop&amp;thing=1&amp;typeSort=0&amp;typedamageSort=0">
+							<img src="images/menu_items/shop.png">
+						</a>
+					</li>
+					<li data-title="Арена">
+						<a href="/?view=arena">
+							<img src="images/menu_items/arena.png">
+						</a>
+					</li>
+					<li data-title="Город">
+						<a href="/?view=town&amp;type=house">
+							<img src="images/menu_items/town.png">
+						</a>
+					</li>
+					<li data-title="Клан">
+						<a href="/?view=town&amp;type=clan">
+							<img src="images/menu_items/clan.png">
+						</a>
+					</li>
+					<li data-title="Статистика">
+						<a href="/?view=statistic">
+							<img src="images/menu_items/statistic.png" >
+						</a>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</div>
+	
+    <div class="main-content">
+        <div class="full-container navbar navbar-default" style="background: #A0C9A0;">
+            <div class="col-lg-2 col-xs-4 header-col">
+                <div class="progress leag-progress-money" data-title="67 / 119">
+                   <div class="progress-bar-icon-left">
+                        <img src="image_char/image/lvl.png" height="17"> 
+                        7
+                    </div>
+                    <div class="progress-bar progress-bar-exp" style="min-width: 2%; width:10%;"></div>
+                </div>
+                <div class="progress leag-progress-money bg-resource-block">
+                    <div class="resource-icon">
+                        <img src="images/coinBlack.png">
+                    </div>
+                    <div class="resource-number">
+                        6420
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-2 col-xs-4 header-col">
+                <div class="progress leag-progress-money" data-title="9000 / 18508">
+                   <div class="progress-bar-icon-left">
+                        <img src="image_char/image/hp.png" height="17"> 
+                    </div>
+                    <div class="progress-bar progress-bar-hp" style="min-width: 2%; width:50%;"></div>
+                </div>
+                <div class="progress leag-progress-money bg-resource-block">
+                    <div class="resource-icon">
+                        <img src="images/diamond.png">
+                    </div>
+                    <div class="resource-number">
+                        97383
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-2 col-xs-4 header-col">
+                <div class="progress leag-progress-money" data-title="1ч. 25мин. / 6 часов">
+                   <div class="progress-bar-icon-left" >
+                        <img src="images/sleep.png" height="17"> 
+                    </div>
+                    <div class="progress-bar progress-bar-sleep" style="min-width: 2%; width:20%;"></div>
+                </div>
+                <div class="progress leag-progress-money bg-resource-block">
+                    <div class="resource-icon">
+                        <img src="images/euro.png">
+                    </div>
+                    <div class="resource-number">
+                        15
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-2 col-xs-4 header-col">
+                <div class="btn-toolbar">
+                    <div class="btn-group btn-group-vertical mini-resource-group">
+                        <a class="btn btn-default">
+                            <img src="images/tournament_icon.png" data-title="Турнирный билет">
+                            48
+                        </a>
+                        <a class="btn btn-default">Ресурс</a>
+                        <a class="btn btn-default">Ресурс</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-2 col-xs-4 header-col">
+                 <div class="btn-toolbar">
+                    <div class="btn-group btn-group-vertical mini-resource-group">
+                        <a class="btn btn-default">Ресурс</a>
+                        <a class="btn btn-default">Ресурс</a>
+                        <a class="btn btn-default">Ресурс</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-2 col-xs-4 header-col">
+                <div class="btn-toolbar">
+                    <div class="btn-group btn-group-vertical mini-resource-group">
+                        <a class="btn btn-default">Время до нападения</a>
+                        <a class="btn btn-default">Время защиты</a>
+                        <a class="btn btn-default">Время работы</a>
+                    </div>
+                </div>
+            </div>
+         </div>
+         <div class="full-container" style="padding:2px;">
+            <div class="row my-row">
+                <div class="col-lg-4" style="padding: 0px;">
+                     <div class="col-lg-6 col-md-6 col-xs-6 navbar navbar-default navbar-width" style="padding: 5px;">
+                            <div class="name-user">
+                             e33
+                         </div>
+
+                         <div class="avatar-user">
+                             <img src="images/avatars/1.png">
+                         </div>
+
+                         <div class="characteristics-block">
+                            <div class="progress leag-progress-char">
+                               <div class="progress-bar-icon-left">
+                                    <img src="image_char/image/strengh.png" height="25">
+                                </div>
+                                <div class="char-number">
+                                    132
+                                </div>
+                                <div class="progress-bar progress-bar-char" style="min-width: 2%; width:99%;"></div>
+                            </div>
+
+                            <div class="progress leag-progress-char">
+                               <div class="progress-bar-icon-left">
+                                    <img src="image_char/image/defence.png" height="25">
+                                </div>
+                                <div class="char-number">
+                                    128
+                                </div>
+                                <div class="progress-bar progress-bar-char" style="min-width: 2%; width:96%;"></div>
+                            </div>
+
+                            <div class="progress leag-progress-char">
+                               <div class="progress-bar-icon-left">
+                                    <img src="image_char/image/agility.png" height="25">
+                                </div>
+                                <div class="char-number">
+                                    133
+                                </div>
+                                <div class="progress-bar progress-bar-char" style="min-width: 2%; width:100%;"></div>
+                            </div>
+                            <div class="progress leag-progress-char">
+                               <div class="progress-bar-icon-left">
+                                    <img src="image_char/image/physique.png" height="25">
+                                </div>
+                                <div class="char-number">
+                                    108
+                                </div>
+                                <div class="progress-bar progress-bar-char" style="min-width: 2%; width:81%;"></div>
+                            </div>
+                            <div class="progress leag-progress-char">
+                               <div class="progress-bar-icon-left">
+                                    <img src="image_char/image/mastery.png" height="25">
+                                </div>
+                                <div class="char-number">
+                                    102
+                                </div>
+                                <div class="progress-bar progress-bar-char" style="min-width: 2%; width:77%;"></div>
+                            </div>
+                         </div>
+                         <div class="name-user">
+                            <img src="image_char/image/power.png" height="20">
+                             1070
+                         </div>
+                     </div>
+                     <div class="col-lg-6 col-md-6 col-xs-6 navbar navbar-default navbar-width">
+                          <div class="col-lg-12" style="padding: 0;">
+                               <div class="row-inventory">
+                                    <div class="inventory-item" data-on="1"  data-show="1">
+                                        <img src="images/cloth/mini/3.png" height="60">
+                                        <div class="inventory-control"> 
+                                            Снять
+                                        </div>                
+                                    </div>
+                                     <div class="inventory-item" data-on="1"  data-show="1">
+                                        <img src="images/cloth/mini/502.png" height="60">
+                                        <div class="inventory-control"> 
+                                            Снять
+                                        </div>                
+                                    </div>
+                                </div>
+
+                                 <div class="row-inventory" >
+                                    <div class="inventory-item" data-on="1"  data-show="1">
+                                        <img src="images/cloth/mini/505.png" height="60">
+                                        <div class="inventory-control"> 
+                                            Снять
+                                        </div>                
+                                    </div>
+                                     <div class="inventory-item" data-on="1"  data-show="1">
+                                        <img src="images/cloth/mini/508.png" height="60">
+                                        <div class="inventory-control"> 
+                                            Снять
+                                        </div>                
+                                    </div>
+                                </div>
+
+                                 <div class="row-inventory">
+                                    <div class="inventory-item" data-on="1"  data-show="1">
+                                        <img src="images/cloth/mini/503.png" height="60">
+                                        <div class="inventory-control"> 
+                                            Снять
+                                        </div>                
+                                    </div>
+                                     <div class="inventory-item" data-on="1"  data-show="1">
+                                        <img src="images/cloth/mini/504.png" height="60">
+                                        <div class="inventory-control"> 
+                                            Снять
+                                        </div>                
+                                    </div>
+                                </div>
+                             </div>
+                          <div class="col-lg-12 col-xs-12" style="padding: 0; text-align: center;">
+                 <div class="col-lg-6 col-xs-6" style="padding: 2px;">
+                      <div class="btn-group btn-group-vertical statistic-group">
+                        <a class="btn btn-default" data-title="Чистый урон">
+                            <img src="image_char/image/damage.png" height="25">
+                            94
+                        </a>
+                        <a class="btn btn-default" data-title="Урон по тяжелой броне">
+                            <img src="image_char/image/damage.png" height="25"> <img src="image_char/image/heavy.png" height="25">
+                            71
+                        </a>
+                        <a class="btn btn-default" data-title="Урон по средней броне">
+                          <img src="image_char/image/damage.png" height="25"> <img src="image_char/image/medium.png" height="25">
+                          118
+                        </a>
+                         <a class="btn btn-default" data-title="Урон по лёгкой броне">
+                          <img src="image_char/image/damage.png" height="25"> <img src="image_char/image/light.png" height="25">
+                          94
+                        </a>
+                    </div>
+                 </div>
+                 <div class="col-lg-6 col-xs-6" style="padding: 2px;">
+                     <div class="btn-group btn-group-vertical statistic-group">
+                        <a class="btn btn-default" data-title="Полная защита">
+                            <img src="image_char/image/armor.png" height="25">
+                            89
+                        </a>
+                        <a class="btn btn-default" data-title="Защита от колющего">
+                            <img src="image_char/image/armor.png" height="25"> <img src="image_char/image/piercing.png" height="25">
+                            89
+                        </a>
+                        <a class="btn btn-default" data-title="Защита от режущего">
+                          <img src="image_char/image/armor.png" height="25"> <img src="image_char/image/cutting.png" height="25">
+                          67
+                        </a>
+                         <a class="btn btn-default" data-title="Защита от дробящего">
+                          <img src="image_char/image/armor.png" height="25"> <img src="image_char/image/maces.png" height="25">
+                          67
+                        </a>
+                    </div>
+                 </div>
+             </div>
+                        </div>
+                 </div>
+                 <div class="col-lg-7 col-md-12 col-xs-12 navbar navbar-default navbar-width main-inventory margin-fix">
+                       <div class="row-inventory">
+                            <div class="inventory-item" data-on="0"  data-show="1">
+                                <img src="images/cloth/mini/501.png" height="60">
+                                <div class="inventory-control"> 
+                                    Снять
+                                </div>    
+                                <div class="inventory-control"> 
+                                    Надеть
+                                </div>       
+                                 <div class="inventory-control-delete"> 
+                                     <i class="glyphicon glyphicon-remove"></i>
+                                </div>               
+                            </div>
+                             <div class="inventory-item" data-on="1"  data-show="1">
+                                <img src="images/cloth/mini/502.png" height="60">
+                                <div class="inventory-control"> 
+                                    Снять
+                                </div>   
+                                <div class="inventory-control"> 
+                                    Надеть
+                                </div>  
+                                 <div class="inventory-control-delete"> 
+                                     <i class="glyphicon glyphicon-remove"></i>
+                                </div>                    
+                            </div>
+                             <div class="inventory-item" data-on="1"  data-show="1">
+                                <img src="images/cloth/mini/504.png" height="60">
+                                <div class="inventory-control"> 
+                                    Снять
+                                </div>   
+                                <div class="inventory-control"> 
+                                    Надеть
+                                </div>   
+                                 <div class="inventory-control-delete"> 
+                                     <i class="glyphicon glyphicon-remove"></i>
+                                </div>                   
+                            </div>
+                             <div class="inventory-item" data-on="1"  data-show="1">
+                                <img src="images/cloth/mini/505.png" height="60">
+                                <div class="inventory-control"> 
+                                    Снять
+                                </div>   
+                                <div class="inventory-control"> 
+                                    Надеть
+                                </div>    
+                                 <div class="inventory-control-delete"> 
+                                     <i class="glyphicon glyphicon-remove"></i>
+                                </div>                  
+                            </div>
+                             <div class="inventory-item" data-on="1"  data-show="1">
+                                <img src="images/cloth/mini/503.png" height="60">
+                                <div class="inventory-control"> 
+                                    Снять
+                                </div>   
+                                <div class="inventory-control"> 
+                                    Надеть
+                                </div>                   
+                            </div>
+                             <div class="inventory-item" data-on="0"  data-show="1">
+                                <img src="images/cloth/mini/506.png" height="60">
+                                <div class="inventory-control"> 
+                                    Снять
+                                </div>   
+                                <div class="inventory-control"> 
+                                    Надеть
+                                </div>                   
+                            </div>
+                             <div class="inventory-item" data-on="1"  data-show="1">
+                                <img src="images/cloth/mini/508.png" height="60">
+                                <div class="inventory-control"> 
+                                    Снять
+                                </div>   
+                                <div class="inventory-control"> 
+                                    Надеть
+                                </div>   
+                                 <div class="inventory-control-delete"> 
+                                     <i class="glyphicon glyphicon-remove"></i>
+                                </div>                   
+                            </div>
+                             <div class="inventory-item" data-on="1"  data-show="1">
+                                <img src="images/cloth/mini/3.png" height="60">
+                                <div class="inventory-control"> 
+                                    Снять
+                                </div>   
+                                <div class="inventory-control"> 
+                                    Надеть
+                                </div>    
+                                 <div class="inventory-control-delete"> 
+                                     <i class="glyphicon glyphicon-remove"></i>
+                                </div>                  
+                            </div>
+                            <div class="inventory-item" data-on="0"  data-show="1">
+                                <img src="images/cloth/mini/4.png" height="60">
+                                <div class="inventory-control"> 
+                                    Снять
+                                </div>   
+                                <div class="inventory-control"> 
+                                    Надеть
+                                </div>  
+                                 <div class="inventory-control-delete"> 
+                                     <i class="glyphicon glyphicon-remove"></i>
+                                </div>                    
+                            </div>
+                            <div class="inventory-item" data-on="0"  data-show="1">
+                                <img src="images/cloth/mini/4.png" height="60">
+                                <div class="inventory-control"> 
+                                    Снять
+                                </div>   
+                                <div class="inventory-control"> 
+                                    Надеть
+                                </div>    
+                                 <div class="inventory-control-delete"> 
+                                     <i class="glyphicon glyphicon-remove"></i>
+                                </div>                  
+                            </div>
+                        
+                       
+                            <div class="inventory-item" data-on="0" data-show="0">
+                                <img src="images/cloth/mini/0.png" height="60">
+                                <div class="inventory-control"> 
+                                    Снять
+                                </div>   
+                                <div class="inventory-control"> 
+                                    Надеть
+                                </div>   
+                                 <div class="inventory-control-delete"> 
+                                     <i class="glyphicon glyphicon-remove"></i>
+                                </div>                   
+                            </div>
+                            <div class="inventory-item" data-on="0" data-show="0">
+                                <img src="images/cloth/mini/0.png" height="60">
+                                <div class="inventory-control"> 
+                                    Снять
+                                </div>   
+                                <div class="inventory-control"> 
+                                    Надеть
+                                </div>                   
+                            </div>
+                            <div class="inventory-item" data-on="0" data-show="0">
+                                <img src="images/cloth/mini/0.png" height="60">
+                                <div class="inventory-control"> 
+                                    Снять
+                                </div>   
+                                <div class="inventory-control"> 
+                                    Надеть
+                                </div>                   
+                            </div>
+                            <div class="inventory-item" data-on="0" data-show="0">
+                                <img src="images/cloth/mini/0.png" height="60">
+                                <div class="inventory-control"> 
+                                    Снять
+                                </div>   
+                                <div class="inventory-control"> 
+                                    Надеть
+                                </div>                   
+                            </div>
+                            <div class="inventory-item" data-on="0" data-show="0">
+                                <img src="images/cloth/mini/999.png" height="60">
+                                <div class="inventory-control"> 
+                                    Снять
+                                </div>   
+                                <div class="inventory-control"> 
+                                    Надеть
+                                </div>                   
+                            </div>
+                            <div class="inventory-item" data-on="0" data-show="0">
+                                <img src="images/cloth/mini/999.png" height="60">
+                                <div class="inventory-control"> 
+                                    Снять
+                                </div>   
+                                <div class="inventory-control"> 
+                                    Надеть
+                                </div>                   
+                            </div>
+                            <div class="inventory-item" data-on="0" data-show="0">
+                                <img src="images/cloth/mini/999.png" height="60">
+                                <div class="inventory-control"> 
+                                    Снять
+                                </div>   
+                                <div class="inventory-control"> 
+                                    Надеть
+                                </div>                   
+                            </div>
+                            <div class="inventory-item" data-on="0" data-show="0">
+                                <img src="images/cloth/mini/999.png" height="60">
+                                <div class="inventory-control"> 
+                                    Снять
+                                </div>   
+                                <div class="inventory-control"> 
+                                    Надеть
+                                </div>                   
+                            </div>
+                            <div class="inventory-item" data-on="0" data-show="0">
+                                <img src="images/cloth/mini/999.png" height="60">
+                                <div class="inventory-control"> 
+                                    Снять
+                                </div>   
+                                <div class="inventory-control"> 
+                                    Надеть
+                                </div>                   
+                            </div>
+                            <div class="inventory-item" data-on="0" data-show="0">
+                                <img src="images/cloth/mini/999.png" height="60">
+                                <div class="inventory-control"> 
+                                    Снять
+                                </div>   
+                                <div class="inventory-control"> 
+                                    Надеть
+                                </div>                   
+                            </div>
+                            <div class="inventory-item" data-on="0" data-show="0">
+                                <img src="images/cloth/mini/999.png" height="60">
+                                <div class="inventory-control"> 
+                                    Снять
+                                </div>   
+                                <div class="inventory-control"> 
+                                    Надеть
+                                </div>                   
+                            </div>
+                            <div class="inventory-item" data-on="0" data-show="0">
+                                <img src="images/cloth/mini/999.png" height="60">
+                                <div class="inventory-control"> 
+                                    Снять
+                                </div>   
+                                <div class="inventory-control"> 
+                                    Надеть
+                                </div>                   
+                            </div>
+                            <div class="inventory-item" data-on="0" data-show="0">
+                                <img src="images/cloth/mini/999.png" height="60">
+                                <div class="inventory-control"> 
+                                    Снять
+                                </div>   
+                                <div class="inventory-control"> 
+                                    Надеть
+                                </div>                   
+                            </div>
+                            <div class="inventory-item" data-on="0" data-show="0">
+                                <img src="images/cloth/mini/999.png" height="60">
+                                <div class="inventory-control"> 
+                                    Снять
+                                </div>   
+                                <div class="inventory-control"> 
+                                    Надеть
+                                </div>                   
+                            </div>
+                            <div class="inventory-item" data-on="0" data-show="0">
+                                <img src="images/cloth/mini/999.png" height="60">
+                                <div class="inventory-control"> 
+                                    Снять
+                                </div>   
+                                <div class="inventory-control"> 
+                                    Надеть
+                                </div>                   
+                            </div>
+                            <div class="inventory-item" data-on="0" data-show="0">
+                                <img src="images/cloth/mini/999.png" height="60">
+                                <div class="inventory-control"> 
+                                    Снять
+                                </div>   
+                                <div class="inventory-control"> 
+                                    Надеть
+                                </div>                   
+                            </div>
+                            <div class="inventory-item" data-on="0" data-show="0">
+                                <img src="images/cloth/mini/999.png" height="60">
+                                <div class="inventory-control"> 
+                                    Снять
+                                </div>   
+                                <div class="inventory-control"> 
+                                    Надеть
+                                </div>                   
+                            </div>
+                            <div class="inventory-item" data-on="0" data-show="0">
+                                <img src="images/cloth/mini/999.png" height="60">
+                                <div class="inventory-control"> 
+                                    Снять
+                                </div>   
+                                <div class="inventory-control"> 
+                                    Надеть
+                                </div>                   
+                            </div>
+                            <div class="inventory-item" data-on="0" data-show="0">
+                                <img src="images/cloth/mini/999.png" height="60">
+                                <div class="inventory-control"> 
+                                    Снять
+                                </div>   
+                                <div class="inventory-control"> 
+                                    Надеть
+                                </div>                   
+                            </div>
+                            <div class="inventory-item" data-on="0" data-show="0">
+                                <img src="images/cloth/mini/999.png" height="60">
+                                <div class="inventory-control"> 
+                                    Снять
+                                </div>   
+                                <div class="inventory-control"> 
+                                    Надеть
+                                </div>                   
+                            </div>
+                     </div>
+                    
+                 </div>
+             <div class="col-lg-7 col-xs-12 navbar navbar-default navbar-width main-inventory margin-fix">
+                <div class="row-inventory">
+                     <div class="inventory-item" data-on="1" data-show="1">
+                        <img src="images/cloth/mini/sandwich.png" height="60">
+                        <div class="inventory-control"> 
+                            Съесть
+                        </div>    
+                        <div class="inventory-control"> 
+                            Съесть
+                        </div>       
+                         <div class="inventory-control-delete" style="display: none;"> 
+                             <i class="glyphicon glyphicon-remove"></i>
+                        </div>               
+                    </div>
+                    <div class="inventory-item" data-on="0" data-show="0">
+                        <img src="images/cloth/mini/999.png" height="60">
+                        <div class="inventory-control"> 
+                            Снять
+                        </div>   
+                        <div class="inventory-control"> 
+                            Надеть
+                        </div>                   
+                    </div>
+                    <div class="inventory-item" data-on="0" data-show="0">
+                        <img src="images/cloth/mini/999.png" height="60">
+                        <div class="inventory-control"> 
+                            Снять
+                        </div>   
+                        <div class="inventory-control"> 
+                            Надеть
+                        </div>                   
+                    </div>
+                    <div class="inventory-item" data-on="0" data-show="0">
+                        <img src="images/cloth/mini/999.png" height="60">
+                        <div class="inventory-control"> 
+                            Снять
+                        </div>   
+                        <div class="inventory-control"> 
+                            Надеть
+                        </div>                   
+                    </div>
+                    <div class="inventory-item" data-on="0" data-show="0">
+                        <img src="images/cloth/mini/999.png" height="60">
+                        <div class="inventory-control"> 
+                            Снять
+                        </div>   
+                        <div class="inventory-control"> 
+                            Надеть
+                        </div>                   
+                    </div>
+                    <div class="inventory-item" data-on="0" data-show="0">
+                        <img src="images/cloth/mini/999.png" height="60">
+                        <div class="inventory-control"> 
+                            Снять
+                        </div>   
+                        <div class="inventory-control"> 
+                            Надеть
+                        </div>                   
+                    </div>
+                    <div class="inventory-item" data-on="0" data-show="0">
+                        <img src="images/cloth/mini/999.png" height="60">
+                        <div class="inventory-control"> 
+                            Снять
+                        </div>   
+                        <div class="inventory-control"> 
+                            Надеть
+                        </div>                   
+                    </div>
+                    <div class="inventory-item" data-on="0" data-show="0">
+                        <img src="images/cloth/mini/999.png" height="60">
+                        <div class="inventory-control"> 
+                            Снять
+                        </div>   
+                        <div class="inventory-control"> 
+                            Надеть
+                        </div>                   
+                    </div>
+                    <div class="inventory-item" data-on="0" data-show="0">
+                        <img src="images/cloth/mini/999.png" height="60">
+                        <div class="inventory-control"> 
+                            Снять
+                        </div>   
+                        <div class="inventory-control"> 
+                            Надеть
+                        </div>                   
+                    </div>
+                    <div class="inventory-item" data-on="0" data-show="0">
+                        <img src="images/cloth/mini/999.png" height="60">
+                        <div class="inventory-control"> 
+                            Снять
+                        </div>   
+                        <div class="inventory-control"> 
+                            Надеть
+                        </div>                   
+                    </div>
+                </div>
+             </div>
+             </div>
+         </div>
+    </div>
+<footer class="footer">
+    Какая то инфа
+</footer>
+</body>
+
+</html>

@@ -1,167 +1,53 @@
-﻿$(document).ready(function(){	
+$(document).ready(function(){	
 
 	var doc_w = $(window).width();
-	if(doc_w > 1024){
+    console.log(doc_w);
+	if(doc_w > 768){
 		$("[data-title]").mousemove(function (eventObject) {
 		$data_info = $(this).attr("data-title");
 		
 		$("#tooltip").text($data_info)
-                     .css({ 
-                         "top" : eventObject.pageY + 5,
-                        "left" : eventObject.pageX + 5
-                     })
-                     .show();
+         .css({ 
+             "top" : eventObject.pageY + 20,
+            "left" : eventObject.pageX + 20
+         })
+         .show();
 
-    }).mouseout(function () {
+		}).mouseout(function () {
 
-        $("#tooltip").hide()
-                     .text("")
-                     .css({
-                         "top" : 0,
-                        "left" : 0
-                     });
-		
-		/*$("#tooltip").text($data_info).show();
-
-		}).mouseout(function(){
-			$("#tooltip").hide().text("")
-		});*/
+			$("#tooltip").hide()
+             .text("")
+             .css({
+                 "top" : 0,
+                "left" : 0
+             });
 		});
 	}
-	/*
-	var urlArray = parseUrlQuery();
-	setMenuItem(urlArray);
-	
-	if(urlArray["view"] === "battleField"){
-		 $("[data-info]").mousemove(function (eventObject) {
-
-        $data_info = $(this).attr("data_info");
+    
+    $(".inventory-item").mousemove(function (eventObject) {
+        var on = $(eventObject.currentTarget).attr("data-on");
+        var show = $(eventObject.currentTarget).attr("data-show");
         
-        $("#tooltip").text($data_info)
-                     .css({ 
-                         "top" : eventObject.pageY + 5,
-                        "left" : eventObject.pageX + 5
-                     })
-                     .show();
-
-    }).mouseout(function () {
-
-        $("#tooltip").hide()
-                     .text("")
-                     .css({
-                         "top" : 0,
-                        "left" : 0
-                     });
+        if(show == "1"){
+            $(eventObject.currentTarget.childNodes[7]).show();
+            if(on == "1")
+                $(eventObject.currentTarget.childNodes[3]).show();
+                
+            else
+                $(eventObject.currentTarget.childNodes[5]).show();
+        }
+    }).mouseout(function (eventObject) {
+        var on = $(eventObject.currentTarget).attr("data-on");
+        var show = $(eventObject.currentTarget).attr("data-show");
+        
+        if(show == "1"){
+            $(eventObject.currentTarget.childNodes[7]).hide();
+            if(on == "1")
+                $(eventObject.currentTarget.childNodes[3]).hide();
+            else
+                $(eventObject.currentTarget.childNodes[5]).hide();
+        }
     });
-	
-	
-		var timer = Number(document.getElementById("timer_battle").innerHTML);
-		var mda = setInterval(function(){
-			timer--;
-			if(timer <= 0){
-				clearTimeout(mda);
-				$('#timer_battle').html("0");
-				$.ajax({
-						type: 'POST',
-						url: 'lib/massBattleFunctions.php',
-						data: {"WhatIMustDo": "updateBattle", "id": urlArray["id"]},
-						success: function(data) {
-							window.location.reload();
-						}
-					});
-			}
-			$('#timer_battle').html(timer);
-		}, 1000);
-		var information = document.querySelector("#information");
-		data = information.dataset;
-		if(data.instock == "true"){
-			var coordinates = $("#battle_information").attr("data-coordinates");
-			var course = Number($("#battle_information").attr("data-course"));
-			var position = coordinates.indexOf('_');
-			var i_coor = Number(coordinates.substring(0, position));
-			var j_coor =  Number(coordinates.substring(position + 1));
-			
-			var min_i = i_coor - course;
-			if(min_i < 1) min_i = 1;
-			var max_i = i_coor + course;
-			if(max_i > 10) max_i = 10;
-			
-			var min_j = j_coor - course;
-			if(min_j < 1) min_j = 1;
-			var max_j = j_coor + course;
-			if(max_j > 20) max_j = 20;
-			
-			if(data.league == data.turn){
-				if(data.move == "0"){
-					for( var i = min_i; i <= max_i; i++){
-						for( var j = min_j; j <= max_j; j++){
-							if( i + "_" + j != coordinates && $("#" + i + "_" + j).hasClass("field") && document.getElementById(i + "_" + j).innerHTML == "")
-								$("#" + i + "_" + j).addClass("canGo");
-						}
-					}
-				}
-			}
-			$('#battleTaible').click(function (event){
-				tag = event.target||event.srcElement;
-				if($("#" + tag.id).hasClass("canGo")){
-					$.ajax({
-						type: 'POST',
-						url: 'lib/massBattleFunctions.php',
-						data: {"WhatIMustDo": "goCoordinates", "coordinates": tag.id, "rowStand": i_coor , "columnStand": j_coor, "id": urlArray["id"]},
-						success: function(data) {
-							if(data === "OK")
-								window.location.reload();
-							else
-								$("#mess3").html(data);
-						}
-					});
-				}
-				
-				if($("#" + tag.id).hasClass("canAttack") && document.getElementById(tag.id).innerHTML != ""){
-					$.ajax({
-						type: 'POST',
-						url: 'lib/massBattleFunctions.php',
-						data: {"WhatIMustDo": "attackCoor", "coordinates": tag.id, "rowStand": i_coor , "columnStand": j_coor, "id": urlArray["id"]},
-						success: function(data) {
-								$("#mess3").html(data);
-						}
-					});
-				}
-			});
-		}
-		if(data.instock == "false")
-			setSpawn(data.league);
-		if (data.instock == "ready"){
-			$('#battleTaible').click(function (event){
-				tag = event.target||event.srcElement;
-				if(data.league == "grey"){
-					var first = 1;
-					var second = 20;
-				}
-				if(data.league == "black"){
-					var first = 1;
-					var second = 2;
-				}
-				if(data.league == "white"){
-					var first = 19;
-					var second = 20;
-				}
-				var position = tag.id.indexOf('_');
-				var i = tag.id.substring(0, position);
-				var j = tag.id.substring(position + 1);
-				if( $("#" + tag.id).hasClass("field  canSpawn") && j >= first && j <= second && i <= 10 && i >= 1){
-					$.ajax({
-						type: 'POST',
-						url: 'lib/massBattleFunctions.php',
-						data: { "WhatIMustDo":"spawnBattle", "row":j , "column":i, "id":urlArray["id"]},
-						success: function(data){
-							window.location.reload();
-						}
-					});
-				}
-			});
-		}
-	}*/
 });
 
 function checkLoc(url){

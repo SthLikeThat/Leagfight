@@ -400,8 +400,6 @@ class allFunctions extends DataBase{
 					header("Location:http://zadanie/index.php?view=town&type=addAdvertising");
 					exit;
 				}
-					var_dump($_FILES);
-					exit;
 					$image = $_FILES['userfile']['tmp_name'];
 					$title = $this->valid->secureText($title);
 					$text = $this->valid->secureText($text);
