@@ -7,14 +7,28 @@ class DataBase extends Template{
 	
 	public $valid;
 	public $ancillary;
-
+	
 	public function __construct() {
 		parent::__construct();
 		$this->valid = new CheckValid($this);
 		$this->ancillary = new Ancillary($this);
 	}
 	
+	protected function checkAll($values){
+		foreach($values as $value){
+			if(is_array($value))
+				$this->checkAll($value);
+			else{
+				if(!$this->valid->check_sql($value))
+					return false;
+				$value = $this->mysqli->real_escape_string($value);
+			}
+		}
+		return $values;
+	}
+	
 	public function select($table_name, $fields, $where ="", $order = "", $up = true, $limit = ""){
+		$fields = $this->checkAll($fields);
 		for ($i=0; $i<count($fields);$i++){
 			if((strpos($fields[$i], "(") === false) && ($fields[$i] !="*")){
 			$fields[$i] = "`".$fields[$i]."`";
@@ -58,25 +72,28 @@ class DataBase extends Template{
 		}
 	
 	public function insert($table_name, $new_values){
+		$new_values = $this->checkAll($new_values);
 		$table_name = $this->config->db_prefix.$table_name;
 		$query = "INSERT INTO $table_name (";
 		foreach ($new_values as $field =>$value) $query .="`".$field."`,";
 		$query = substr($query, 0, -1);
 		$query .= ") VALUES (";
-		foreach ($new_values as $value) $query .= "'".addslashes($value)."',";
+		foreach ($new_values as $value) 
+			$query .= "'".addslashes($value)."',";
 		$query = substr($query, 0, -1);
 		$query .= ")";
 		return $this->query($query);
 	}
 	
 	public function update($table_name, $upd_fields, $where) {
+		$upd_fields = $this->checkAll($upd_fields);
 		$table_name = $this->config->db_prefix.$table_name;
 		$query = " UPDATE $table_name SET ";
 		foreach ($upd_fields as $field => $value) $query .= "`$field` = '".addslashes($value)."',";
 		$query = substr($query, 0, -1);
 		if ($where) {
 			$query .= " WHERE $where ;";
-			return $this->query($query);
+				return $this->query($query);
 		}
 		else return false;
 	}
@@ -117,8 +134,7 @@ class DataBase extends Template{
 	
 	public function getAll($table_name, $order, $up) {
 		return $this->select($table_name, array("*"), "", $order, $up);
-	}
-		
+	}	
 	
 	public function setField($table_name, $field, $value, $field_in, $value_in) {
 		return $this->update($table_name, array($field=>$value), "`$field_in` = '".addslashes($value_in)."'");
@@ -127,11 +143,6 @@ class DataBase extends Template{
 	public function setFieldOnID($table_name, $id, $field, $value) {
 		if (!$this->existsID($table_name, $id)) return false;
 		return $this->setField($table_name, $field, $value, "id", $id);
-	}
-	
-	public function putThingOn($id, $field, $value){
-		if (!$this->existsID("users", $id)) return false;
-		return $this->setField("users", $field, $value, "id", $id);
 	}
 	
 	public function getCount($table_name) {
@@ -156,12 +167,64 @@ class DataBase extends Template{
 		$prefix = $this->config->db_prefix;
 		$text = "SELECT * FROM `$prefix$table_names[0]`";
 		if(count($table_names) > 1){
-			for($i = 1; $i < count($table_names); $i++){
+			$count = count($table_names);
+			for($i = 1; $i < $count; $i++){
 				$text .= " INNER JOIN `$prefix$table_names[$i]` ON $prefix$table_names[0].$field = $prefix$table_names[$i].$field";
 			}
 		}
 		else return false;
-		return $text;
+		$result_set = $this->query($text);
+		if (!$result_set) return false;
+		$i = 0;
+		while ($row = $result_set->fetch_assoc()){
+			$data[$i] = $row;
+			$i++;
+		}
+		$result_set->close();
+		
+		return $data[0];
+	}
+	
+	public function getForManyFields($table_name, $field, $allfiled){
+		$table_name = $this->config->db_prefix.$table_name;
+		$text = "SELECT * FROM `$table_name` WHERE ";
+		$count = count($allfiled);
+		foreach($allfiled as $tag){
+			$text .= "$field = '".$tag."' ||";
+		}
+		$text = substr($text, 0, -2);
+		$result_set = $this->query($text);
+		if (!$result_set) return false;
+		$i = 0;
+		while ($row = $result_set->fetch_assoc()){
+			$data[$i] = $row;
+			$i++;
+		}
+		$result_set->close();
+		
+		return $data;
+	}
+	
+	public function selectIN($table_name, $field, $values){
+		$table_name = $this->config->db_prefix.$table_name;
+		$text = "SELECT * FROM `$table_name` WHERE ";
+		$count = count($allfiled);
+		$text .= "`$field` IN (";
+		foreach($values as $tag){
+			$text .=  $tag.", ";
+		}
+		$text = substr($text, 0, -2);
+		$text .= ")";
+		$result_set = $this->query($text);
+		if (!$result_set) return false;
+		$i = 0;
+		while ($row = $result_set->fetch_assoc()){
+			$data[$i] = $row;
+			$i++;
+		}
+		$result_set->close();
+		
+		return $data;
 	}
 	
 	public function selectFromTables($table_names, $field, $value){
@@ -210,21 +273,10 @@ class DataBase extends Template{
 		return $data;
 	}
 	
-	public function getThingByHash($hash, $inventory){
-		for($i = 1; $i <= count($inventory); $i++){
-			if($inventory["slot$i"] == "999")
-				break;
-			if($inventory["slot$i"] != "0"){
-				$slot = unserialize($inventory["slot$i"]);
-				if($hash == $slot["hash"]){
-					if($slot["id"] < 500)
-						$table_name = "weapon";
-					if($slot["id"] > 500)
-						$table_name = "armor";
-					return $this->getElementOnID($table_name, $slot["id"]);
-				}
-			}
-		}
+	public function nofound(){
+		require_once "../notfound.php";
+		$notfound = new NotFoundContent($this);
+		return $notfound->getCenter();
 	}
 }
 ?>

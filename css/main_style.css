@@ -125,3 +125,25 @@ li{
     height: 60px;
     background-color: #f5f5f5;
 }
+
+.pop-info{
+    display: none;
+}
+
+.count-potion{
+    position: absolute;
+    left: 0;
+    top: 0;
+    background-color: rgba( 0, 0, 0, 0);
+    color: white;
+    #padding: 3px;
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 0;
+   width: 33%;
+    color: black;
+}
+
+.count-potion:hover{
+    background-color: rgba( 21, 21, 21, .6);
+    color: white;
+}

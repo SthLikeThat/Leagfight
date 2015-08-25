@@ -1,8 +1,10 @@
 $(document).ready(function(){	
-
+    var timeout;
+    
 	var doc_w = $(window).width();
-    console.log(doc_w);
+    //Всплывающая инфа текст
 	if(doc_w > 768){
+        
 		$("[data-title]").mousemove(function (eventObject) {
 		$data_info = $(this).attr("data-title");
 		
@@ -22,33 +24,157 @@ $(document).ready(function(){
                 "left" : 0
              });
 		});
+        
+         //Всплывающая инфа Html
+        $("[data-info]").mousemove(function (eventObject) {
+            
+            $('[data-info]').mousemove(function(){
+                $("#tooltip").hide()
+                 .text("")
+                 .css({
+                     "top" : 0,
+                    "left" : 0
+                 });
+                
+                clearTimeout(timeout);
+                timeout = setTimeout(function(){
+                    childs = eventObject.currentTarget.children;
+                    var info = getChildrenBLock(childs, "pop-info", "class").innerHTML;
+                    if(!info)
+                        return false;
+                    $("#tooltip").html(info)
+                     .css({ 
+                         "top" : eventObject.pageY + 20,
+                        "left" : eventObject.pageX + 20
+                     })
+                     .show();
+                }, 600);
+                
+                 
+            });
+         });
+        
+         $("[data-info]").mouseout(function () {
+                clearTimeout(timeout);
+                $("#tooltip").hide()
+                 .text("")
+                 .css({
+                     "top" : 0,
+                    "left" : 0
+                 });
+        });
+        
 	}
     
+    //Отображение и скрытие блоков Надеть/Снять/Удалить
     $(".inventory-item").mousemove(function (eventObject) {
         var on = $(eventObject.currentTarget).attr("data-on");
         var show = $(eventObject.currentTarget).attr("data-show");
         
+        var childs = eventObject.currentTarget.children;
+        var blockOn = getChildrenBLock(childs, "on", "id");
+        var blockOff = getChildrenBLock(childs, "off", "id");
+        var blockDelete = getChildrenBLock(childs, "delete", "id");
+        var blockCount = getChildrenBLock(childs, "count", "id");
+
         if(show == "1"){
-            $(eventObject.currentTarget.childNodes[7]).show();
+            $(blockDelete).show();
+            $(blockCount).show();
             if(on == "1")
-                $(eventObject.currentTarget.childNodes[3]).show();
+                $(blockOff).show();
                 
             else
-                $(eventObject.currentTarget.childNodes[5]).show();
+                $(blockOn).show();
         }
     }).mouseout(function (eventObject) {
         var on = $(eventObject.currentTarget).attr("data-on");
         var show = $(eventObject.currentTarget).attr("data-show");
         
+        var childs = eventObject.currentTarget.children;
+        var blockOn = getChildrenBLock(childs, "on", "id");
+        var blockOff = getChildrenBLock(childs, "off", "id");
+        var blockDelete = getChildrenBLock(childs, "delete", "id");
+        var blockCount = getChildrenBLock(childs, "count", "id");
+        
         if(show == "1"){
-            $(eventObject.currentTarget.childNodes[7]).hide();
+            $(blockDelete).hide();
+            $(blockCount).hide();
             if(on == "1")
-                $(eventObject.currentTarget.childNodes[3]).hide();
+                $(blockOff).hide();
             else
-                $(eventObject.currentTarget.childNodes[5]).hide();
+                $(blockOn).hide();
+        }
+    });
+    
+    //Надеть/Снять в инвентаре
+    $(".inventory-item .inventory-control").click(function (eventObject) {
+        var type = eventObject.target.id;
+        var inventory_item = eventObject.target.parentElement;
+        var hash = $(inventory_item).attr("data-hash");
+        var image = inventory_item.children[0].innerHTML;
+
+        /* Запрос возвращает куда надеть(item) и как надеть(type) :
+        change - заменить вещь, on - чисто надеть, off - чисто снять */
+        resultData = {"result": true, "item": "armor", "type": "change"};
+        if(resultData.result){
+            if (resultData.type == "change"){
+                //Текущая
+                var item = $("#" + resultData.item);
+                var ItemHash = $(item).attr("data-hash");
+                //Он же в инвентаре
+                var item_inv = $(".main-inventory [data-hash=" + ItemHash + "]");
+                
+                //Надеваем в инвентаре
+                $(inventory_item).attr("data-on", "1");
+                //Надеваем в панельке
+                $("#" + resultData.item + " .inventory-item-image").html(image);
+                $("#" + resultData.item).attr("data-hash", hash);
+                //Снимаем в инвентаре предыдущую
+                $(item_inv).attr("data-on", "0");
+            }
+            if (resultData.type == "on"){
+                //Надеваем в инвентаре
+                $(inventory_item).attr("data-on", "1");
+                
+                //Надеваем в панельке
+                $("#" + resultData.item + " .inventory-item-image").html(image);
+                $("#" + resultData.item).attr("data-hash", hash);
+            }
+            
+            if (resultData.type == "off"){
+                var ItemHash = $(item).attr("data-hash");
+                var item_inv = $(".main-inventory [data-hash=" + ItemHash + "]");
+                
+                //Снимаем в панельке
+                $("#" + resultData.item + " .inventory-item-image").html('<img src="images/cloth/mini/' + resultData.item + '.png" height="60">');
+                $("#" + resultData.item).attr("data-on", "0");
+                $("#" + resultData.item).attr("data-show", "0");
+                
+                //Снимаем в инвентаре
+                $(item_inv).attr("data-on", "0");
+                
+            }
+            //Скрываем текущую кнопку
+            $(eventObject.currentTarget).hide();
         }
     });
 });
+
+function getChildrenBLock(childs, children, type){
+    for(var i = 0; i < childs.length; i++){
+        if(type == "id"){
+            if(childs[i].id == children){
+                return childs[i];
+            }
+        }
+        if(type == "class"){
+            if(childs[i].className == children){
+                return childs[i];
+            }
+        }
+    }
+    return false;
+}
 
 function checkLoc(url){
 	 $.ajax({

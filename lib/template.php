@@ -4,13 +4,12 @@ require_once "checkvalid_class.php";
 
 abstract class Template{
 	
-	protected $config;
+	public $config;
 	public $mysqli;
 	
 	public function __construct() {
 		$this->config = new Config();
 		$this->mysqli = new mysqli($this->config->host, $this->config->user, $this->config->password, $this->config->db);
-		//$this->mysqli->query("UPDATE  `Opros`.`smgys_mda` SET  `mda` =  '$mda' WHERE  `smgys_mda`.`id` =1;");
 	}
 	
 	public function query($query){
@@ -18,11 +17,18 @@ abstract class Template{
 	}
 	
 	protected function getTemplate($name) {
-		$text = file_get_contents($this->config->dir_tmpl.$name.".tpl");
-		return str_replace("%address%", $this->config->address, $text);
+		if(file_exists ($_SERVER['DOCUMENT_ROOT'].$this->config->dir_tmpl.$name.".tpl")){
+			$text = file_get_contents($_SERVER['DOCUMENT_ROOT'].$this->config->dir_tmpl.$name.".tpl");
+			return str_replace("%address%", $this->config->address, $text);
+		}
+		else{
+			echo "<script>alert('Не найдена tpl - $name');</script>";
+			return false;
+		}
+			
 	}
 	
-	protected function getReplaceTemplate($sr, $template) {
+	public function getReplaceTemplate($sr, $template) {
 		return $this->getReplaceContent($sr, $this->getTemplate($template));
 	}
 	
@@ -38,8 +44,13 @@ abstract class Template{
 		return str_replace($search, $replace, $content);
 	}
 	
-	protected function getFileContent($file){
-		return file_get_contents($this->config->dir_tmpl."ready/".$file.".tpl");
+	public function getFileContent($file){
+		if(file_exists ($_SERVER['DOCUMENT_ROOT'].$this->config->dir_tmpl."ready/".$file.".tpl"))
+			return file_get_contents($_SERVER['DOCUMENT_ROOT'].$this->config->dir_tmpl."ready/".$file.".tpl");
+		else{
+			echo "<script>alert('Не найдена tpl - $file');</script>";
+			return false;
+		}
 	}
 }
 ?>

@@ -1,8 +1,15 @@
-<li class="invItem">
-		<div class="inventoryItems" onmouseover='showDetails(%onOff%, %slot%, %show%)' onmouseout="lostFocus(%slot%) " >
-			<img src="images/cloth/mini/%id%.png"  class="inventoryItems" onclick="showDetails2(%slot%, %show%, '%hash%')"/>
-			<div id="puton_%slot%" class="displayPutOn" onclick="putOnThisThing(%slot%)" > Надеть </div>
-			<div id="putoff_%slot%" class="displayPutOn" onclick="putOffThisThing(%slot%)" > Снять </div>
-			<div id="delete_%slot%" class="delete"  onclick="deleteThis(%slot%, %type%, '%hash%')"> &times; </div> 
-		</div>
-</li>
+<div class="inventory-item" data-on="%onOff%"  data-show="%show%" data-hash="%hash%" data-info>
+   <div class="inventory-item-image">
+        <img src="images/cloth/mini/%id%.png" height="60">
+    </div>
+    <div class="inventory-control" id="off"> 
+        Снять
+    </div>    
+    <div class="inventory-control" id="on"> 
+        Надеть
+    </div>       
+     <div class="inventory-control-delete" id="delete" data-toggle="modal" data-target="#modal-delete-thing"> 
+         <i class="glyphicon glyphicon-remove"></i>
+    </div>    
+    %info%       
+</div>

@@ -1,49 +1,42 @@
-<!DOCTYPE html>
 <html>
 <head>
-	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-	<!--[if lt IE 9]><script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<title>Главная страницы</title>
-	<link href="css/style.css" rel="stylesheet">
-	<script src="lib/jquery-2.1.3.min.js"></script>
-	<script src="lib/scripta.js"></script>
-	<script src="lib/games.js"></script>
+	<link href="css/main_style.css" rel="stylesheet">
+	
+	<link href="css/bootstrap.css" rel="stylesheet">
+	<link href="css/bootstrap_my.css" rel="stylesheet">
+	<link href="css/font-awesome.css" rel="stylesheet">
+
 </head>
 
-<body onload="checkThisHeader();checkThis();jobTime();">
-
-<div class="wrapper" >
+<body>
+    <span id="tooltip"></span>
 	
-	<header class="header">
-		%header%
-	</header>
-		
-	<div class="middle" id="middle">
-
+	<div class="navbar navbar-inverse navbar-static-top leag-navbar">
 		<div class="container">
-				%center%
-		</div>
-
-		<aside class="left-sidebar">
-			<ul>%menu%</ul>
-			<div id="bottomMenu">
-			<ul>
-				<li> <div class="photo" id="menu_options" data-title="Настройки"><a href="/?view=options" class="menuUrl"><img src="images/menu_items/options.png" alt="" height="25"></a></div> </li>
-				<li> <div class="photo" data-title="Выход"><a href="lib/exit.php" class="menuUrl"><img src="images/menu_items/exit.png" alt="" height="25"></a></div> </li>
-			</ul>
-			</div>
-		</aside>
-
-	</div>
-</div>
-<footer class="footer" id="footer">
-	<div id="mess3"></div>
-</footer>
-	<div id="mess4"></div>
-	<div id="alert" onclick="notAlert()">
-		&times;
-		<div id="alertWindow">
+            %menu%
 		</div>
 	</div>
+	
+	<div class="main-content">
+        <div class="full-container navbar navbar-default" style="background: #A0C9A0;">
+			%header%
+		</div>
+		
+		<div class="full-container" style="padding:2px;">
+			%center%
+		</div>
+    </div>
+
+	
+    <footer class="footer">
+        Какая то инфа
+    </footer>
+
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+    <script src="js/bootstrap.js"></script>
+    <script src="js/scripta.js"></script>
 </body>
+
 </html>

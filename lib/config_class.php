@@ -11,7 +11,7 @@ class Config{
 	var $user = "simple_man";
 	var $password = "3HDrsTE3uw8NjBjD";
 	var $pass_prefix = "mda";
-	var $dir_tmpl = "C:/OpenServer/domains/Zadanie/tmpl/";
+	var $dir_tmpl = "/tmpl/";
 }
 
 ?>

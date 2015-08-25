@@ -1,62 +1,36 @@
-	<div class="avatar">
-		%nick% <br />
-		<img src="images/avatars/%avatar%.png" class="avatarimg"/>
-		<div class="leftavatar" id="leftavatar" onclick="addSomeStats('add')" >
-			%characteristics%
-		</div>
-		
-		<div id="addSomeStats" >
-			<form name="characteristics" id="characteristics">
-				<table>
-				<tr><td> Скидка: </td> <td> %discount%% </td> <td colspan="2" > <a href="#" style="width:90%;" onclick="addSomeStats('show')" > Назад </a> </td></tr>
-				
-				<tr><td> <img src="image_char/image/strengh.png" height="20"/> </td>
-				<td> <a href="#" onclick="delInputValue('strengh','max')"> <img src="images/delAll.png" height="20"/> </a> <a href="#" onclick="delInputValue('strengh',10)"><img src="images/del10.png" height="20"/></a> <a href="#" onclick="delInputValue('strengh',1)"> <img src="images/del1.png" height="20"/></a> </td>
-				<td> <input type="text" name="strengh" id="strengh" value="0" /> </td> 
-				<td>  <a href="#" onclick="addInputValue('strengh',1)"> <img src="images/pump1.png" height="20"/> </a> <a href="#" onclick="addInputValue('strengh',10)"> <img src="images/pump10.png" height="20"/> </a> <a href="#" onclick="addInputValue('strengh','max')"> <img src="images/pumpAll.png" height="20"/> </a></td></tr>
-				
-				<tr><td> <img src="image_char/image/defence.png" height="20"/> </td>
-				<td> <a href="#" onclick="delInputValue('defence','max')"> <img src="images/delAll.png" height="20"/> </a> <a href="#" onclick="delInputValue('defence',10)"> <img src="images/del10.png" height="20"/> </a> <a href="#" onclick="delInputValue('defence',1)"> <img src="images/del1.png" height="20"/> </a> </td>
-				<td> <input type="text" name="defence" id="defence" value="0"/> </td> 
-				<td> <a href="#" onclick="addInputValue('defence',1)"> <img src="images/pump1.png" height="20"/> </a> <a href="#" onclick="addInputValue('defence',10)"> <img src="images/pump10.png" height="20"/> </a> <a href="#" onclick="addInputValue('defence','max')"> <img src="images/pumpAll.png" height="20"/> </a> </td></tr>
-				
-				<tr><td> <img src="image_char/image/agility.png" height="20"/> </td>
-				<td> <a href="#" onclick="delInputValue('agility','max')"> <img src="images/delAll.png" height="20"/> </a> <a href="#" onclick="delInputValue('agility',10)"> <img src="images/del10.png" height="20"/> </a> <a href="#" onclick="delInputValue('agility',1)"><img src="images/del1.png" height="20"/> </a> </td>
-				<td> <input type="text" name="agility" id="agility" value="0"/> </td>
-				<td> <a href="#" onclick="addInputValue('agility',1)"> <img src="images/pump1.png" height="20"/> </a> <a href="#" onclick="addInputValue('agility',10)"> <img src="images/pump10.png" height="20"/> </a> <a href="#" onclick="addInputValue('agility','max')"> <img src="images/pumpAll.png" height="20"/> </a></td></tr>
-				
-				<tr><td> <img src="image_char/image/physique.png" height="20"/> </td>
-				<td> <a href="#" onclick="delInputValue('physique','max')"> <img src="images/delAll.png" height="20"/> </a> <a href="#" onclick="delInputValue('physique',10)"> <img src="images/del10.png" height="20"/> </a> <a href="#" onclick="delInputValue('physique',1)"> <img src="images/del1.png" height="20"/> </a> </td>
-				<td> <input type="text" name="physique" id="physique" value="0"/> </td> 
-				<td> <a href="#" onclick="addInputValue('physique',1)"> <img src="images/pump1.png" height="20"/> </a> <a href="#" onclick="addInputValue('physique',10)"> <img src="images/pump10.png" height="20"/> </a> <a href="#" onclick="addInputValue('physique','max')"> <img src="images/pumpAll.png" height="20"/> </a> </td></tr>
-				
-				<tr><td> <img src="image_char/image/mastery.png" height="20"/> </td>
-				<td> <a href="#" onclick="delInputValue('mastery','max')"> <img src="images/delAll.png" height="20"/> </a> <a href="#" onclick="delInputValue('mastery',10)"> <img src="images/del10.png" height="20"/> </a> <a href="#" onclick="delInputValue('mastery',1)"> <img src="images/del1.png" height="20"/> </a> </td>
-				<td> <input type="text" name="mastery" id="mastery" value="0"/> </td>
-				<td> <a href="#" onclick="addInputValue('mastery',1)"> <img src="images/pump1.png" height="20"/> </a> <a href="#" onclick="addInputValue('mastery',10)"> <img src="images/pump10.png" height="20"/> </a> <a href="#" onclick="addInputValue('mastery','max')"> <img src="images/pumpAll.png" height="20"/> </a> </td></tr>
-				
-				
-				<tr> <td> <img src="images/coinBlack.png" height="20"/> </td> <td> <div id="pumpPrice"> 0 </div> </td><td colspan="2" ><a href="#" style="width:90%;" onclick="sendChar('yes')"> Тренироваться </a>  </td></tr>
-				</table>
-			</form>
-		</div>
-	</div>
-	<div id ="invBlock">
-		<div class="clothing" id="clothing">
-			%equipment%
-		</div>
-		
-		<div class="inventory" id="inventory">
-			%inventory%
-		</div>
-		
-		<div class="inventory" id="invPotions">
-			%invPotions%
-		</div>
-	</div>
-    <div class="damageInformation">
-        %damageInformation%
-    </div>
-	
-	
-	
+<div class="full-container" style="padding:2px;">
+	<div class="row my-row">
+		<div class="col-lg-4" style="padding: 0px;">
+			<div class="col-lg-6 col-md-6 col-xs-6 navbar navbar-default navbar-width" style="padding: 5px;">
+                <div class="name-user">
+                    %nick%
+                 </div>
+                 <div class="avatar-user">
+                     <img src="images/avatars/%avatar%.png">
+                 </div>
+
+                 <div class="characteristics-block" data-toggle="modal" data-target="#modal-up-chars">
+                    %characteristics%
+                 </div>
+            </div>
+            <div class="col-lg-6 col-md-6 col-xs-6 navbar navbar-default navbar-width">
+                <div class="col-lg-12" style="padding: 0;">
+                    %equipment%
+                </div>
+                <div class="col-lg-12 col-xs-12" style="padding: 0; text-align: center;">
+                %damageInformation%
+         </div>
+            </div>
+             </div>
+            
+        <div class="col-lg-7 col-md-12 col-xs-12 navbar navbar-default navbar-width main-inventory margin-fix">
+            <div class="row-inventory">
+                %inventory%
+            </div>
+        </div>
+        <div class="col-lg-7 col-xs-12 navbar navbar-default navbar-width main-inventory margin-fix">
+            <div class="row-inventory">
+                %invPotions%
+            </div>
+        </div>
+        %modales%

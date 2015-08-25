@@ -7,10 +7,7 @@
 	<link href="css/bootstrap.css" rel="stylesheet">
 	<link href="css/bootstrap_my.css" rel="stylesheet">
 	<link href="css/font-awesome.css" rel="stylesheet">
-	
-	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
-	<script src="js/bootstrap.js"></script>
-	<script src="js/scripta.js"></script>
+
 </head>
 
 <body>
@@ -168,7 +165,7 @@
                              <img src="images/avatars/1.png">
                          </div>
 
-                         <div class="characteristics-block">
+                         <div class="characteristics-block" data-toggle="modal" data-target="#modal-up-chars">
                             <div class="progress leag-progress-char">
                                <div class="progress-bar-icon-left">
                                     <img src="image_char/image/strengh.png" height="25">
@@ -222,32 +219,78 @@
                              1070
                          </div>
                      </div>
+                     
                      <div class="col-lg-6 col-md-6 col-xs-6 navbar navbar-default navbar-width">
                           <div class="col-lg-12" style="padding: 0;">
-                               <div class="row-inventory">
-                                    <div class="inventory-item" data-on="1"  data-show="1">
-                                        <img src="images/cloth/mini/3.png" height="60">
+                               <div class="row-inventory" >
+                                    <div class="inventory-item" id="primaryWeapon" data-on="1"  data-show="1" data-info>
+                                       <div class="inventory-item-image">
+                                            <img src="images/cloth/mini/3.png" height="60">
+                                        </div>
                                         <div class="inventory-control"> 
                                             Снять
-                                        </div>                
+                                        </div>      
+                                        <div class="pop-info">
+                                            <table class="table" style="margin: 0;">
+                                                 <tbody>
+                                                    <tr>
+                                                         <td class="info" colspan="2" style="text-align: center;">Отвёртка</td>
+                                                     </tr>
+                                                     <tr>
+                                                         <td class="success">Хват</td>
+                                                         <td class="active">Одноручное</td>
+                                                     </tr>
+                                                     <tr>
+                                                         <td class="success">Тип урона</td>
+                                                         <td class="active">Колющее</td>
+                                                     </tr>
+                                                     <tr>
+                                                         <td class="success">Уровень</td>
+                                                         <td class="active">7</td>
+                                                     </tr>
+                                                     <tr>
+                                                         <td class="success">Урон[5]</td>
+                                                         <td class="active">0.63</td>
+                                                     </tr>
+                                                     <tr>
+                                                         <td class="success">Крит[5]</td>
+                                                         <td class="active">2.13</td>
+                                                     </tr>
+                                                     <tr>
+                                                         <td class="success">Сила</td>
+                                                         <td class="active">13</td>
+                                                     </tr>
+                                                     <tr>
+                                                         <td class="success">Мастерство</td>
+                                                         <td class="active">5</td>
+                                                     </tr>
+                                                 </tbody>
+                                             </table>
+                                        </div>         
                                     </div>
-                                     <div class="inventory-item" data-on="1"  data-show="1">
-                                        <img src="images/cloth/mini/502.png" height="60">
+                                     <div class="inventory-item" id="helmet" data-on="1"  data-show="1" data-info>
+                                       <div class="inventory-item-image">
+                                            <img src="images/cloth/mini/502.png" height="60">
+                                        </div>
                                         <div class="inventory-control"> 
                                             Снять
                                         </div>                
                                     </div>
                                 </div>
 
-                                 <div class="row-inventory" >
+                                 <div class="row-inventory" id="secondaryWeapon">
                                     <div class="inventory-item" data-on="1"  data-show="1">
-                                        <img src="images/cloth/mini/505.png" height="60">
+                                       <div class="inventory-item-image">
+                                            <img src="images/cloth/mini/505.png" height="60">
+                                        </div>
                                         <div class="inventory-control"> 
                                             Снять
                                         </div>                
                                     </div>
-                                     <div class="inventory-item" data-on="1"  data-show="1">
-                                        <img src="images/cloth/mini/508.png" height="60">
+                                     <div class="inventory-item" id="armor" data-on="1"  data-show="1" data-hash="cccccc">
+                                       <div class="inventory-item-image">
+                                            <img src="images/cloth/mini/508.png" height="60">
+                                         </div>
                                         <div class="inventory-control"> 
                                             Снять
                                         </div>                
@@ -255,14 +298,18 @@
                                 </div>
 
                                  <div class="row-inventory">
-                                    <div class="inventory-item" data-on="1"  data-show="1">
-                                        <img src="images/cloth/mini/503.png" height="60">
+                                    <div class="inventory-item" id="bracers" data-on="1"  data-show="1">
+                                       <div class="inventory-item-image">
+                                            <img src="images/cloth/mini/503.png" height="60">
+                                        </div>
                                         <div class="inventory-control"> 
                                             Снять
                                         </div>                
                                     </div>
-                                     <div class="inventory-item" data-on="1"  data-show="1">
-                                        <img src="images/cloth/mini/504.png" height="60">
+                                     <div class="inventory-item" id="leggings" data-on="1"  data-show="1">
+                                       <div class="inventory-item-image">
+                                            <img src="images/cloth/mini/504.png" height="60">
+                                        </div>
                                         <div class="inventory-control"> 
                                             Снять
                                         </div>                
@@ -313,33 +360,63 @@
              </div>
                         </div>
                  </div>
+                 
                  <div class="col-lg-7 col-md-12 col-xs-12 navbar navbar-default navbar-width main-inventory margin-fix">
                        <div class="row-inventory">
-                            <div class="inventory-item" data-on="0"  data-show="1">
-                                <img src="images/cloth/mini/501.png" height="60">
-                                <div class="inventory-control"> 
+                            <div class="inventory-item" data-on="0"  data-show="1" data-hash="aaaaaaa" data-info>
+                               <div class="inventory-item-image">
+                                    <img src="images/cloth/mini/501.png" height="60">
+                                </div>
+                                <div class="inventory-control" id="off"> 
                                     Снять
                                 </div>    
-                                <div class="inventory-control"> 
+                                <div class="inventory-control" id="on"> 
                                     Надеть
                                 </div>       
-                                 <div class="inventory-control-delete"> 
+                                 <div class="inventory-control-delete" id="delete" data-toggle="modal" data-target="#modal-delete-thing"> 
                                      <i class="glyphicon glyphicon-remove"></i>
-                                </div>               
+                                </div>    
+                                <div class="pop-info">
+                                    <table class="table" style="margin: 0;">
+                                         <tbody>
+                                            <tr>
+                                                 <td class="info" colspan="2" style="text-align: center;">Кожанка</td>
+                                             </tr>
+                                             <tr>
+                                                 <td class="success">Тип</td>
+                                                 <td class="active">Лёгкая</td>
+                                             </tr>
+                                             <tr>
+                                                 <td class="success">Уровень</td>
+                                                 <td class="active">1</td>
+                                             </tr>
+                                             <tr>
+                                                 <td class="success">Броня[5]</td>
+                                                 <td class="active">0.25</td>
+                                             </tr>
+                                             <tr>
+                                                 <td class="success">Защита</td>
+                                                 <td class="active">5</td>
+                                             </tr>
+                                         </tbody>
+                                     </table>
+                                </div>              
                             </div>
-                             <div class="inventory-item" data-on="1"  data-show="1">
+                             <div class="inventory-item" data-on="1"  data-show="1" data-hash="bbbbbbb" data-info>
+                               <div class="inventory-item-image">
                                 <img src="images/cloth/mini/502.png" height="60">
-                                <div class="inventory-control"> 
+                                 </div>
+                                <div class="inventory-control" id="off"> 
                                     Снять
                                 </div>   
-                                <div class="inventory-control"> 
+                                <div class="inventory-control" id="on"> 
                                     Надеть
                                 </div>  
-                                 <div class="inventory-control-delete"> 
+                                 <div class="inventory-control-delete" id="delete" data-toggle="modal" data-target="#modal-delete-thing"> 
                                      <i class="glyphicon glyphicon-remove"></i>
                                 </div>                    
                             </div>
-                             <div class="inventory-item" data-on="1"  data-show="1">
+                             <div class="inventory-item" data-on="1"  data-show="1" data-info>
                                 <img src="images/cloth/mini/504.png" height="60">
                                 <div class="inventory-control"> 
                                     Снять
@@ -351,7 +428,7 @@
                                      <i class="glyphicon glyphicon-remove"></i>
                                 </div>                   
                             </div>
-                             <div class="inventory-item" data-on="1"  data-show="1">
+                             <div class="inventory-item" data-on="1"  data-show="1" data-info>
                                 <img src="images/cloth/mini/505.png" height="60">
                                 <div class="inventory-control"> 
                                     Снять
@@ -381,17 +458,19 @@
                                     Надеть
                                 </div>                   
                             </div>
-                             <div class="inventory-item" data-on="1"  data-show="1">
+                            <div class="inventory-item" data-on="1"  data-show="1" data-hash="cccccc">
+                               <div class="inventory-item-image">
                                 <img src="images/cloth/mini/508.png" height="60">
-                                <div class="inventory-control"> 
+                                 </div>
+                                <div class="inventory-control" id="off"> 
                                     Снять
                                 </div>   
-                                <div class="inventory-control"> 
+                                <div class="inventory-control" id="on"> 
                                     Надеть
-                                </div>   
-                                 <div class="inventory-control-delete"> 
+                                </div>  
+                                 <div class="inventory-control-delete" id="delete" data-toggle="modal" data-target="#modal-delete-thing"> 
                                      <i class="glyphicon glyphicon-remove"></i>
-                                </div>                   
+                                </div>                    
                             </div>
                              <div class="inventory-item" data-on="1"  data-show="1">
                                 <img src="images/cloth/mini/3.png" height="60">
@@ -717,9 +796,221 @@
              </div>
          </div>
     </div>
+    
+ <div class="modal fade" id="modal-delete-thing">
+      <div class="modal-dialog modal-md" style="margin-top: 10%;">
+          <div class="modal-content">
+              <div class="modal-header">
+                  <button class="close" type="button" data-dismiss="modal">
+                      <i class="glyphicon glyphicon-remove"></i>
+                  </button>
+                  <h4 class="modal-title">Удаление вещи</h4>
+              </div>
+              <div class="modal-body">
+                  <p>Вы действительно хотите удалить эту вещь?</p>
+              </div>
+              <div class="modal-footer">
+                  <button class="btn btn-success" type="button" style="float: left;"> Удалить </button>
+                  <button class="btn btn-danger" type="button" data-dismiss="modal"> Отмена </button>
+              </div>
+          </div>
+      </div>
+    </div>
+     
+    <div class="modal fade" id="modal-up-chars">
+      <div class="modal-dialog modal-lg" style="margin-top: 10%;">
+          <div class="modal-content">
+              <div class="modal-header">
+                  <button class="close" type="button" data-dismiss="modal">
+                      <i class="glyphicon glyphicon-remove"></i>
+                  </button>
+                  <h4 class="modal-title">Прокачка характеристик</h4>
+              </div>
+              <div class="modal-body" style="text-align: center;">
+                  <div class="characteristics-block" id="training">
+                      <div class="up-char-row">
+                          <div class="train-image">
+                              <img src="image_char/image/strengh.png" height="20"> Сила
+                          </div>
+                           <div class="btn-group">
+                                <button class="btn btn-success">
+                                    <img src="images/del1.png" height="20">
+                                </button>
+                                <button class="btn btn-success">
+                                   <img src="images/del10.png" height="20">
+                               </button>
+                                <button class="btn btn-success">
+                                    <img src="images/delAll.png" height="20">
+                                </button>
+                             </div> 
+                              <input type="text" class="form-control" placeholder="0">
+                            <div class="btn-group">
+                                <button class="btn btn-success">
+                                    <img src="images/pump1.png" height="20">
+                                </button>
+                                <button class="btn btn-success">
+                                   <img src="images/pump10.png" height="20">
+                               </button>
+                                <button class="btn btn-success">
+                                    <img src="images/pumpAll.png" height="20">
+                                </button>
+                             </div>
+                              <div class="train-summ">
+                                 327 <img src="images/coinBlack.png" height="20">
+                              </div>
+                         </div>
+                         <div class="up-char-row">
+                              <div class="train-image">
+                                  <img src="image_char/image/defence.png" height="20"> Защита
+                              </div>
+                               <div class="btn-group">
+                                    <button class="btn btn-success">
+                                        <img src="images/del1.png" height="20">
+                                    </button>
+                                    <button class="btn btn-success">
+                                       <img src="images/del10.png" height="20">
+                                   </button>
+                                    <button class="btn btn-success">
+                                        <img src="images/delAll.png" height="20">
+                                    </button>
+                                 </div> 
+                              <input type="text" class="form-control" placeholder="0">
+                            <div class="btn-group">
+                                <button class="btn btn-success">
+                                    <img src="images/pump1.png" height="20">
+                                </button>
+                                <button class="btn btn-success">
+                                   <img src="images/pump10.png" height="20">
+                               </button>
+                                <button class="btn btn-success">
+                                    <img src="images/pumpAll.png" height="20">
+                                </button>
+                             </div>
+                              <div class="train-summ">
+                                0 <img src="images/coinBlack.png" height="20">
+                              </div>
+                         </div>
+                         <div class="up-char-row">
+                              <div class="train-image">
+                                  <img src="image_char/image/agility.png" height="20"> Ловкость
+                              </div>
+                               <div class="btn-group">
+                                    <button class="btn btn-success">
+                                        <img src="images/del1.png" height="20">
+                                    </button>
+                                    <button class="btn btn-success">
+                                       <img src="images/del10.png" height="20">
+                                   </button>
+                                    <button class="btn btn-success">
+                                        <img src="images/delAll.png" height="20">
+                                    </button>
+                                 </div> 
+                              <input type="text" class="form-control" placeholder="0">
+                            <div class="btn-group">
+                                <button class="btn btn-success">
+                                    <img src="images/pump1.png" height="20">
+                                </button>
+                                <button class="btn btn-success">
+                                   <img src="images/pump10.png" height="20">
+                               </button>
+                                <button class="btn btn-success">
+                                    <img src="images/pumpAll.png" height="20">
+                                </button>
+                             </div>
+                              <div class="train-summ">
+                                139 <img src="images/coinBlack.png" height="20">
+                              </div>
+                         </div>
+                         <div class="up-char-row">
+                              <div class="train-image">
+                                  <img src="image_char/image/physique.png" height="20"> Телосложение
+                              </div>
+                               <div class="btn-group">
+                                    <button class="btn btn-success">
+                                        <img src="images/del1.png" height="20">
+                                    </button>
+                                    <button class="btn btn-success">
+                                       <img src="images/del10.png" height="20">
+                                   </button>
+                                    <button class="btn btn-success">
+                                        <img src="images/delAll.png" height="20">
+                                    </button>
+                                 </div> 
+                              <input type="text" class="form-control" placeholder="0">
+                            <div class="btn-group">
+                                <button class="btn btn-success">
+                                    <img src="images/pump1.png" height="20">
+                                </button>
+                                <button class="btn btn-success">
+                                   <img src="images/pump10.png" height="20">
+                               </button>
+                                <button class="btn btn-success">
+                                    <img src="images/pumpAll.png" height="20">
+                                </button>
+                             </div>
+                              <div class="train-summ">
+                                0 <img src="images/coinBlack.png" height="20">
+                              </div>
+                         </div>
+                         <div class="up-char-row">
+                              <div class="train-image">
+                                  <img src="image_char/image/mastery.png" height="20"> Мастерство
+                              </div>
+                               <div class="btn-group">
+                                    <button class="btn btn-success">
+                                        <img src="images/del1.png" height="20">
+                                    </button>
+                                    <button class="btn btn-success">
+                                       <img src="images/del10.png" height="20">
+                                   </button>
+                                    <button class="btn btn-success">
+                                        <img src="images/delAll.png" height="20">
+                                    </button>
+                                 </div> 
+                              <input type="text" class="form-control" placeholder="0">
+                            <div class="btn-group">
+                                <button class="btn btn-success">
+                                    <img src="images/pump1.png" height="20">
+                                </button>
+                                <button class="btn btn-success">
+                                   <img src="images/pump10.png" height="20">
+                               </button>
+                                <button class="btn btn-success">
+                                    <img src="images/pumpAll.png" height="20">
+                                </button>
+                             </div>
+                              <div class="train-summ">
+                                0 <img src="images/coinBlack.png" height="20">
+                              </div>
+                         </div>
+                         <div class="result-sum-row">
+                            <div class="result-sum">
+                                 Тотальная сумма: 466<img src="images/coinBlack.png" height="20">
+                             </div>
+                             <div class="result-sum">
+                             Скидка: 13.187%
+                             </div>
+                             <div class="result-sum">
+                             Итого: 332<img src="images/coinBlack.png" height="20">
+                             </div>
+                         </div>
+                    </div>
+              </div>
+              <div class="modal-footer">
+                  <button class="btn btn-success" type="button" style="float: left;"> Прокачать </button>
+                  <button class="btn btn-danger" type="button" data-dismiss="modal"> Отмена </button>
+              </div>
+          </div>
+      </div>
+    </div>
+    
 <footer class="footer">
     Какая то инфа
 </footer>
+
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+<script src="js/bootstrap.js"></script>
+<script src="js/scripta.js"></script>
 </body>
 
 </html>

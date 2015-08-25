@@ -1,13 +1,18 @@
-<div class='detail1 photoDetail' data-title='%typeName%'>
-	<img src='image_char/image/%type%.png' alt='%typeName%'  height='45'>
-</div> 
-
- <div class='detail2 photoDetail' data-title='Уровень'>
-	<img src='image_char/image/lvl.png ' alt='Уровень' height='20'> 
-	<br/>%requiredlvl%
-</div>
-
- <div class='detail2 photoDetail'data-title='Броня (%armorLvl%)' >
-	<img src='image_char/image/armor.png ' alt='Урон' height='20'> 
-	<br/>%armor%
-</div> 	
+ <div class="pop-info">
+    <table class="table" style="margin: 0;">
+     <tbody>
+        <tr>
+             <td class="info" colspan="2" style="text-align: center;">%name%</td>
+         </tr>
+         <tr>
+             <td class="success">Тип</td>
+             <td class="active">%typeName%</td>
+         </tr>
+         <tr>
+             <td class="success">Уровень</td>
+             <td class="active">%requiredlvl%</td>
+         </tr>
+         <tr>
+             <td class="success">Броня[%armorLvl%]</td>
+             <td class="active">%armor%</td>
+         </tr>

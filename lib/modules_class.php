@@ -5,7 +5,6 @@ require_once "checkvalid_class.php";
 
 abstract class Modules extends Template{
 
-	protected $config;
 	protected $data;
 	protected $db;
 	protected $valid;
@@ -14,8 +13,9 @@ abstract class Modules extends Template{
 	public function __construct($db) {
 		session_start();
 		
-		$this->config = new Config();
 		$this->db = $db;
+		$this->config = $this->db->config;
+		
 		$this->valid = new CheckValid($db);
 		$this->data = $this->secureData(array_merge($_POST, $_GET));
 		if(!$this->getAuthUser()){
@@ -23,10 +23,7 @@ abstract class Modules extends Template{
             header("Location: auth.html");
             return false;
         }
-		//echo memory_get_usage()." - начало";
-		$this->inventory = $this->db->getAllOnField("user_inventory", "id", $_SESSION["id"], "", "");
-		$this->user = $this->db->selectFromTables(array("users", "user_resources", "user_inventory_potions", "user_settings", "user_statistic"), "id", $_SESSION["id"]);
-		//echo memory_get_usage()." - конец";
+		$this->user = $this->db->selectFromTables(array("users", "user_resources", "user_settings", "user_statistic"), "id", $_SESSION["id"]);
 	}
 	
 	private function secureData($data) {

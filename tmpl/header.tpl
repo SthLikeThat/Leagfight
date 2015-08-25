@@ -1,53 +1,84 @@
-<div class="topItem">
-	<div class="lvlAndExp headerInformation" data-title="%currentExp%/%needExp%"><div class="lvl"><img src="image_char/image/lvl.png" height="17">%lvl%</div><div id="percentExp" style="width:%exp%%;" > </div> </div>
-	<div class="resource"><img src="images/coinBlack.png" height="25" class="imgResource"/><div id="gold">%gold%</div></div>
-</div>
-
-<div class="topItem">
-	<div class="lvlAndExp headerInformation" data-title="%currentHp%/%maxHp%"><div class="lvl"><img src="image_char/image/hp.png" height="17"></div> <div id="percentHp" style="width:%hp%%;"> </div> </div>
-	<div class="resource"><img src="images/diamond.png" height="25" class="imgResource"/><div id="another">%another%</div></div>
-</div>
-
-<div class="topItem">
-	<div class="lvlAndExp"> <div id="sleep" onclick="goSleep(0)"> <img src="images/sleep.png" height="17" /> </div> 
-	<div id="rangeSleep"> <input type="range" min="1" max="12" id="range" name="range" value="6" oninput="showHours()" > </div> </div>
-	<div id="sleepHours">   </div>
-	<div id="sleepGo" onclick="goSleep(1)"> <img src="images/go.png" height="17" /> </div>
-	<div class="resource"><img src="images/euro.png" height="25" class="imgResource"/><div id="donat">%donat%</div></div>
-</div>
-
-
-<div class="topItem">
-		<div class="minor">
-		<div class="minorResource"><img src="images/tournament_icon.png" height="18"/>%tournament_icon%</div>
-		<div class="minorResource">Ресурс</div>
-		<div class="minorResource">Ресурс</div>
+<div class="col-lg-2 col-xs-4 header-col">
+	<div class="progress leag-progress-money" data-title="%currentExp% / %needExp%">
+	   <div class="progress-bar-icon-left">
+			<img src="image_char/image/lvl.png" height="17"> 
+			%lvl%
+		</div>
+		<div class="progress-bar progress-bar-exp" style="min-width: 2%; width:%exp%%;"></div>
+	</div>
+	<div class="progress leag-progress-money bg-resource-block">
+		<div class="resource-icon">
+			<img src="images/coinBlack.png">
+		</div>
+		<div class="resource-number">
+			%gold%
+		</div>
 	</div>
 </div>
 
-<div class="topItem">
-	<div class="minor">
-		<div class="minorResource">Ресурс</div>
-		<div class="minorResource">Ресурс</div>
-		<div class="minorResource">Ресурс</div>
+<div class="col-lg-2 col-xs-4 header-col">
+	<div class="progress leag-progress-money" data-title="%currentHp% / %maxHp%">
+	   <div class="progress-bar-icon-left">
+			<img src="image_char/image/hp.png" height="17"> 
+		</div>
+		<div class="progress-bar progress-bar-hp" style="min-width: 2%; width:%hp%%;"></div>
+	</div>
+	<div class="progress leag-progress-money bg-resource-block">
+		<div class="resource-icon">
+			<img src="images/diamond.png">
+		</div>
+		<div class="resource-number">
+			%another%
+		</div>
 	</div>
 </div>
 
-<div class="topItem">
-	<div class="counter">
-		<div class="counter1">	<div id="timeToAttack"> Время до нападения </div>
-		<div id="timerHeader" class="timerHeader"> 
-			<div id="timerMinHeader" class="timerAllHeader" >%timerMin%</div><div class="timerAllHeader">:</div>
-			<div id="timerSecHeader" class="timerAllHeader">%timerSec%</div>	
-		</div> 
+<div class="col-lg-2 col-xs-4 header-col">
+	<div class="progress leag-progress-money" data-title="1ч. 25мин. / 6 часов">
+	   <div class="progress-bar-icon-left" >
+			<img src="images/sleep.png" height="17"> 
+		</div>
+		<div class="progress-bar progress-bar-sleep" style="min-width: 2%; width:20%;"></div>
 	</div>
+	<div class="progress leag-progress-money bg-resource-block">
+		<div class="resource-icon">
+			<img src="images/euro.png">
+		</div>
+		<div class="resource-number">
+			%donat%
+		</div>
+	</div>
+</div>
+
+<div class="col-lg-2 col-xs-4 header-col">
+	<div class="btn-toolbar">
+		<div class="btn-group btn-group-vertical mini-resource-group">
+			<a class="btn btn-default">
+				<img src="images/tournament_icon.png" data-title="Турнирный билет">
+				%tournament_icon%
+			</a>
+			<a class="btn btn-default">Ресурс</a>
+			<a class="btn btn-default">Ресурс</a>
+		</div>
+	</div>
+</div>
+
+<div class="col-lg-2 col-xs-4 header-col">
+	 <div class="btn-toolbar">
+		<div class="btn-group btn-group-vertical mini-resource-group">
+			<a class="btn btn-default">Ресурс</a>
+			<a class="btn btn-default">Ресурс</a>
+			<a class="btn btn-default">Ресурс</a>
+		</div>
+	</div>
+</div>
 	
-	<div class="counter1">	<div id="timeDef"> Время защиты </div> </div>
-	
-	<div class="counter1">	<div id="timeJob"> Время работы </div>
-		<div id="jobHeader" class="widthTimerHeader"> 
-			<div id="jobHourHeader" class="timerAllHeader" ></div>
-			<div id="mda">%mda%</div>
-		</div> 
+<div class="col-lg-2 col-xs-4 header-col">
+	<div class="btn-toolbar">
+		<div class="btn-group btn-group-vertical mini-resource-group">
+			<a class="btn btn-default">Время до нападения</a>
+			<a class="btn btn-default">Время защиты</a>
+			<a class="btn btn-default">Время работы</a>
+		</div>
 	</div>
 </div>
