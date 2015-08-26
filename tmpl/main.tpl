@@ -33,7 +33,21 @@
     <footer class="footer">
         Какая то инфа
     </footer>
-
+    <div class="modal fade in" id="alert_danger">
+      <div class="modal-dialog modal-md " style="margin-top: 10%;">
+          <div class="modal-content">
+              <div class="modal-header alert-danger">
+                 <button class="close" type="button" onclick="$('#alert_danger').hide();">
+                      <i class="glyphicon glyphicon-remove"></i>
+                  </button>
+                  <h4 class="modal-title">Невозможное действие!</h4>
+              </div>
+              <div class="modal-body">
+                    Ваш уровень недостаточен! Нужно как минимум 7 уровень для надевания этой вещи.
+              </div>
+          </div>
+      </div>
+    </div>
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
     <script src="js/bootstrap.js"></script>
     <script src="js/scripta.js"></script>

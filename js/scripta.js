@@ -7,11 +7,15 @@ $(document).ready(function(){
         
 		$("[data-title]").mousemove(function (eventObject) {
 		$data_info = $(this).attr("data-title");
+        leftIndent = 20;
+        var yourX = eventObject.screenX;
+        if(doc_w - yourX < 250)
+            leftIndent = -200;
 		
 		$("#tooltip").text($data_info)
          .css({ 
              "top" : eventObject.pageY + 20,
-            "left" : eventObject.pageX + 20
+            "left" : eventObject.pageX + leftIndent
          })
          .show();
 
@@ -29,6 +33,11 @@ $(document).ready(function(){
         $("[data-info]").mousemove(function (eventObject) {
             
             $('[data-info]').mousemove(function(){
+                leftIndent = 20;
+                var yourX = eventObject.screenX;
+                if(doc_w - yourX < 250)
+                    leftIndent = -200;
+                    
                 $("#tooltip").hide()
                  .text("")
                  .css({
@@ -45,7 +54,7 @@ $(document).ready(function(){
                     $("#tooltip").html(info)
                      .css({ 
                          "top" : eventObject.pageY + 20,
-                        "left" : eventObject.pageX + 20
+                        "left" : eventObject.pageX + leftIndent
                      })
                      .show();
                 }, 600);
@@ -112,51 +121,69 @@ $(document).ready(function(){
         var inventory_item = eventObject.target.parentElement;
         var hash = $(inventory_item).attr("data-hash");
         var image = inventory_item.children[0].innerHTML;
-
+        var childs = eventObject.target.parentElement.children;
+        var info = getChildrenBLock(childs, "pop-info", "class").innerHTML;
+        
+        var serverResult = $.post( "../lib/inventoryFunctions.php", { 'WhatIMustDo': "toggle_thing", 'hash': hash });
         /* Запрос возвращает куда надеть(item) и как надеть(type) :
-        change - заменить вещь, on - чисто надеть, off - чисто снять */
-        resultData = {"result": true, "item": "armor", "type": "change"};
-        if(resultData.result){
-            if (resultData.type == "change"){
-                //Текущая
-                var item = $("#" + resultData.item);
-                var ItemHash = $(item).attr("data-hash");
-                //Он же в инвентаре
-                var item_inv = $(".main-inventory [data-hash=" + ItemHash + "]");
-                
-                //Надеваем в инвентаре
-                $(inventory_item).attr("data-on", "1");
-                //Надеваем в панельке
-                $("#" + resultData.item + " .inventory-item-image").html(image);
-                $("#" + resultData.item).attr("data-hash", hash);
-                //Снимаем в инвентаре предыдущую
-                $(item_inv).attr("data-on", "0");
-            }
-            if (resultData.type == "on"){
-                //Надеваем в инвентаре
-                $(inventory_item).attr("data-on", "1");
-                
-                //Надеваем в панельке
-                $("#" + resultData.item + " .inventory-item-image").html(image);
-                $("#" + resultData.item).attr("data-hash", hash);
-            }
+        change - заменить вещь, on - чисто надеть, off - чисто снять 
+        Пример удачной смены вещи: resultData = {"result": true, "item": "armor", "type": "change", errors: "", statistic: {}};*/
+        serverResult .done(function( data ) {
+            var resultData = JSON.parse(data);
             
-            if (resultData.type == "off"){
-                var ItemHash = $(item).attr("data-hash");
-                var item_inv = $(".main-inventory [data-hash=" + ItemHash + "]");
-                
-                //Снимаем в панельке
-                $("#" + resultData.item + " .inventory-item-image").html('<img src="images/cloth/mini/' + resultData.item + '.png" height="60">');
-                $("#" + resultData.item).attr("data-on", "0");
-                $("#" + resultData.item).attr("data-show", "0");
-                
-                //Снимаем в инвентаре
-                $(item_inv).attr("data-on", "0");
-                
+            if(resultData.result){
+                if (resultData.type == "change"){
+                    //Текущая
+                    var item = $("#" + resultData.item);
+                    var ItemHash = $(item).attr("data-hash");
+                    //Он же в инвентаре
+                    var item_inv = $(".main-inventory [data-hash=" + ItemHash + "]");
+
+                    //Надеваем в инвентаре
+                    $(inventory_item).attr("data-on", "1");
+                    //Надеваем в панельке
+                    $("#" + resultData.item + " .inventory-item-image").html(image);
+                    $("#" + resultData.item).attr("data-hash", hash);
+                     $("#" + resultData.item + " .pop-info").html(info);
+                    //Снимаем в инвентаре предыдущую
+                    $(item_inv).attr("data-on", "0");
+                }
+                if (resultData.type == "on"){
+                    //Надеваем в инвентаре
+                    $(inventory_item).attr("data-on", "1");
+
+                    //Надеваем в панельке
+                    $("#" + resultData.item + " .inventory-item-image").html(image);
+                    $("#" + resultData.item).attr("data-hash", hash);
+                    $("#" + resultData.item).attr("data-on", "1");
+                    $("#" + resultData.item).attr("data-show", "1");
+                    $("#" + resultData.item + " .pop-info").html(info);
+                }
+
+                if (resultData.type == "off"){
+                    var ItemHash = $(item).attr("data-hash");
+                    var item_inv = $(".main-inventory [data-hash=" + hash + "]");
+
+                    //Снимаем в панельке
+                    $("#" + resultData.item + " .inventory-item-image").html('<img src="images/cloth/mini/' + resultData.item + '.png" height="60">');
+                    $("#" + resultData.item).attr("data-on", "0");
+                    $("#" + resultData.item).attr("data-show", "0");
+
+                    //Снимаем в инвентаре
+                    $(item_inv).attr("data-on", "0"); 
+                }
+                //Заменяем новую статистику
+                $.each(resultData.statistic, function(index, value) {
+                    $(".statistic-group #" + index + " .value").html(value);
+                }); 
+                //Скрываем текущую кнопку
+                $(eventObject.currentTarget).hide();
             }
-            //Скрываем текущую кнопку
-            $(eventObject.currentTarget).hide();
-        }
+            else{
+                $("#alert_danger .modal-body").html(resultData.error);
+                $("#alert_danger").show();
+            }
+        });
     });
 });
 

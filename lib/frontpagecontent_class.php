@@ -2,7 +2,9 @@
 require_once "modules_class.php";
 
 class FrontPageContent extends Modules {
-
+	
+	private $damageInformation;
+	
 	public function __construct($db) {
 		parent::__construct($db);
 	}
@@ -12,7 +14,10 @@ class FrontPageContent extends Modules {
             return false;
 		$this->inventory = $this->db->getAllOnField("user_inventory", "id", $_SESSION["id"], "", "");
 		$this->potions = $this->db->getAllOnField("user_inventory_potions", "id", $_SESSION["id"], "", "");
-		$this->getAllInventory();
+		$inventories = $this->db->ancillary->getAllInventory($this->inventory, $this->potions);
+		$this->inventory_database = $inventories["inventory"];
+		$this->inventory_potions_database = $inventories["potions"];
+		unset($inventories);
 		
 		$sr["characteristics"] = $this->getCharacteristics();
 		$sr["nick"] = $this->user["login"];
@@ -21,78 +26,18 @@ class FrontPageContent extends Modules {
 		$sr["equipment"] = $this->getEquipment();
 		$sr["inventory"] = $this->getInventory();
 		$sr["invPotions"] = $this->getPotions();
-		$sr["damageInformation"] = $this->getDamageInformation();
+		$sr["damageInformation"] = $this->db->ancillary->getDamageInformation($this->user, $this->damageInformation);
 		
 		$discount = 100;
 		for($i = 1; $i <= $this->user["lvl"]; $i++) 
 			$discount = $discount -($discount * 0.02);
 		$modal["discount"] = round(100 - $discount."%", 3);
-		$sr["modales"] = $this->getReplaceTemplate($modal, "modal_training");
+		$modales = $this->getReplaceTemplate($modal, "modal_training");
+		$modales .= $this->getReplaceTemplate($modal, "modal_deleting");
+		$sr["modales"] = $modales;
 		
 		return $this->getReplaceTemplate($sr, "center");
 	}
-	
-	private function getAllInventory(){
-		foreach($this->inventory as $key => $inventory_item){
-			if($inventory_item == "999")
-				break;
-			if(!is_numeric($inventory_item) && (int) $key == 0){
-				$inventory_item = unserialize($inventory_item);
-				if($inventory_item["id"] < 500){
-					$weapons[] = $inventory_item["id"];
-				}
-				if($inventory_item["id"] > 500 && $inventory_item["id"] < 1000){
-					$armors[] = $inventory_item["id"];
-				}
-			}
-		}
-		
-		$count = count($this->potions);
-		for($i = 1; $i < $count; $i++){
-			if($this->potions["potion$i"] == "999")
-				break;
-			if($this->potions["potion$i"] != "0"){
-				$inventory_item = unserialize($this->potions["potion$i"]);
-				$potions[] = $inventory_item["id"];
-			}
-		}
-		
-		$this->inventory_database = array_merge($this->db->selectIN("weapon", "id", $weapons), $this->db->selectIN("armor", "id", $armors));
-		$this->inventory_potions_database = $this->db->selectIN("something", "id", $potions);
-	}
-	
-    private function getDamageInformation(){
-		$user["armorTypes"] = array(1 => 0, 2 => 0, 3 => 1);
-		foreach($this->damageInformation as $key => $thing){
-			if($key != "primaryWeapon" && $key != "secondaryWeapon"){
-				$totalArmor += $thing["armor"];
-				$user["armorTypes"][$thing["type"]] = 1;
-			}
-				
-			$user['Strengh'] += $thing["bonusstr"];
-			$user['Defence'] += $thing["bonusdef"];
-			$user['Agility'] += $thing["bonusag"];
-			$user['Physique'] += $thing["bonusph"];
-			$user['Mastery'] += $thing["bonusms"];
-		}
-		$user["Strengh"] += $this->user["Strengh"];
-		$user["Defence"] += $this->user["Defence"];
-		$user["Agility"] += $this->user["Agility"];
-		$user["Physique"] += $this->user["Physique"];
-		$user["Mastery"] += $this->user["Mastery	"];
-		
-        $sr["damage"] = round($this->damageInformation["primaryWeapon"]["damage"] * $user["Strengh"], 0);
-        $sr["damageHeavy"] = round($this->db->ancillary->getDamageBonus($this->damageInformation["primaryWeapon"]["typedamage"], array(1 => 0, 2 => 0, 3 => 1) ) * $sr["damage"], 0);
-        $sr["damageMedium"] = round($this->db->ancillary->getDamageBonus($this->damageInformation["primaryWeapon"]["typedamage"], array(1 => 0, 2 => 1, 3 => 0) ) * $sr["damage"], 0);
-        $sr["damageLight"] = round($this->db->ancillary->getDamageBonus($this->damageInformation["primaryWeapon"]["typedamage"], array(1 => 1, 2 => 0, 3 => 0) ) * $sr["damage"], 0);
-		
-        $sr["armor"] = round($totalArmor * $user["Defence"], 0);
-        $sr["armorPiercing"] = round($this->db->ancillary->getDamageBonus("1", $user["armorTypes"]) * $sr["armor"] , 0);
-        $sr["armorCutting"] = round($this->db->ancillary->getDamageBonus("2", $user["armorTypes"]) * $sr["armor"] , 0);
-        $sr["armorMaces"] = round($this->db->ancillary->getDamageBonus("3", $user["armorTypes"]) * $sr["armor"] , 0);
-		
-        return $this->getReplaceTemplate($sr, "damageInformation");
-    }
 
 	private function getEquipment($array = false){
 		for($i = 1; $i < count($this->inventory); $i++){
@@ -151,26 +96,32 @@ class FrontPageContent extends Modules {
 		if($this->user["primaryWeapon"] == "0"){
 			$sr["primaryWeapon"] = "primaryWeapon";
 			$sr["hashPrim"] = 0;
+			$sr["primaryWeaponInfo"] = "";
 		}
 		if($this->user["secondaryWeapon"] == "0"){
 			$sr["secondaryWeapon"] = "secondaryWeapon";
 			$sr["hashSec"] = 0;
+			$sr["secondaryWeaponInfo"] = "";
 		}
 		if($this->user["armor"] == "0"){
 			$sr["armor"] = "armor";
 			$sr["hashArmor"] = 0;
+			$sr["armorInfo"] = "";
 		}
 		if($this->user["helmet"] == "0"){
 			$sr["helmet"] = "helmet";
 			$sr["hashHelmet"] = 0;
+			$sr["helmetInfo"] = "";
 		}
 		if($this->user["bracers"] == "0"){
 			$sr["bracers"] = "bracers";
 			$sr["hashBracers"] = 0;
+			$sr["bracersInfo"] = "";
 		}
 		if($this->user["leggings"] == "0"){
 			$sr["leggings"] = "leggings";
 			$sr["hashLeggings"] = 0;
+			$sr["leggingsInfo"] = "";
 		}
 		
 		$text = $this->getReplaceTemplate($sr, "equipment");

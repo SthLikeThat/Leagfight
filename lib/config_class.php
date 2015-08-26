@@ -5,7 +5,7 @@ class Config{
 	var $sitename = "game";
 	var $address = "http://zadanie/";
 	var $secret = "mgm2";
-	var $host = "localhost";
+	var $host = "192.168.0.100";
 	var $db = "Opros";
 	var $db_prefix = "smgys_";
 	var $user = "simple_man";

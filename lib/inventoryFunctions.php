@@ -5,15 +5,22 @@ require_once "auth.php";
 class inventoryFunctions extends DataBase{
 
     private $db;
-    private $user;
+	private $user;
+    private $inventory;
+    private $potions;
+    private $inventories_database;
 
     public function __construct() {
         parent::__construct();
         $this->db = $this;
         session_start();
         $this->user = $this->db->selectFromTables(array("users", "user_resources", "user_settings", "user_statistic"), "id", $_SESSION["id"]);
+		
         $this->inventory = $this->db->getAllOnField("user_inventory", "id", $this->user["id"], "", "");
-        $this->inventoryPotions = $this->db->getAllOnField("user_inventory_potions", "id", $this->user["id"], "", "");
+		$this->potions = $this->db->getAllOnField("user_inventory_potions", "id", $this->user["id"], "", "");
+		$this->inventories_database = $this->db->ancillary->getAllInventory($this->inventory, $this->potions);
+		
+       
     }
 
     public function query($query){
@@ -23,6 +30,150 @@ class inventoryFunctions extends DataBase{
         return $result;
     }
 
+	public function toggle($hash){
+		//  Пример ответа$resultData = array("result" => true, "item" => "armor", "type" => "change", "error" => 0);
+		$resultData = array();
+		$result = 0;
+		$this->db->mysqli->autocommit(false);
+		if($inventory_item["id"] < 1000){
+			//Ищем пришедшую вещь в инвентаре
+			foreach($this->inventory as $tempthing){
+				if($tempthing != "0" and $tempthing != "999"){
+					$tempthing = unserialize($tempthing);
+					//Находима текущую вещь
+					if($tempthing["hash"] == $hash){
+						$thing = $tempthing;
+					}
+					//Находим все вещи для изменения статистики
+					if($tempthing["hash"] == $this->user["primaryWeapon"])
+						$damageInformation["primaryWeapon"] = $tempthing;
+					if($tempthing["hash"] == $this->user["secondaryWeapon"])
+						$damageInformation["secondaryWeapon"] = $tempthing;
+					if($tempthing["hash"] == $this->user["helmet"])
+						$damageInformation["helmet"] = $tempthing;
+					if($tempthing["hash"] == $this->user["armor"])
+						$damageInformation["armor"] = $tempthing;
+					if($tempthing["hash"] == $this->user["bracers"])
+						$damageInformation["bracers"] = $tempthing;
+					if($tempthing["hash"] == $this->user["leggings"])
+						$damageInformation["leggings"] = $tempthing;
+				}
+			}
+			//Находим о ней информацию в базе
+			foreach($this->inventories_database["inventory"] as $inventory_item){
+				if($inventory_item["id"] == $thing["id"])
+					break;
+			}
+			
+			//Определяем тип вещи(Для оружия нужно уточнение в какой оно руке)
+			if($inventory_item["thing"] == 2)
+				$resultData["item"] = "armor";
+			if($inventory_item["thing"] == 3)
+				$resultData["item"] = "helmet";
+			if($inventory_item["thing"] == 4)
+				$resultData["item"] = "leggings";
+			if($inventory_item["thing"] == 5)
+				$resultData["item"] = "bracers";
+			if($inventory_item["thing"] == 6)
+				$resultData["item"] = "secondaryWeapon";
+			
+			//Снимаем если хеш совпадает
+			if($this->user["primaryWeapon"] == $hash){
+				$resultData["item"] = "primaryWeapon";
+				$resultData["type"] = "off";
+			}
+			if($this->user["secondaryWeapon"] == $hash){
+				$resultData["item"] = "secondaryWeapon";
+				$resultData["type"] = "off";
+			}
+			if($this->user["helmet"] == $hash || $this->user["armor"] == $hash || $this->user["bracers"] == $hash || $this->user["leggings"] == $hash)
+				$resultData["type"] = "off";
+			
+			//Нет, надо не снять, а нечто другое
+			if(!$resultData["type"]){
+				if($inventory_item["thing"] == 1){
+					if($this->user["secondaryWeapon"] == "0")
+						$resultData["item"] = "secondaryWeapon";
+					else
+						$resultData["item"] = "primaryWeapon";
+				}
+				if($this->user[$resultData["item"]] == "0"){
+					$resultData["type"] = "on";
+				}
+				//Значит надо заменить вещь
+				if(!$resultData["type"]){
+					$resultData["type"] = "change";
+				}
+			}
+			
+			//Что делать опредились, теперь надо это делать
+			if($resultData["type"] == "change" || $resultData["type"] == "on"){
+				if($inventory_item["lvl"] <= $this->user["lvl"]){
+					$this->db->update("users", array($resultData["item"] => $hash), "`id` = " . $this->user["id"]);
+					$damageInformation[$resultData["item"]] = $thing;
+				}
+				else{
+					$resultData["error"] = "Ваш уровень слишком низок для этой вещи!";
+					$resultData["result"] = false;
+					$result = false;
+				}
+			}
+			if($resultData["type"] == "off"){
+				$this->db->update("users", array($resultData["item"] => 0), "`id` = " . $this->user["id"]);
+				unset($damageInformation[$resultData["item"]]);
+			}
+		}
+		
+		if(!$resultData["result"])
+			$result = $this->db->mysqli->commit();
+		
+		if($result)
+			$resultData["result"] = true;
+		else{
+			$resultData["result"] = false;
+			$resultData["error"] = "Возникла серверная ошибка";
+		}
+		
+		//Вытягиваем новую статистику урона
+		if($resultData["result"]){
+			foreach($this->inventories_database["inventory"] as $inventory_db_item){ //Для каждой вещи в базе
+				foreach($damageInformation as $key => $info_item){ 
+					if($inventory_db_item["id"] == $info_item["id"]){ //Находим такую же вещь в надетом
+						$modificator = 1;
+						
+						//Модификаторы для оружия
+						if($info_item["id"] < 500){
+							$damage[0] = $inventory_db_item["damage"];
+							$crit[0] = $inventory_db_item["crit"];
+							for($i = 1; $i <= 5; $i++){
+								$modificator += 0.05;
+								$damage[$i] = round($damage[0] * $modificator, 2);
+								$crit[$i] = round($crit[0] * $modificator,2);
+							}
+							$inventory_db_item["crit"] = $crit[$info_item["crit"]];
+							$inventory_db_item["damage"] = $damage[$info_item["damage"]];
+						}
+						
+						//Модификаторы для брони
+						if($info_item["id"] > 500 && $info_item["id"] < 1000){
+							$armor[0] = (float) $inventory_db_item["defence"];
+							for($i = 1; $i <= 5; $i++){
+								$modificator += 0.05;
+								$armor[$i] = round($armor[0] * $modificator, 2);
+							}
+							$inventory_db_item["armor"] = $armor[$info_item["armor"]];
+						}
+						
+						$info[$key] = $inventory_db_item;
+					}
+				}
+			}
+			$resultData["statistic"] = $this->db->ancillary->getDamageInformation($this->user, $info, true);
+		}
+		
+		echo json_encode($resultData);
+	}
+	
     public function putOff($slot){
         echo memory_get_usage()/1024 ." - начало";
         //Снятие через надетые вещи
@@ -606,39 +757,42 @@ class inventoryFunctions extends DataBase{
 }
     $inventoryFunctions = new inventoryFunctions();
 
-switch ($_REQUEST["WhatIMustDo"]) {
+switch ($_POST["WhatIMustDo"]) {
+	case "toggle_thing":
+		$inventoryFunctions->toggle($_POST["hash"]);
+		break;
     case "putOffThisThing":
-        $inventoryFunctions->putOff($_REQUEST["slot"]);
+        $inventoryFunctions->putOff($_POST["slot"]);
         break;
     case "deleteThis":
-        $inventoryFunctions->deleteThis($_REQUEST["slot"], $_REQUEST["type"]);
+        $inventoryFunctions->deleteThis($_POST["slot"], $_POST["type"]);
         break;
     case "wantDelete":
-        $inventoryFunctions->wantDelete($_REQUEST["slot"], $_REQUEST["type"]);
+        $inventoryFunctions->wantDelete($_POST["slot"], $_POST["type"]);
         break;
     case "putOnThisThing":
-        $inventoryFunctions->put($_REQUEST["slot"]);
+        $inventoryFunctions->put($_POST["slot"]);
         break;
     case "showDetails":
-        $inventoryFunctions->show($_REQUEST["iden"], 0, $_REQUEST["inStorage"]);
+        $inventoryFunctions->show($_POST["iden"], 0, $_POST["inStorage"]);
         break;
     case "showDetailsSmith":
-        $inventoryFunctions->showDetailsSmith($_REQUEST["slot"]);
+        $inventoryFunctions->showDetailsSmith($_POST["slot"]);
         break;
     case "getMenuSmith":
-        $inventoryFunctions->getMenuSmith($_REQUEST["slot"]);
+        $inventoryFunctions->getMenuSmith($_POST["slot"]);
         break;
     case "buyThing":
-        $inventoryFunctions->buy($_REQUEST["iden"]);
+        $inventoryFunctions->buy($_POST["iden"]);
         break;
     case "useIt":
-        $inventoryFunctions->useIt($_REQUEST["name"]);
+        $inventoryFunctions->useIt($_POST["name"]);
         break;
     case "buyPotion":
-        $inventoryFunctions->buyPotion($_REQUEST["iden"]);
+        $inventoryFunctions->buyPotion($_POST["iden"]);
         break;
     case "upSmith":
-        $inventoryFunctions->upSmith($_REQUEST["type"], $_REQUEST["slot"], $_REQUEST["damageLvl"], $_REQUEST["critLvl"], $_REQUEST["armorLvl"]);
+        $inventoryFunctions->upSmith($_POST["type"], $_POST["slot"], $_POST["damageLvl"], $_POST["critLvl"], $_POST["armorLvl"]);
         break;
 }
 ?>
