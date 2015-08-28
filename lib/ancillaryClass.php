@@ -17,14 +17,34 @@ class Ancillary{
         else exit;
     }
 
+	function inverse($x) {
+    if (!$x) {
+        throw new Exception('Деление на ноль.');
+    }
+    return 1/$x;
+}
+
 	public function getAllInventory($inventory, $potions){
+		try{
+			if(!is_bool($inventory) && !is_array($inventory)){
+				 throw new Exception('Параметр inventory должен быть либо bool, либо array.');
+			}
+			if(!is_bool($potions) && !is_array($potions)){
+				 throw new Exception('Параметр potions должен быть либо bool, либо array.');
+			}
+		}
+		catch (Exception $e) {
+			$exception = array("text" => $e->getMessage(), "file" => $e->getFile(), "method" => __METHOD__, "line" => $e->getLine());
+			echo $this->db->getReplaceTemplate($exception, "exception");
+		}
+		
 		//Вытаскивает все вещи находящиеся в $inventory из базы
 		if($inventory){
 			foreach($inventory as $key => $inventory_item){
 				if($inventory_item == "999")
 					break;
 				if(!is_numeric($inventory_item) && (int) $key == 0){
-					$inventory_item = unserialize($inventory_item);
+					$inventory_item = (array) json_decode($inventory_item);
 					if($inventory_item["id"] < 500){
 						$weapons[] = $inventory_item["id"];
 					}
@@ -33,7 +53,11 @@ class Ancillary{
 					}
 				}
 			}
-			$resultData["inventory"] = array_merge($this->db->selectIN("weapon", "id", $weapons), $this->db->selectIN("armor", "id", $armors));
+			if(count($weapons) > 0)
+				$weapons_data = $this->db->selectIN("weapon", "id", $weapons);
+			if(count($armors) > 0)
+				$armors_data = $this->db->selectIN("armor", "id", $armors);
+			$resultData["inventory"] = array_merge($weapons_data, $armors_data);
 		}
 		//Вытаскивает все вещи находящиеся в $potions из базы
 		if($potions){
@@ -42,23 +66,25 @@ class Ancillary{
 				if($potions["potion$i"] == "999")
 					break;
 				if($potions["potion$i"] != "0"){
-					$inventory_item = unserialize($potions["potion$i"]);
+					$inventory_item = (array) json_decode($potions["potion$i"]);
 					$potionsData[] = $inventory_item["id"];
 				}
 			}
-			$resultData["potions"] = $this->db->selectIN("something", "id", $potionsData);
+			if(count($potionsData) > 0)
+				$resultData["potions"] = $this->db->selectIN("something", "id", $potionsData);
 		}
 		
 		return $resultData;
 	}
 	
-	public function getDamageInformation($user, $damageInformation, $returnArray = false){
+	public function getDamageInformation(array $user, array $damageInformation, $returnArray = false){
 		// $returnArray нужен для получения инфы после снятия/надеваняи вещи в inventoryFunctions->toggle
-		$user["armorTypes"] = array(1 => 0, 2 => 0, 3 => 1);
+		$user["armorTypes"] = array(1 => 0, 2 => 0, 3 => 0);
 		foreach($damageInformation as $key => $thing){
 			if($key != "primaryWeapon" && $key != "secondaryWeapon"){
 				$totalArmor += $thing["armor"];
-				$user["armorTypes"][$thing["type"]] = 1;
+				if($thing["typeDefence"] != 0)
+					$user["armorTypes"][(int)$thing["typeDefence"]] = 1;
 			}
 				
 			$user['Strengh'] += $thing["bonusstr"];
@@ -71,7 +97,8 @@ class Ancillary{
 		$user["Defence"] += $this->user["Defence"];
 		$user["Agility"] += $this->user["Agility"];
 		$user["Physique"] += $this->user["Physique"];
-		$user["Mastery"] += $this->user["Mastery	"];
+		$user["Mastery"] += $this->user["Mastery"];
+		//print_r($user["armorTypes"]);
 		
         $sr["damage"] = round($damageInformation["primaryWeapon"]["damage"] * $user["Strengh"], 0);
         $sr["damageHeavy"] = round($this->getDamageBonus($damageInformation["primaryWeapon"]["typedamage"], array(1 => 0, 2 => 0, 3 => 1) ) * $sr["damage"], 0);
@@ -79,9 +106,9 @@ class Ancillary{
         $sr["damageLight"] = round($this->getDamageBonus($damageInformation["primaryWeapon"]["typedamage"], array(1 => 1, 2 => 0, 3 => 0) ) * $sr["damage"], 0);
 		
         $sr["armor"] = round($totalArmor * $user["Defence"], 0);
-        $sr["armorPiercing"] = round($this->getDamageBonus("1", $user["armorTypes"]) * $sr["armor"] , 0);
-        $sr["armorCutting"] = round($this->getDamageBonus("2", $user["armorTypes"]) * $sr["armor"] , 0);
-        $sr["armorMaces"] = round($this->getDamageBonus("3", $user["armorTypes"]) * $sr["armor"] , 0);
+        $sr["armorPiercing"] = round($this->getDamageBonus(1, $user["armorTypes"]) * $sr["armor"] , 0);
+        $sr["armorCutting"] = round($this->getDamageBonus(2, $user["armorTypes"]) * $sr["armor"] , 0);
+        $sr["armorMaces"] = round($this->getDamageBonus(3, $user["armorTypes"]) * $sr["armor"] , 0);
 		
 		if($returnArray)
 			return $sr;
@@ -233,19 +260,20 @@ class Ancillary{
         return $result;
     }
 
-    public function getDamageBonus($typedamage, $armorTypes){
+    public function getDamageBonus($typedamage, array $armorTypes){
         $damageBonus = 1;
-        if($typedamage == "1"){
+		$typedamage = (int) $typedamage;
+        if($typedamage == 1){
             if($armorTypes[1] == 1) $damageBonus += 0;
             if($armorTypes[2] == 1) $damageBonus += 0.25;
             if($armorTypes[3] == 1) $damageBonus -= 0.25;
         }
-        if($typedamage == "2"){
+        if($typedamage == 2){
             if($armorTypes[1] == 1) $damageBonus -= 0.25;
             if($armorTypes[2] == 1) $damageBonus += 0;
             if($armorTypes[3] == 1) $damageBonus -= 0.25;
         }
-        if($typedamage == "3"){
+        if($typedamage == 3){
             if($armorTypes[1] == 1) $damageBonus -= 0.25;
             if($armorTypes[2] == 1) $damageBonus += 0;
             if($armorTypes[3] == 1) $damageBonus += 0.25;

@@ -29,17 +29,30 @@ class inventoryFunctions extends DataBase{
         }
         return $result;
     }
-
+	
+	private function getPercent($current, $max){
+			$procent = 100/$max;
+			$length = $procent * $current;
+			$length = round($length, 0);
+			return $length;
+	}
+	
 	public function toggle($hash){
-		//  Пример ответа$resultData = array("result" => true, "item" => "armor", "type" => "change", "error" => 0);
+		if(!is_string($hash)){
+			$resultData = array("result" => false, "error" => "Возникла серверная ошибка");
+			die(json_encode($resultData));
+		}
+		//  Пример ответа $resultData = array("result" => true, "item" => "armor", "type" => "change", "error" => 0);
 		$resultData = array();
 		$result = 0;
+		$thing = false;
+		
 		$this->db->mysqli->autocommit(false);
 		if($inventory_item["id"] < 1000){
 			//Ищем пришедшую вещь в инвентаре
 			foreach($this->inventory as $tempthing){
 				if($tempthing != "0" and $tempthing != "999"){
-					$tempthing = unserialize($tempthing);
+					$tempthing = (array) json_decode($tempthing);
 					//Находима текущую вещь
 					if($tempthing["hash"] == $hash){
 						$thing = $tempthing;
@@ -58,6 +71,10 @@ class inventoryFunctions extends DataBase{
 					if($tempthing["hash"] == $this->user["leggings"])
 						$damageInformation["leggings"] = $tempthing;
 				}
+			}
+			if(!$thing){
+				$resultData = array("result" => false, "error" => "Нет такой вещи в инвентаре");
+				die(json_encode($resultData));
 			}
 			//Находим о ней информацию в базе
 			foreach($this->inventories_database["inventory"] as $inventory_item){
@@ -91,6 +108,7 @@ class inventoryFunctions extends DataBase{
 			
 			//Нет, надо не снять, а нечто другое
 			if(!$resultData["type"]){
+				//Может надеть?
 				if($inventory_item["thing"] == 1){
 					if($this->user["secondaryWeapon"] == "0")
 						$resultData["item"] = "secondaryWeapon";
@@ -156,7 +174,7 @@ class inventoryFunctions extends DataBase{
 						
 						//Модификаторы для брони
 						if($info_item["id"] > 500 && $info_item["id"] < 1000){
-							$armor[0] = (float) $inventory_db_item["defence"];
+							$armor[0] = (float) $inventory_db_item["armor"];
 							for($i = 1; $i <= 5; $i++){
 								$modificator += 0.05;
 								$armor[$i] = round($armor[0] * $modificator, 2);
@@ -174,145 +192,156 @@ class inventoryFunctions extends DataBase{
 		echo json_encode($resultData);
 	}
 	
-    public function putOff($slot){
-        echo memory_get_usage()/1024 ." - начало";
-        //Снятие через надетые вещи
-        if(is_string($slot)){
-            if($slot == "helmet" or $slot == "armor" or $slot == "bracers" or $slot == "leggings" or $slot == "primaryWeapon" or $slot == "secondaryWeapon"){
-                $this->db->setFieldOnID("users", $this->user["id"], $slot, 0);
-                exit;
-            }
+	public function delete_thing($hash, $name){
+		if(!is_string($hash) && !is_null($hash) || !is_string($name) && !is_null($name)){
+			$resultData = array("result" => false, "error" => "Возникла серверная ошибка");
+			die(json_encode($resultData));
+		}
+		// Если пришел hash - удаляем из инвентаря, name - из зелий
+		// Пример ответа $resultData = array("result" => true, item => "helmet", "error" => 0);
+		$resultData = array();
+		$result = 0;
+		
+		$this->db->mysqli->autocommit(false);
+		if(!is_null($hash)){
+			//Ищем пришедшую вещь в инвентаре
+			foreach($this->inventory as $slot => $tempthing){
+				if($tempthing != "0" and $tempthing != "999"){
+					$tempthing = (array) json_decode($tempthing);
+					//Находима текущую вещь
+					if($tempthing["hash"] == $hash){
+						$slot_in_inventory = $slot;
+						break;
+					}
+				}
+			}
+		}
+		else{
+			foreach($this->potions as $slot => $tempthing){
+				if($tempthing != "0" and $tempthing != "999"){
+					$tempthing = (array) json_decode($tempthing);
+					//Находима текущуе зелье
+					if($tempthing["image"] == $name){
+						$slot_in_inventory = $slot;
+						break;
+					}
+				}
+			}
+		}
+		//Если пришла вещь, то надо проверить её наличие в экипировке
+		if(!is_null($hash)){
+			$equipment = array("primaryWeapon" => $this->user["primaryWeapon"], "secondaryWeapon" => $this->user["secondaryWeapon"], 
+			"helmet" => $this->user["helmet"], "armor" => $this->user["armor"], 
+			"bracers" => $this->user["bracers"], "leggings" => $this->user["leggings"]);
+			
+			foreach($equipment as $item => $equip_hash){
+				if($equip_hash == $hash){
+					$resultData["item"] = $item;
+					break;
+				}	
+			}
+		}
+		//Удаляем
+		if($slot_in_inventory){
+			if(!is_null($hash))
+				$this->db->update("user_inventory", array($slot_in_inventory => 0), "`id` = {$this->user["id"]}");
+			else
+				$this->db->update("user_inventory_potions", array($slot_in_inventory => 0), "`id` = {$this->user["id"]}");
+		}
+		if($resultData["item"]){
+			$this->db->update("users", array($resultData["item"] => 0), "`id` = {$this->user["id"]}");
+		}
+		$result = $this->db->mysqli->commit();
+		
+		if($result){
+			$resultData["result"] = true;
+		}
+		else{
+			$resultData["result"] = false;
+			$resultData["error"] = "Возникла серверная ошибка";
+		}
+		
+		echo json_encode($resultData);
+	}
+
+	public function use_thing($name){
+		if(!is_string($name)){
+			$resultData = array("result" => false, "error" => "Возникла серверная ошибка[0]");
+			die(json_encode($resultData));
+		}
+		
+		//Ищем есть ли она у юзера в инвентаре
+		foreach($this->potions as $slot => $tempthing){
+			if($tempthing != "0" and $tempthing != "999"){
+				$tempthing = (array) json_decode($tempthing);
+				//Находима текущее зелье
+				if($tempthing["image"] == $name){
+					$slot_in_inventory = $slot;
+					break;
+				}
+			}
+		}
+		if(!$slot_in_inventory){
+			$resultData = array("result" => false, "error" => "Нет такой вещи в инвентаре");
+			die(json_encode($resultData));
+		}
+		
+		//Ищем её в базе
+		foreach($this->inventories_database["potions"] as $potion){
+			if($potion["id"] == $tempthing["id"]){
+				$potion_in_db = $potion;
+				break;
+			}
+			
+		}
+		
+		if(!$potion_in_db){
+			$resultData = array("result" => false, "error" => "Возникла серверная ошибка[1]");
+			die(json_encode($resultData));
+		}
+		
+		$resultData["effect"] = $potion_in_db["typeEffect"];
+		
+		$this->db->mysqli->autocommit(false);
+        if($potion_in_db["typeEffect"] == "healPercent"){
+			
+			if($this->user["maxHp"] == $this->user["currentHp"]){
+				$resultData = array("result" => false, "error" => "У вас и так полно здоровья");
+				die(json_encode($resultData));
+			}
+			
+            $regenHp = round(($this->user["maxHp"] * $potion_in_db["valueEffect"])/100, 0);
+            $newHp = $this->user["currentHp"] + $regenHp;
+
+            if($newHp > $this->user["maxHp"])
+				$newHp = $this->user["maxHp"];
+            $this->db->setField("users", "currentHp", $newHp, "id", $this->user["id"]);
+            $tempthing["count"]--;
+			$resultData["valueEffect"] = $this->getPercent($newHp, $this->user["maxHp"]);
+			$resultData["numberHp"] = $newHp . " / " . $this->user["maxHp"];
+			
+            if( $tempthing["count"] > 0){
+				$this->db->setField("user_inventory_potions", $slot_in_inventory, json_encode($tempthing), "id", $this->user["id"]);
+				$resultData["to_do"] = "count";
+			}
+			else{
+				$this->db->setField("user_inventory_potions", $slot_in_inventory, 0 , "id", $this->user["id"]);
+				$resultData["to_do"] = "delete";
+			}	
         }
-        if($slot > count($this->inventory)) exit;
-        //Снятие через инвентарь
-        $invItem = unserialize($this->inventory["slot$slot"]);
-        if($this->user["armor"] == $invItem["hash"])	$this->db->putThingOn($this->user["id"], "armor", "0");
-        if($this->user["helmet"] == $invItem["hash"])	$this->db->putThingOn($this->user["id"], "helmet", "0");
-        if($this->user["leggings"] == $invItem["hash"])	$this->db->putThingOn($this->user["id"], "leggings", "0");
-        if($this->user["bracers"] == $invItem["hash"])	$this->db->putThingOn($this->user["id"], "bracers", "0");
-
-        if($this->user["secondaryWeapon"] == $invItem["hash"])	$this->db->putThingOn($this->user["id"], "secondaryWeapon", "0");
-        if($this->user["primaryWeapon"] == $invItem["hash"])	$this->db->putThingOn($this->user["id"], "primaryWeapon", "0");
-    }
-
-    public function wantDelete($slot, $type){
-        if(!$this->valid->check_sql($slot)) exit;
-        if($type == 1){
-            $invItem = unserialize($this->inventory["slot$slot"]);
-            if($invItem["id"] < 500) $table_name = "weapon";
-            if($invItem["id"] > 500 and $invItem["id"] < 1000) $table_name = "armor";
-            $item = $this->db->getElementOnID($table_name, $invItem["id"]);
-            $sr["text"] = "Вы действительно хотите удалить ".$item["name"]." ?";
-        }
-        if($type == 2){
-            for($i = 1; $i <= 5; $i++){
-                if($this->inventoryPotions["slot$i"] == $slot)
-                    break;
-            }
-            $item = $this->db->getAllOnField("something", "image", $slot, "", "");
-            $sr["text"] = "Вы действительно хотите удалить ".$item["title"]." ?";
-        }
-        $sr["onclick"] = "shureDelete('$slot', $type)";
-        $sr["textDelete"] = "Удалить";
-        $text = $this->getReplaceTemplate($sr, "deleteAlert");
-        echo $text;
-    }
-
-    public function deleteThis($slot, $type){
-        if($type == 1){
-            $invItem = unserialize($this->inventory["slot$slot"]);
-            $this->db->setFieldOnID("user_inventory", $this->user["id"], "slot$slot", 0);
-            if($this->user["helmet"] == $invItem["hash"])
-                $this->db->setFieldOnID("users", $this->user["id"], "helmet", 0);
-            if($this->user["armor"] == $invItem["hash"])
-                $this->db->setFieldOnID("users", $this->user["id"], "armor", 0);
-            if($this->user["leggings"] == $invItem["hash"])
-                $this->db->setFieldOnID("users", $this->user["id"], "leggings", 0);
-            if($this->user["bracers"] == $invItem["hash"])
-                $this->db->setFieldOnID("users", $this->user["id"], "bracers", 0);
-            if($this->user["primaryWeapon"] == $invItem["hash"])
-                $this->db->setFieldOnID("users", $this->user["id"], "primaryWeapon", 0);
-            if($this->user["secondaryWeapon"] == $invItem["hash"])
-                $this->db->setFieldOnID("users", $this->user["id"], "secondaryWeapon", 0);
-        }
-        if($type == 2){
-            for($i = 1; $i <= 5; $i++){
-                if($this->inventoryPotions["slot$i"] == $slot)
-                    break;
-            }
-            $this->db->setFieldOnID("user_inventory_potions", $this->user["id"], "slot$i", 0);
-            $this->db->setFieldOnID("user_inventory_potions", $this->user["id"], "slot$i"."_count", 0);
-        }
-    }
-
-    public function put($slot){
-        $invItem = unserialize($this->inventory["slot$slot"]);
-        if($invItem["id"] < 500){
-            $weaponInformation = $this->db->getAllOnField("weapon", "id", $invItem["id"], "", "");
-            if($this->user["lvl"] >= $weaponInformation["requiredlvl"]){
-                $weapon = $this->db->getElementOnID("weapon",$invItem["id"]);
-
-                $primaryWeapon = $this->db->getThingByHash($this->user["primaryWeapon"], $this->inventory);
-                if($primaryWeapon["type"] == 2){
-                    $this->db->putThingOn($this->user["id"], "primaryWeapon", $invItem["hash"]);
-                    die("OK");
-                }
-
-                if($this->user["primaryWeapon"] == "0" ){
-                    $this->db->putThingOn($this->user["id"], "primaryWeapon", $invItem["hash"]);
-                    if($weapon["type"] == 2)
-                        $this->db->putThingOn($this->user["id"], "secondaryWeapon", 0);
-                    die("OK");
-                }
-                if($this->user["secondaryWeapon"] == "0" ){
-                    $this->db->putThingOn($this->user["id"], "secondaryWeapon", $invItem["hash"]);
-                }
-                else{
-                    $this->db->putThingOn($this->user["id"], "primaryWeapon", $invItem["hash"]);
-                }
-
-                die("OK");
-            }
-            else die("Нужен ".$weaponInformation["requiredlvl"]." уровень!");
-        }
-
-        if($invItem["id"] > 500 and $invItem["id"] < 1000){
-            $armorInformation = $this->db->getAllOnField("armor", "id", $invItem["id"], "", "");
-            if($this->user["lvl"] >= $armorInformation["requiredlvl"]){
-
-                if($armorInformation["thing"] == 2){
-                    $this->db->putThingOn($this->user["id"], "armor", $invItem["hash"]);
-                    die("OK");
-                }
-
-                if($armorInformation["thing"] == 3){
-                    $this->db->putThingOn($this->user["id"], "helmet", $invItem["hash"]);
-                    die("OK");
-                }
-
-                if($armorInformation["thing"] == 4){
-                    $this->db->putThingOn($this->user["id"], "leggings", $invItem["hash"]);
-                    die("OK");
-                }
-
-                if($armorInformation["thing"] == 5){
-                    $this->db->putThingOn($this->user["id"], "bracers", $invItem["hash"]);
-                    die("OK");
-                }
-
-                if($armorInformation["thing"] == 6){
-                    $weapon = $this->db->getThingByHash($this->user["primaryWeapon"], $this->inventory);
-                    if($weapon["type"] == 2)
-                        die("Нельзя надеть щит с двуручкой. ");
-                    $this->db->putThingOn($this->user["id"], "secondaryWeapon", $invItem["hash"]);
-                    die("OK");
-                }
-            }
-            else die("Нужен ".$armorInformation["requiredlvl"]." уровень!");
-        }
-    }
-
-    public function showDetailsSmith($slot){
+		$result = $this->db->mysqli->commit();
+		
+		if($result){
+			$resultData["result"] = true;
+		}
+		else{
+			$resultData["result"] = false;
+			$resultData["error"] = "Возникла серверная ошибка[2]";
+		}
+		echo json_encode($resultData);
+	}
+    
+	public function showDetailsSmith($slot){
         $invItem = unserialize($this->inventory["slot$slot"]);
         if($invItem["id"] < 500){
             $weapon = $this->db->getElementOnID("weapon", $invItem["id"]);
@@ -415,97 +444,6 @@ class inventoryFunctions extends DataBase{
         }
     }
 
-    public function show($slot, $invItem, $inStorage){
-        if($invItem == 0)
-            $invItem = unserialize($this->inventory["slot$slot"]);
-        if($invItem == null)
-            return false;
-        if($invItem["id"] < 500){
-            $weapon = $this->db->getElementOnID("weapon", $invItem["id"]);
-            if($weapon["type"] == 1){ $type="one"; $typeName="Одноручное";}
-            if($weapon["type"] == 2){ $type="two"; $typeName="Двуручное";}
-            if($weapon["type"] == 3){ $type="staff"; $typeName="Древковое";}
-            if($weapon["typedamage"] == 1){ $typedamage="piercing"; $typedamageName="Колющее";}
-            if($weapon["typedamage"] == 2){ $typedamage="cutting"; $typedamageName="Режущее";}
-            if($weapon["typedamage"] == 3){ $typedamage="maces"; $typedamageName="Дробящее";}
-            $damage[0] = $weapon["damage"];
-            $crit[0] = $weapon["crit"];
-            $modificator = 1;
-            for($i = 1; $i <=5; $i++){
-                $modificator += 0.05;
-                $damage[$i] = round($damage[0] * $modificator,2);
-                $crit[$i] = round($crit[0] * $modificator,2);
-            }
-            $sr["typeName"] = $typeName;
-            $sr["type"] = $type;
-            $sr["typedamage"] = $typedamage;
-            $sr["damageLvl"] = $invItem["damage"];
-            $sr["critLvl"] = $invItem["crit"];
-            $sr["typedamageName"] = $typedamageName;
-            $sr["requiredlvl"] = $weapon["requiredlvl"];
-            $sr["damage"] = $damage[$invItem["damage"]];
-            $sr["crit"] = $crit[$invItem["crit"]];
-
-            $text = $this->getReplaceTemplate($sr, "weaponView");
-
-            if($weapon["bonusstr"]) $text .= "<div class='detail2 photoDetail' data-title='Сила'><img src='image_char/image/strengh.png' alt='Сила'  height='20' > <br />".$weapon["bonusstr"]."</div>";
-            if($weapon["bonusdef"]) $text .= "<div class='detail2 photoDetail' data-title='Защита'><img src='image_char/image/defence.png' alt='Защита'  height='20' > <br/>".$weapon["bonusdef"]."</div>";
-            if($weapon["bonusag"]) $text .= "<div class='detail2 photoDetail' data-title='Ловкость'><img src='image_char/image/agility.png' alt='Ловкость' height='20' > <br/>".$weapon["bonusag"]."</div>";
-            if($weapon["bonusph"]) $text .= "<div class='detail2 photoDetail' data-title='Телосложение'><img src='image_char/image/physique.png' alt='Телосложение'  height='20' > <br/>".$weapon["bonusph"]."</div>";
-            if($weapon["bonusms"]) $text .= "<div class='detail2 photoDetail' data-title='Мастерство'><img src='image_char/image/mastery.png' alt='Мастерство'  height='20' > <br/>".$weapon["bonusms"]."</div>";
-
-            if(!$inStorage)
-                echo $text;
-            else{
-                if($weapon["bonusstr"])  $sr["strengh"] = $weapon["bonusstr"];
-                if($weapon["bonusdef"]) $sr["defence"] = $weapon["bonusdef"];
-                if($weapon["bonusag"]) $sr["agility"] = $weapon["bonusag"];
-                if($weapon["bonusph"]) $sr["physique"] = $weapon["bonusph"];
-                if($weapon["bonusms"]) $sr["mastery"] = $weapon["bonusms"];
-                $sr["id"] = $invItem["id"];
-                echo json_encode($sr);
-            }
-        }
-
-        if($invItem["id"] > 500 and $invItem["id"] < 1000){
-            $armor = $this->db->getElementOnID("armor", $invItem["id"]);
-            if($armor["typeDefence"] == 1){ $type="light"; $typeName="Лёгкая";}
-            if($armor["typeDefence"] == 2){ $type="medium"; $typeName="Средняя";}
-            if($armor["typeDefence"] == 3){ $type="heavy"; $typeName="Тяжелая";}
-
-            $defence[0] = $armor["defence"];
-            $modificator = 1;
-            for($i = 1; $i <=5; $i++){
-                $modificator += 0.05;
-                $defence[$i] = round($defence[0] * $modificator,2);
-            }
-            $sr["type"] = $type;
-            $sr["typeName"] = $typeName;
-            $sr["requiredlvl"] = $armor["requiredlvl"];
-            $sr["armor"] = $defence[$invItem["armor"]];
-            $sr["armorLvl"] = $invItem["armor"];
-            $text = $this->getReplaceTemplate($sr, "armorView");
-
-            if($armor["bonusstr"]) $text .= "<div class='detail2 photoDetail' data-title='Сила'><img src='image_char/image/strengh.png' alt='Сила'  height='20' > <br />".$armor["bonusstr"]."</div>";
-            if($armor["bonusdef"]) $text .= "<div class='detail2 photoDetail' data-title='Защита'><img src='image_char/image/defence.png' alt='Защита'  height='20' > <br/>".$armor["bonusdef"]."</div>";
-            if($armor["bonusag"]) $text .= "<div class='detail2 photoDetail' data-title='Ловкость'><img src='image_char/image/agility.png' alt='Ловкость' height='20' > <br/>".$armor["bonusag"]."</div>";
-            if($armor["bonusph"]) $text .= "<div class='detail2 photoDetail' data-title='Телосложение'><img src='image_char/image/physique.png' alt='Телосложение'  height='20' > <br/>".$armor["bonusph"]."</div>";
-            if($armor["bonusms"]) $text .= "<div class='detail2 photoDetail' data-title='Мастерство'><img src='image_char/image/mastery.png' alt='Мастерство'  height='20' > <br/>".$armor["bonusms"]."</div>";
-
-            if(!$inStorage)
-                echo $text;
-            else{
-                if($armor["bonusstr"])  $sr["strengh"] = $armor["bonusstr"];
-                if($armor["bonusdef"]) $sr["defence"] = $armor["bonusdef"];
-                if($armor["bonusag"]) $sr["agility"] = $armor["bonusag"];
-                if($armor["bonusph"]) $sr["physique"] = $armor["bonusph"];
-                if($armor["bonusms"]) $sr["mastery"] = $armor["bonusms"];
-                $sr["id"] = $invItem["id"];
-                echo json_encode($sr);
-            }
-        }
-    }
-
     private function generateCode($length = 8) {
         $chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPRQSTUVWXYZ0123456789";
         $code = "";
@@ -599,21 +537,6 @@ class inventoryFunctions extends DataBase{
             echo "!";
             exit;
         }
-    }
-
-    private function setFieldInventory($id, $iden) {
-        $inventory = $this->db->getAllOnField("user_inventory", "id", $id, "", "");
-        $field = false;
-        foreach ($inventory as $key => $value){
-            if($value == "0"){
-                $field = $key;
-                break;
-            }
-        }
-        if(!$field)
-            return false;
-        else
-            return $this->db->update("user_inventory", array($field=>$iden), "`id` = '".$id."'");
     }
 
     private function setFieldInvPotion($id){
@@ -753,7 +676,7 @@ class inventoryFunctions extends DataBase{
             }
         }
     }
-
+	
 }
     $inventoryFunctions = new inventoryFunctions();
 
@@ -761,23 +684,11 @@ switch ($_POST["WhatIMustDo"]) {
 	case "toggle_thing":
 		$inventoryFunctions->toggle($_POST["hash"]);
 		break;
-    case "putOffThisThing":
-        $inventoryFunctions->putOff($_POST["slot"]);
+    case "delete_thing":
+        $inventoryFunctions->delete_thing($_POST["hash"], $_POST["name"]);
         break;
-    case "deleteThis":
-        $inventoryFunctions->deleteThis($_POST["slot"], $_POST["type"]);
-        break;
-    case "wantDelete":
-        $inventoryFunctions->wantDelete($_POST["slot"], $_POST["type"]);
-        break;
-    case "putOnThisThing":
-        $inventoryFunctions->put($_POST["slot"]);
-        break;
-    case "showDetails":
-        $inventoryFunctions->show($_POST["iden"], 0, $_POST["inStorage"]);
-        break;
-    case "showDetailsSmith":
-        $inventoryFunctions->showDetailsSmith($_POST["slot"]);
+	case "use_thing":
+        $inventoryFunctions->use_thing($_POST["name"]);
         break;
     case "getMenuSmith":
         $inventoryFunctions->getMenuSmith($_POST["slot"]);

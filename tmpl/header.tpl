@@ -1,5 +1,5 @@
-<div class="col-lg-2 col-xs-4 header-col">
-	<div class="progress leag-progress-money" data-title="%currentExp% / %needExp%">
+<div class="col-lg-2 col-xs-4 header-col" >
+	<div class="progress leag-progress-money" data-title="%currentExp% / %needExp%" id="exp">
 	   <div class="progress-bar-icon-left">
 			<img src="image_char/image/lvl.png" height="17"> 
 			%lvl%
@@ -17,7 +17,7 @@
 </div>
 
 <div class="col-lg-2 col-xs-4 header-col">
-	<div class="progress leag-progress-money" data-title="%currentHp% / %maxHp%">
+	<div class="progress leag-progress-money" data-title="%currentHp% / %maxHp%" id="hp">
 	   <div class="progress-bar-icon-left">
 			<img src="image_char/image/hp.png" height="17"> 
 		</div>
@@ -34,7 +34,7 @@
 </div>
 
 <div class="col-lg-2 col-xs-4 header-col">
-	<div class="progress leag-progress-money" data-title="1ч. 25мин. / 6 часов">
+	<div class="progress leag-progress-money" data-title="1ч. 25мин. / 6 часов" id="sleep">
 	   <div class="progress-bar-icon-left" >
 			<img src="images/sleep.png" height="17"> 
 		</div>

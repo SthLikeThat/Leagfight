@@ -1,7 +1,8 @@
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-	<title>Главная страницы</title>
+	<title>%title%</title>
+	<link rel="shortcut icon" href="../images/icons/%shortcut_icon%.png" type="image/png">
 	<link href="css/main_style.css" rel="stylesheet">
 	
 	<link href="css/bootstrap.css" rel="stylesheet">
@@ -40,10 +41,10 @@
                  <button class="close" type="button" onclick="$('#alert_danger').hide();">
                       <i class="glyphicon glyphicon-remove"></i>
                   </button>
-                  <h4 class="modal-title">Невозможное действие!</h4>
+                  <h4 class="modal-title">Что-то пошло не так</h4>
               </div>
               <div class="modal-body">
-                    Ваш уровень недостаточен! Нужно как минимум 7 уровень для надевания этой вещи.
+                   
               </div>
           </div>
       </div>

@@ -5,13 +5,13 @@
                   <button class="close" type="button" data-dismiss="modal">
                       <i class="glyphicon glyphicon-remove"></i>
                   </button>
-                  <h4 class="modal-title">Удаление вещи</h4>
+                  <h4 class="modal-title">Вы действительно хотие удалить эту вещь?</h4>
               </div>
               <div class="modal-body">
                   <p>Вы действительно хотите удалить эту вещь?</p>
               </div>
               <div class="modal-footer">
-                  <button class="btn btn-success" type="button" style="float: left;"> Удалить </button>
+                  <button class="btn btn-success" type="button" style="float: left;" id="delete"> Удалить </button>
                   <button class="btn btn-danger" type="button" data-dismiss="modal"> Отмена </button>
               </div>
           </div>

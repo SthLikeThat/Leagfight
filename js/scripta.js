@@ -1,11 +1,10 @@
 $(document).ready(function(){	
     var timeout;
-    
 	var doc_w = $(window).width();
     //Всплывающая инфа текст
 	if(doc_w > 768){
         
-		$("[data-title]").mousemove(function (eventObject) {
+    $("[data-title]").mousemove(function (eventObject) {
 		$data_info = $(this).attr("data-title");
         leftIndent = 20;
         var yourX = eventObject.screenX;
@@ -76,7 +75,7 @@ $(document).ready(function(){
 	}
     
     //Отображение и скрытие блоков Надеть/Снять/Удалить
-    $(".inventory-item").mousemove(function (eventObject) {
+    $(".inventory-item, .inventory-item-potion").mousemove(function (eventObject) {
         var on = $(eventObject.currentTarget).attr("data-on");
         var show = $(eventObject.currentTarget).attr("data-show");
         
@@ -120,17 +119,16 @@ $(document).ready(function(){
         var type = eventObject.target.id;
         var inventory_item = eventObject.target.parentElement;
         var hash = $(inventory_item).attr("data-hash");
-        var image = inventory_item.children[0].innerHTML;
-        var childs = eventObject.target.parentElement.children;
-        var info = getChildrenBLock(childs, "pop-info", "class").innerHTML;
+        var info = getChildrenBLock(inventory_item.children, "pop-info", "class").innerHTML;
+        var image = getChildrenBLock(inventory_item.children, "inventory-item-image", "class").innerHTML;
         
         var serverResult = $.post( "../lib/inventoryFunctions.php", { 'WhatIMustDo': "toggle_thing", 'hash': hash });
         /* Запрос возвращает куда надеть(item) и как надеть(type) :
         change - заменить вещь, on - чисто надеть, off - чисто снять 
-        Пример удачной смены вещи: resultData = {"result": true, "item": "armor", "type": "change", errors: "", statistic: {}};*/
+        Пример удачной смены вещи: resultData = {"result": true, "item": "armor", "type": "change", errors: "", statistic: {} };*/
         serverResult .done(function( data ) {
             var resultData = JSON.parse(data);
-            
+           
             if(resultData.result){
                 if (resultData.type == "change"){
                     //Текущая
@@ -168,6 +166,7 @@ $(document).ready(function(){
                     $("#" + resultData.item + " .inventory-item-image").html('<img src="images/cloth/mini/' + resultData.item + '.png" height="60">');
                     $("#" + resultData.item).attr("data-on", "0");
                     $("#" + resultData.item).attr("data-show", "0");
+                    $("#" + resultData.item + " .pop-info").detach();
 
                     //Снимаем в инвентаре
                     $(item_inv).attr("data-on", "0"); 
@@ -184,7 +183,137 @@ $(document).ready(function(){
                 $("#alert_danger").show();
             }
         });
+         serverResult .fail(function() {
+                $("#alert_danger .modal-body").html("Возникла серверная ошибка");
+                $("#alert_danger").show();
+         });
     });
+    
+     //Использовать зелье в инвентаре, эта функция в будущем обещает быть очень длинной
+     $(".inventory-item-potion .inventory-control").click(function (eventObject) {
+         var inventory_item =  eventObject.currentTarget.parentElement;
+         var name = $(inventory_item).attr("data-name");
+         var serverResult = $.post( "../lib/inventoryFunctions.php", { 'WhatIMustDo': "use_thing", 'name': name });
+         //Пример ответа resultData = {"result": true, "effcet": "armor", "type": "change", "to_do": "count", "errors": ""}
+          serverResult .done(function( data ) {
+              var resultData = JSON.parse(data);
+              
+              if(resultData.result){
+                  if(resultData.effect = "healPercent"){
+                        //Добавляем процент хп
+                        $(".progress-bar-hp").css({"width" : resultData.valueEffect + "%"});
+                        $("#hp").attr("data-title", resultData.numberHp);
+                  }
+                  
+                  //Что делать с вещью
+                  if(resultData.to_do == "count"){
+                        //Понижаем счетчик зелий
+                        var count = getChildrenBLock(inventory_item.children, "count", "id").innerHTML;
+                        count--;
+                        $("[data-name=" + name + "] #count").html(count);
+                  }
+                  if(resultData.to_do == "delete"){
+                      //Удаляем её
+                       $("[data-name=" + name + "]").attr("data-show", 0);
+                       $("[data-name=" + name + "] #count").html(0);
+                       $("[data-name=" + name + "] .inventory-item-image").html('<img src="images/cloth/mini/0.png" height="60">');
+                       $("[data-name=" + name + "] .pop-info").detach();
+                       //Скрываем кнопки
+                       $("[data-name=" + name + "] .inventory-control").hide();
+                       $("[data-name=" + name + "] .inventory-control-delete").hide();
+                       $("[data-name=" + name + "]").attr("data-name", "");
+                  }
+              }
+              else{
+                $("#alert_danger .modal-body").html(resultData.error);
+                $("#alert_danger").show();
+              }
+          });
+          serverResult .fail(function() {
+                $("#alert_danger .modal-body").html("Возникла серверная ошибка");
+                $("#alert_danger").show();
+         });
+     });
+    
+    //Запрос на удаление вещи в инвентаре
+    $(".inventory-item .inventory-control-delete, .inventory-item-potion .inventory-control-delete").click(function (eventObject) {
+        //Очищаем предыдущие значения
+        $("#modal-delete-thing #delete").attr("data-hash", "");
+        $("#modal-delete-thing #delete").attr("data-name", "");
+        
+        //Смотрим текущие
+        var inventory_item = eventObject.currentTarget.parentElement;
+        var hash = $(inventory_item).attr("data-hash");
+        var info = getChildrenBLock(inventory_item.children, "pop-info", "class").innerHTML;
+        
+        //Подставляем в кнопку
+        $("#modal-delete-thing .modal-body").html(info);
+        if(typeof(hash) != "undefined")
+            $("#modal-delete-thing #delete").attr("data-hash", hash);
+        else{
+             var name = $(inventory_item).attr("data-name");
+             $("#modal-delete-thing #delete").attr("data-name", name);
+        }
+    }); 
+    //Подтверждение удаления в инвентаре
+    $("#modal-delete-thing #delete").click(function (eventObject) {
+        var hash = $(this).attr("data-hash");
+       
+        if(hash != "")
+            var serverResult = $.post( "../lib/inventoryFunctionss.php", { 'WhatIMustDo': "delete_thing", 'hash': hash });
+        else{
+            var name = $(this).attr("data-name");
+            var serverResult = $.post( "../lib/inventoryFunctionss.php", { 'WhatIMustDo': "delete_thing", 'name': name });
+        }
+        serverResult.done(function( data ){
+            var resultData = JSON.parse(data);
+            
+            if(resultData.result){
+                $("#modal-delete-thing .close").click();
+                
+                //Если удаляли вещь
+                if(hash != ""){
+                    var item_inv = $(".main-inventory [data-hash=" + hash + "]");
+
+                    //Заменяем картинку на пустой слот
+                    $(".main-inventory [data-hash=" + hash + "] .inventory-item-image").html('<img src="images/cloth/mini/0.png" height="60">');
+                    $(".main-inventory [data-hash=" + hash + "] .pop-info").remove();
+                    $(item_inv).attr("data-show", "0");
+                    $(item_inv).attr("data-on", "0");
+                    $(item_inv).attr("data-hash", "");
+
+                    //Если эта вещь еще и в экипировке надета, то там проделываем всё тоже самое
+                    if(resultData.item){
+                          $("#" + resultData.item + " .inventory-item-image").html('<img src="images/cloth/mini/' + resultData.item + '.png" height="60">');
+                        $("#" + resultData.item).attr("data-show", "0");
+                        $("#" + resultData.item).attr("data-on", "0");
+                        $("#" + resultData.item).attr("data-hash", "");
+                        $("#" + resultData.item + ".pop-info").remove();
+                    }
+                }
+                
+                //Если удаляли зелье
+                else{
+                    var item_inv = $(".main-inventory [data-name=" + name + "]");
+                     $(".main-inventory [data-name=" + name + "] .inventory-item-image").html('<img src="images/cloth/mini/0.png" height="60">');
+                     $(".main-inventory [data-name=" + name + "] .count-potion").html(0);
+                    $(".main-inventory [data-name=" + name + "] .pop-info").remove();
+                    $(item_inv).attr("data-show", "0");
+                    $(item_inv).attr("data-on", "0");
+                    $(item_inv).attr("data-name", "");
+                }
+            }
+            else{
+                 $("#alert_danger .modal-body").html(resultData.error);
+                 $("#alert_danger").show();
+            }
+        });
+         serverResult .fail(function( data ) {
+                $("#alert_danger .modal-body").html("Возникла серверная ошибка");
+                $("#alert_danger").show();
+         });
+    });
+    
 });
 
 function getChildrenBLock(childs, children, type){

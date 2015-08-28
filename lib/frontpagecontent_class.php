@@ -18,9 +18,16 @@ class FrontPageContent extends Modules {
 		$this->inventory_database = $inventories["inventory"];
 		$this->inventory_potions_database = $inventories["potions"];
 		unset($inventories);
-		
+		/*$this->db->mysqli->autocommit(false);
+		foreach($this->potions as $key => $item){
+			if($item != "0" && $item !="999" && $item != "1"){
+				$temp = unserialize($item);
+				$this->db->update("user_inventory_potions", array($key => json_encode($temp)), "`id` = {$this->user["id"]}");
+			}
+		}
+		$this->db->mysqli->commit();*/
 		$sr["characteristics"] = $this->getCharacteristics();
-		$sr["nick"] = $this->user["login"];
+		$sr["nick"] = htmlspecialchars($this->user["login"]);
 		$sr["avatar"] = $this->user["avatar"];
 
 		$sr["equipment"] = $this->getEquipment();
@@ -35,14 +42,20 @@ class FrontPageContent extends Modules {
 		$modales = $this->getReplaceTemplate($modal, "modal_training");
 		$modales .= $this->getReplaceTemplate($modal, "modal_deleting");
 		$sr["modales"] = $modales;
-		
 		return $this->getReplaceTemplate($sr, "center");
 	}
-
+	
+	protected function getTitle(){
+		return "Персонаж";
+	}
+	protected function getShortcut_icon(){
+		return "profile";
+	}
+	
 	private function getEquipment($array = false){
 		for($i = 1; $i < count($this->inventory); $i++){
             if($this->inventory["slot$i"] != "0" and $this->inventory["slot$i"] != "999") {
-                $invItem = unserialize($this->inventory["slot$i"]);
+                $invItem = (array) json_decode($this->inventory["slot$i"]);
                 if ($invItem["hash"] == $this->user["primaryWeapon"]) {
 					$info = $this->getTableInfo($invItem, true);
 					$sr["primaryWeaponInfo"] = $info["html"];
@@ -132,7 +145,6 @@ class FrontPageContent extends Modules {
 	}
 	
 	public function getTableInfo($thing, $return_array = false){
-		
 		// $return_array нужна для отображения информации об уроне в getDamageInformation
 		
 		foreach($this->inventory_database as $inventory_item){
@@ -206,13 +218,13 @@ class FrontPageContent extends Modules {
             if($inventory_item["typeDefence"] == 2){ $type="medium"; $typeName="Средняя";}
             if($inventory_item["typeDefence"] == 3){ $type="heavy"; $typeName="Тяжелая";}
 
-            $defence[0] = $inventory_item["defence"];
+            $defence[0] = $inventory_item["armor"];
             $modificator = 1;
             for($i = 1; $i <=5; $i++){
                 $modificator += 0.05;
                 $defence[$i] = round($defence[0] * $modificator,2);
             }
-            $sr["type"] = $inventory_item["typeDefence"];
+            $sr["typeDefence"] = $inventory_item["typeDefence"];
             $sr["typeName"] = $typeName;
             $sr["name"] = $inventory_item["name"];
             $sr["requiredlvl"] = $inventory_item["requiredlvl"];
@@ -240,7 +252,7 @@ class FrontPageContent extends Modules {
             if($inventory_item["bonusms"]){
 				$sr["bonusms"] = $inventory_item["bonusms"];
 				$text .= " <tr><td class='success'>Мастерство</td><td class='active'>{$inventory_item["bonusms"]}</td></tr>";
-			} 
+			}
 			
 			$text .= "</tbody></table></div>";
         }
@@ -345,18 +357,19 @@ class FrontPageContent extends Modules {
 		//Сам инвентарь
 		for($i = 1; $i < $count; $i++){
 			if($inventory["slot$i"] != "0" and $inventory["slot$i"] != "999"){
-				$invItem = unserialize($inventory["slot$i"]);
+				$invItem = (array) json_decode($inventory["slot$i"]);
 				$sr["show"] = 1;
 				$sr["info"] = $this->getTableInfo($invItem);
+				$sr["hash"] = $invItem["hash"];
 			}
 			if($inventory["slot$i"] == "0" or $inventory["slot$i"] == "999"){
 				$invItem["id"] = $inventory["slot$i"];
 				$sr["show"] = 0;
 				$sr["info"] = "";
+				$sr["hash"] = "";
 			}
 
 			$sr["id"] = $invItem["id"];
-			$sr["slot"] = $i;
 			if($invItem["hash"] == $this->user["secondaryWeapon"] or $invItem["hash"] == $this->user["primaryWeapon"]){
 				$sr["onOff"] = "1";
 			}
@@ -365,9 +378,8 @@ class FrontPageContent extends Modules {
 			or $invItem["hash"] == $this->user["bracers"]){
 				$sr["onOff"] = "1";
 			}
-			else $sr["onOff"] = "0";
-			$sr["type"] = 1;
-			$sr["hash"] = $invItem["hash"];
+			else
+				$sr["onOff"] = "0";
 			
 			$text .= $this->getReplaceTemplate($sr, "inventoryItem");
 		}
@@ -396,7 +408,7 @@ class FrontPageContent extends Modules {
 		//Сам инвентарь
 		for($i = 1; $i < $count; $i++){
 			if($this->potions["potion$i"] != "0" && $this->potions["potion$i"] != "999"){
-				$potion = unserialize($this->potions["potion$i"]);
+				$potion = (array) json_decode($this->potions["potion$i"]);
 				$sr["count"] = $potion["count"];
 				$sr["image"] = $potion["image"];
 				$sr["info"] = $this->getTableInfoSth($potion);
@@ -427,9 +439,9 @@ class FrontPageContent extends Modules {
 				if($max<$massiv[$i]) $max = $massiv[$i];
 			}
 			$procent = 100/$max;
-			$dlina = $procent * $massiv[$nomer];
-			$dlina = round($dlina, 0);
-			return $dlina;
+			$length = $procent * $massiv[$nomer];
+			$length = round($length, 0);
+			return $length;
 	}
 }
 ?>

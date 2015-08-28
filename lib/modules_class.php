@@ -35,6 +35,8 @@ abstract class Modules extends Template{
 	}
 	
 	public function getContent() {
+		$sr["title"] = $this->getTitle();
+		$sr["shortcut_icon"] = $this->getShortcut_icon();
 		$sr["menu"] = $this->getFileContent("mainMenu");
 		$sr["header"] = $this->getHeader();
 		$sr["center"] = $this->getCenter();
@@ -45,6 +47,8 @@ abstract class Modules extends Template{
 	}
 	
 	abstract protected function getCenter();
+	abstract protected function getTitle();
+	abstract protected function getShortcut_icon();
 	
 	protected function getHeader(){
 		$user = $this->user;
@@ -54,11 +58,11 @@ abstract class Modules extends Template{
 		$sr["donat"] = $user["Donat"];
 		$sr["currentExp"] = $user["currentExp"];
 		$sr["needExp"] = $user["needExp"];
-		$sr["exp"] = $this->getImage($user["currentExp"],$user["needExp"]);
+		$sr["exp"] = $this->getPercent($user["currentExp"],$user["needExp"]);
 		$sr["lvl"] = $user["lvl"];
 		$sr["currentHp"] = $user["currentHp"];
 		$sr["maxHp"] = $user["maxHp"];
-		$sr["hp"] = $this->getImage($user["currentHp"],$user["maxHp"]);
+		$sr["hp"] = $this->getPercent($user["currentHp"],$user["maxHp"]);
 			
 			//Таймер нападения
 			$timeToAttack = $user["timerAttack"];
@@ -170,7 +174,7 @@ abstract class Modules extends Template{
 		exit;
 	}
 	
-	private function getImage($current, $max){
+	private function getPercent($current, $max){
 			$procent = 100/$max;
 			$dlina = $procent * $current;
 			$dlina = round($dlina, 0);

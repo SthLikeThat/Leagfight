@@ -21,7 +21,7 @@
              <td class="active">%damage%</td>
          </tr>
          <tr>
-             <td class="success">Крит[5]</td>
+             <td class="success">Крит[%critLvl%]</td>
              <td class="active">%crit%</td>
          </tr>
  
