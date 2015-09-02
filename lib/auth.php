@@ -22,23 +22,17 @@ class Auth {
 		return $this->db->query($query);
 	}
 	
-	private function getUserInfo(){
-			$id = $_SESSION["id"];
-			if(!$id) header("Location: auth.html");
-			return $this->db->getAllOnField("users", "id",$id, "", "");
-	}
-	
 	public function checkAuth($email, $password){
 		if ($_SERVER['REQUEST_METHOD'] == 'POST'){
 			if($this->valid->checkUser($email, $password)){
 				$hash = md5($this->generateCode());
-				$user = $this->db->getAllOnField("users", "email",$email, "", "");
+				$user = $this->db->getAllOnField("accounts", "email", $email, "id_account", "");
 				if($user["confirmed"] !== "1")
 					die("Подтвердите регистрацию!");
 				$user_id = $user["id"];
-				$this->db->update("users", array("user_hash"=>$hash), "`email` = '$email'");
+				$this->db->update("accounts", array("user_hash"=>$hash), "`email` = '$email'");
 				session_start();
-				$_SESSION["id"] = $user["id"];
+				$_SESSION["id_account"] = $user["id_account"];
 				$_SESSION["hash"] = $hash;
 				die("OK");
 			}

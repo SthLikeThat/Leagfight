@@ -8,6 +8,7 @@
 	<link href="css/bootstrap.css" rel="stylesheet">
 	<link href="css/bootstrap_my.css" rel="stylesheet">
 	<link href="css/font-awesome.css" rel="stylesheet">
+	<link href="css/style.css" rel="stylesheet">
 
 </head>
 
@@ -49,7 +50,7 @@
           </div>
       </div>
     </div>
-    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+    <script src="js/jquery-2.1.3.min.js"></script>
     <script src="js/bootstrap.js"></script>
     <script src="js/scripta.js"></script>
 </body>

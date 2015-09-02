@@ -8,11 +8,11 @@ abstract class Modules extends Template{
 	protected $data;
 	protected $db;
 	protected $valid;
-	protected $user;
+	protected $account;
+	protected $user_information;
 	
-	public function __construct($db) {
+	public function __construct($db) {	
 		session_start();
-		
 		$this->db = $db;
 		$this->config = $this->db->config;
 		
@@ -23,7 +23,10 @@ abstract class Modules extends Template{
             header("Location: auth.html");
             return false;
         }
-		$this->user = $this->db->selectFromTables(array("users", "user_resources", "user_settings", "user_statistic"), "id", $_SESSION["id"]);
+		
+		$this->account = $this->db->select("accounts", array("*"), "`id_account` =". $_SESSION["id_account"], "id_account")[0];
+		$this->user_information = $this->db->select("user_information", array("*"), "`id_user` =". $_SESSION["id_account"], "id_user")[0];
+		$this->resources = $this->db->select("user_resources", array("*"), "`id_user` =". $_SESSION["id_account"], "id_user")[0];
 	}
 	
 	private function secureData($data) {
@@ -40,9 +43,6 @@ abstract class Modules extends Template{
 		$sr["menu"] = $this->getFileContent("mainMenu");
 		$sr["header"] = $this->getHeader();
 		$sr["center"] = $this->getCenter();
-		if($this->data["ajax"] == 1)
-			return $this->getReplaceTemplate($sr, "mainWrapper");
-		else
 		return $this->getReplaceTemplate($sr, "main");
 	}
 	
@@ -51,19 +51,18 @@ abstract class Modules extends Template{
 	abstract protected function getShortcut_icon();
 	
 	protected function getHeader(){
-		$user = $this->user;
-		$sr["gold"] = $user["Gold"];
-		$sr["tournament_icon"] = $user["tournament_icon"];
-		$sr["another"] = $user["Another"];
-		$sr["donat"] = $user["Donat"];
-		$sr["currentExp"] = $user["currentExp"];
-		$sr["needExp"] = $user["needExp"];
-		$sr["exp"] = $this->getPercent($user["currentExp"],$user["needExp"]);
-		$sr["lvl"] = $user["lvl"];
-		$sr["currentHp"] = $user["currentHp"];
-		$sr["maxHp"] = $user["maxHp"];
-		$sr["hp"] = $this->getPercent($user["currentHp"],$user["maxHp"]);
-			
+		$sr["gold"] = $this->resources["Gold"];
+		$sr["tournament_icon"] = $this->resources["tournament_icon"];
+		$sr["another"] = $this->resources["Another"];
+		$sr["donat"] = $this->resources["Donat"];
+		$sr["currentExp"] = $this->user_information["current_Exp"];
+		$sr["needExp"] = $this->user_information["need_Exp"];
+		$sr["exp"] = $this->getPercent($this->user_information["current_Exp"],$this->user_information["need_Exp"]);
+		$sr["lvl"] = $this->user_information["lvl"];
+		$sr["currentHp"] = $this->user_information["current_Hp"];
+		$sr["maxHp"] = $this->user_information["max_Hp"];
+		$sr["hp"] = $this->getPercent($this->user_information["current_Hp"],$this->user_information["max_Hp"]);
+		/*	
 			//Таймер нападения
 			$timeToAttack = $user["timerAttack"];
 			$allSeconds = $timeToAttack - time();
@@ -125,7 +124,7 @@ abstract class Modules extends Template{
 				$this->db->setField("users", "typeJob", 0, "id", $user["id"]);
 				$this->db->setField("users", "jobEnd", 0, "id", $user["id"]);
 			}
-			$sr["mda"] = $allSeconds;
+			$sr["mda"] = $allSeconds;*/
 		$text = $this->getReplaceTemplate($sr, "header");
 		return $text;
 	}
@@ -142,12 +141,12 @@ abstract class Modules extends Template{
 	}
 	
 	final protected function getAuthUser() {
-		if(!$_SESSION["id"]){
+		if(!$_SESSION["id_account"]){
             return false;
 		}
-		$user = $this->db->getFieldsBetter("users", "id", $_SESSION["id"], array("id", "user_hash", "currentHp", "maxHp", "lastRegen"), "=");
+		$user = $this->db->getFieldsBetter("accounts", "id_account", $_SESSION["id_account"], array("id_account", "user_hash"), "=");
 		$user = $user[0];
-        $time = time();
+        /*$time = time();
 		if($user["lastRegen"] + 3600 < $time and $user["currentHp"] < $user["maxHp"]){
 			$maxCycle = round(($time - $user["lastRegen"])/3600,0);
 			if($maxCycle > 20)	$maxCycle = 20;
@@ -160,7 +159,7 @@ abstract class Modules extends Template{
             }
 			else $this->db->setFieldOnID("users", $user["id"], "currentHp", $user["currentHp"] + $bonusHP);
 			$this->db->setFieldOnID("users", $user["id"], "lastRegen", $time);
-		}
+		}*/
 		if($_SESSION["hash"] === $user["user_hash"]){
 			return true;
 		}

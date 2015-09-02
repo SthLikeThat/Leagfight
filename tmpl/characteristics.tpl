@@ -1,6 +1,6 @@
 <div class="progress leag-progress-char">
    <div class="progress-bar-icon-left">
-        <img src="image_char/image/strengh.png" height="25">
+        <img src="images/icons/strengh.png" height="25">
     </div>
     <div class="char-number">
         %strengh%
@@ -10,7 +10,7 @@
 
 <div class="progress leag-progress-char">
    <div class="progress-bar-icon-left">
-        <img src="image_char/image/defence.png" height="25">
+        <img src="images/icons/defence.png" height="25">
     </div>
     <div class="char-number">
         %defence%
@@ -20,7 +20,7 @@
 
 <div class="progress leag-progress-char">
    <div class="progress-bar-icon-left">
-        <img src="image_char/image/agility.png" height="25">
+        <img src="images/icons/agility.png" height="25">
     </div>
     <div class="char-number">
         %agility%
@@ -29,7 +29,7 @@
 </div>
 <div class="progress leag-progress-char">
    <div class="progress-bar-icon-left">
-        <img src="image_char/image/physique.png" height="25">
+        <img src="images/icons/physique.png" height="25">
     </div>
     <div class="char-number">
         %physique%
@@ -38,7 +38,7 @@
 </div>
 <div class="progress leag-progress-char">
    <div class="progress-bar-icon-left">
-        <img src="image_char/image/mastery.png" height="25">
+        <img src="images/icons/mastery.png" height="25">
     </div>
     <div class="char-number">
         %mastery%
@@ -47,6 +47,6 @@
 </div>
 
 <div class="name-user">
-    <img src="image_char/image/power.png" height="20">
+    <img src="images/icons/power.png" height="20">
      %power%
 </div>

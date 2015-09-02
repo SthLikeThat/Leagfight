@@ -162,7 +162,8 @@ class allFunctions extends DataBase{
 						$lastBonus = 1;
 					if($total == "mastery") $mastery = 999;
 					for($i=0;$i<$mastery;$i++){
-						for($a=0;$a<$i;$a++) $bonus *=1.03;
+						for($a=0;$a<$i;$a++) 
+							$bonus *=1.03;
 						$newPrice = $price * $bonus;
 						$newPrice = round($newPrice - ($newPrice * $discount),0);
 						if($totalPrice + $newPrice > $this->user["Gold"] and $total == "mastery"){

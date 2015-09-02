@@ -10,38 +10,27 @@ class FrontPageContent extends Modules {
 	}
 	
 	public function getCenter(){
-        if(is_null($this->user))
+        if(is_null($this->account))
             return false;
-		$this->inventory = $this->db->getAllOnField("user_inventory", "id", $_SESSION["id"], "", "");
-		$this->potions = $this->db->getAllOnField("user_inventory_potions", "id", $_SESSION["id"], "", "");
+		$this->inventory = $this->db->getAllOnField("user_inventory", "id_user", $_SESSION["id_account"], "id_user", "");
+		$this->potions = $this->db->getAllOnField("user_potions", "id_user", $_SESSION["id_account"], "id_user", "");
+		$this->equipment = $this->db->getAllOnField("user_equipment", "id_user", $_SESSION["id_account"], "id_user", "");
 		$inventories = $this->db->ancillary->getAllInventory($this->inventory, $this->potions);
 		$this->inventory_database = $inventories["inventory"];
 		$this->inventory_potions_database = $inventories["potions"];
 		unset($inventories);
-		/*$this->db->mysqli->autocommit(false);
-		foreach($this->potions as $key => $item){
-			if($item != "0" && $item !="999" && $item != "1"){
-				$temp = unserialize($item);
-				$this->db->update("user_inventory_potions", array($key => json_encode($temp)), "`id` = {$this->user["id"]}");
-			}
-		}
-		$this->db->mysqli->commit();*/
+		
 		$sr["characteristics"] = $this->getCharacteristics();
-		$sr["nick"] = htmlspecialchars($this->user["login"]);
-		$sr["avatar"] = $this->user["avatar"];
+		$sr["nick"] = htmlspecialchars($this->account["login"]);
+		$sr["avatar"] = $this->account["avatar"];
 
 		$sr["equipment"] = $this->getEquipment();
 		$sr["inventory"] = $this->getInventory();
 		$sr["invPotions"] = $this->getPotions();
-		$sr["damageInformation"] = $this->db->ancillary->getDamageInformation($this->user, $this->damageInformation);
+		$sr["damageInformation"] = $this->db->ancillary->getDamageInformation($this->user_information, $this->damageInformation);
 		
-		$discount = 100;
-		for($i = 1; $i <= $this->user["lvl"]; $i++) 
-			$discount = $discount -($discount * 0.02);
-		$modal["discount"] = round(100 - $discount."%", 3);
-		$modales = $this->getReplaceTemplate($modal, "modal_training");
-		$modales .= $this->getReplaceTemplate($modal, "modal_deleting");
-		$sr["modales"] = $modales;
+		
+		$sr["modales"] = $this->getModales();
 		return $this->getReplaceTemplate($sr, "center");
 	}
 	
@@ -52,11 +41,28 @@ class FrontPageContent extends Modules {
 		return "profile";
 	}
 	
+	private function getModales(){
+		$discount = 100;
+		for($i = 1; $i <= $this->user_information["lvl"]; $i++) 
+			$discount = $discount -($discount * 0.02);
+		$modal["discount"] = round(100 - $discount."%", 3);
+		$modal["strengh"] = $this->user_information["Strengh"];
+		$modal["defence"] = $this->user_information["Defence"];
+		$modal["agility"] = $this->user_information["Agility"];
+		$modal["physique"] = $this->user_information["Physique"];
+		$modal["mastery"] = $this->user_information["Mastery"];
+		
+		$modales = $this->getReplaceTemplate($modal, "modal_training");
+		$modales .= $this->getReplaceTemplate($modal, "modal_deleting");
+		return $modales;
+	}
+	
 	private function getEquipment($array = false){
-		for($i = 1; $i < count($this->inventory); $i++){
+		$count = count($this->inventory);
+		for($i = 1; $i < $count; $i++){
             if($this->inventory["slot$i"] != "0" and $this->inventory["slot$i"] != "999") {
                 $invItem = (array) json_decode($this->inventory["slot$i"]);
-                if ($invItem["hash"] == $this->user["primaryWeapon"]) {
+                if ($invItem["hash"] == $this->equipment["primaryWeapon"]) {
 					$info = $this->getTableInfo($invItem, true);
 					$sr["primaryWeaponInfo"] = $info["html"];
 					$this->damageInformation["primaryWeapon"] = $info["array"];
@@ -64,7 +70,7 @@ class FrontPageContent extends Modules {
                     $sr["primaryWeapon"] = $invItem["id"];
                     $sr["hashPrim"] = $invItem["hash"];
                 }
-                if ($invItem["hash"] == $this->user["secondaryWeapon"]) {
+                if ($invItem["hash"] == $this->equipment["secondaryWeapon"]) {
 					$info = $this->getTableInfo($invItem, true);
 					$sr["secondaryWeaponInfo"] = $info["html"];
 					$this->damageInformation["secondaryWeapon"] = $info["array"];
@@ -72,7 +78,7 @@ class FrontPageContent extends Modules {
                     $sr["secondaryWeapon"] = $invItem["id"];
                     $sr["hashSec"] = $invItem["hash"];
                 }
-                if ($invItem["hash"] == $this->user["armor"]) {
+                if ($invItem["hash"] == $this->equipment["armor"]) {
 					$info = $this->getTableInfo($invItem, true);
 					$sr["armorInfo"] = $info["html"];
 					$this->damageInformation["armor"] = $info["array"];
@@ -80,7 +86,7 @@ class FrontPageContent extends Modules {
                     $sr["armor"] = $invItem["id"];
                     $sr["hashArmor"] = $invItem["hash"];
                 }
-                if ($invItem["hash"] == $this->user["helmet"]) {
+                if ($invItem["hash"] == $this->equipment["helmet"]) {
 					$info = $this->getTableInfo($invItem, true);
 					$sr["helmetInfo"] = $info["html"];
 					$this->damageInformation["helmet"] = $info["array"];
@@ -88,7 +94,7 @@ class FrontPageContent extends Modules {
                     $sr["helmet"] = $invItem["id"];
                     $sr["hashHelmet"] = $invItem["hash"];
                 }
-                if ($invItem["hash"] == $this->user["bracers"]) {
+                if ($invItem["hash"] == $this->equipment["bracers"]) {
 					$info = $this->getTableInfo($invItem, true);
 					$sr["bracersInfo"] = $info["html"];
 					$this->damageInformation["bracers"] = $info["array"];
@@ -96,7 +102,7 @@ class FrontPageContent extends Modules {
                     $sr["bracers"] = $invItem["id"];
                     $sr["hashBracers"] = $invItem["hash"];
                 }
-                if ($invItem["hash"] == $this->user["leggings"]) {
+                if ($invItem["hash"] == $this->equipment["leggings"]) {
 					$info = $this->getTableInfo($invItem, true);
 					$sr["leggingsInfo"] = $info["html"];
 					$this->damageInformation["leggings"] = $info["array"];
@@ -106,32 +112,32 @@ class FrontPageContent extends Modules {
                 }
             }
 		}
-		if($this->user["primaryWeapon"] == "0"){
+		if($this->equipment["primaryWeapon"] == "0"){
 			$sr["primaryWeapon"] = "primaryWeapon";
 			$sr["hashPrim"] = 0;
 			$sr["primaryWeaponInfo"] = "";
 		}
-		if($this->user["secondaryWeapon"] == "0"){
+		if($this->equipment["secondaryWeapon"] == "0"){
 			$sr["secondaryWeapon"] = "secondaryWeapon";
 			$sr["hashSec"] = 0;
 			$sr["secondaryWeaponInfo"] = "";
 		}
-		if($this->user["armor"] == "0"){
+		if($this->equipment["armor"] == "0"){
 			$sr["armor"] = "armor";
 			$sr["hashArmor"] = 0;
 			$sr["armorInfo"] = "";
 		}
-		if($this->user["helmet"] == "0"){
+		if($this->equipment["helmet"] == "0"){
 			$sr["helmet"] = "helmet";
 			$sr["hashHelmet"] = 0;
 			$sr["helmetInfo"] = "";
 		}
-		if($this->user["bracers"] == "0"){
+		if($this->equipment["bracers"] == "0"){
 			$sr["bracers"] = "bracers";
 			$sr["hashBracers"] = 0;
 			$sr["bracersInfo"] = "";
 		}
-		if($this->user["leggings"] == "0"){
+		if($this->equipment["leggings"] == "0"){
 			$sr["leggings"] = "leggings";
 			$sr["hashLeggings"] = 0;
 			$sr["leggingsInfo"] = "";
@@ -146,12 +152,11 @@ class FrontPageContent extends Modules {
 	
 	public function getTableInfo($thing, $return_array = false){
 		// $return_array нужна для отображения информации об уроне в getDamageInformation
-		
+
 		foreach($this->inventory_database as $inventory_item){
 			if($inventory_item["id"] == $thing["id"])
 				break;
 		}
-
         if($inventory_item["id"] < 500){
 			
             if($inventory_item["type"] == 1)
@@ -160,11 +165,11 @@ class FrontPageContent extends Modules {
 				$typeName="Двуручное";
             if($inventory_item["type"] == 3)
 				$typeName="Древковое";
-            if($inventory_item["typedamage"] == 1)
+            if($inventory_item["type_damage"] == 1)
 				$typedamageName="Колющее";
-            if($inventory_item["typedamage"] == 2)
+            if($inventory_item["type_damage"] == 2)
 				$typedamageName="Режущее";
-            if($inventory_item["typedamage"] == 3)
+            if($inventory_item["type_damage"] == 3)
 				$typedamageName="Дробящее";
 			
             $damage[0] = $inventory_item["damage"];
@@ -179,34 +184,34 @@ class FrontPageContent extends Modules {
             $sr["name"] = $inventory_item["name"];
             $sr["typeName"] = $typeName;
 			$sr["typedamageName"] = $typedamageName;
-			$sr["typedamage"] = $inventory_item["typedamage"];
+			$sr["type_damage"] = $inventory_item["type_damage"];
             $sr["damageLvl"] = $thing["damage"];
             $sr["critLvl"] = $thing["crit"];
-            $sr["requiredlvl"] = $inventory_item["requiredlvl"];
+            $sr["requiredlvl"] = $inventory_item["required_lvl"];
             $sr["damage"] = $damage[$thing["damage"]];
             $sr["crit"] = $crit[$thing["crit"]];
 
             $text = $this->getReplaceTemplate($sr, "weaponView");
 			
-            if($inventory_item["bonusstr"]){
-				$sr["bonusstr"] = $inventory_item["bonusstr"];
-				$text .= " <tr><td class='success'>Сила</td><td class='active'>{$inventory_item["bonusstr"]}</td></tr>";
+            if($inventory_item["bonus_strengh"]){
+				$sr["bonus_strengh"] = $inventory_item["bonus_strengh"];
+				$text .= " <tr><td class='success'>Сила</td><td class='active'>{$inventory_item["bonus_strengh"]}</td></tr>";
 			}
-            if($inventory_item["bonusdef"]){
-				$sr["bonusdef"] = $inventory_item["bonusdef"];
-				$text .= " <tr><td class='success'>Защита</td><td class='active'>{$inventory_item["bonusdef"]}</td></tr>";
+            if($inventory_item["bonus_defence"]){
+				$sr["bonus_defence"] = $inventory_item["bonus_defence"];
+				$text .= " <tr><td class='success'>Защита</td><td class='active'>{$inventory_item["bonus_defence"]}</td></tr>";
 			} 
-            if($inventory_item["bonusag"]){
-				$sr["bonusag"] = $inventory_item["bonusag"];
-				$text .= " <tr><td class='success'>Ловкость</td><td class='active'>{$inventory_item["bonusag"]}</td></tr>";
+            if($inventory_item["bonus_agility"]){
+				$sr["bonus_agility"] = $inventory_item["bonus_agility"];
+				$text .= " <tr><td class='success'>Ловкость</td><td class='active'>{$inventory_item["bonus_agility"]}</td></tr>";
 			} 
-            if($inventory_item["bonusph"]){
-				$sr["bonusph"] = $inventory_item["bonusph"];
-				$text .= " <tr><td class='success'>Телосложение</td><td class='active'>{$inventory_item["bonusph"]}</td></tr>";
+            if($inventory_item["bonus_physique"]){
+				$sr["bonus_physique"] = $inventory_item["bonus_physique"];
+				$text .= " <tr><td class='success'>Телосложение</td><td class='active'>{$inventory_item["bonus_physique"]}</td></tr>";
 			} 
-            if($inventory_item["bonusms"]){
-				$sr["bonusms"] = $inventory_item["bonusms"];
-				$text .= " <tr><td class='success'>Мастерство</td><td class='active'>{$inventory_item["bonusms"]}</td></tr>";
+            if($inventory_item["bonus_mastery"]){
+				$sr["bonus_mastery"] = $inventory_item["bonus_mastery"];
+				$text .= " <tr><td class='success'>Мастерство</td><td class='active'>{$inventory_item["bonus_mastery"]}</td></tr>";
 			} 
 			
 			$text .= "</tbody></table></div>";
@@ -214,9 +219,12 @@ class FrontPageContent extends Modules {
 
         if($inventory_item["id"] > 500 && $inventory_item["id"] < 1000){
 
-            if($inventory_item["typeDefence"] == 1){ $type="light"; $typeName="Лёгкая";}
-            if($inventory_item["typeDefence"] == 2){ $type="medium"; $typeName="Средняя";}
-            if($inventory_item["typeDefence"] == 3){ $type="heavy"; $typeName="Тяжелая";}
+            if($inventory_item["type_defence"] == 1)
+				$typeName="Лёгкая";
+            if($inventory_item["type_defence"] == 2)
+				$typeName="Средняя";
+            if($inventory_item["type_defence"] == 3)
+				$typeName="Тяжелая";
 
             $defence[0] = $inventory_item["armor"];
             $modificator = 1;
@@ -224,35 +232,35 @@ class FrontPageContent extends Modules {
                 $modificator += 0.05;
                 $defence[$i] = round($defence[0] * $modificator,2);
             }
-            $sr["typeDefence"] = $inventory_item["typeDefence"];
+            $sr["type_defence"] = $inventory_item["type_defence"];
             $sr["typeName"] = $typeName;
             $sr["name"] = $inventory_item["name"];
-            $sr["requiredlvl"] = $inventory_item["requiredlvl"];
+            $sr["requiredlvl"] = $inventory_item["required_lvl"];
             $sr["armor"] = $defence[$thing["armor"]];
             $sr["armorLvl"] = $thing["armor"];
 			
             $text = $this->getReplaceTemplate($sr, "armorView");
 
-            if($inventory_item["bonusstr"]){
-				$sr["bonusstr"] = $inventory_item["bonusstr"];
-				$text .= " <tr><td class='success'>Сила</td><td class='active'>{$inventory_item["bonusstr"]}</td></tr>";
+            if($inventory_item["bonus_strengh"]){
+				$sr["bonus_strengh"] = $inventory_item["bonus_strengh"];
+				$text .= " <tr><td class='success'>Сила</td><td class='active'>{$inventory_item["bonus_strengh"]}</td></tr>";
 			}
-            if($inventory_item["bonusdef"]){
-				$sr["bonusdef"] = $inventory_item["bonusdef"];
-				$text .= " <tr><td class='success'>Защита</td><td class='active'>{$inventory_item["bonusdef"]}</td></tr>";
+            if($inventory_item["bonus_defence"]){
+				$sr["bonus_defence"] = $inventory_item["bonus_defence"];
+				$text .= " <tr><td class='success'>Защита</td><td class='active'>{$inventory_item["bonus_defence"]}</td></tr>";
 			} 
-            if($inventory_item["bonusag"]){
-				$sr["bonusag"] = $inventory_item["bonusag"];
-				$text .= " <tr><td class='success'>Ловкость</td><td class='active'>{$inventory_item["bonusag"]}</td></tr>";
+            if($inventory_item["bonus_agility"]){
+				$sr["bonus_agility"] = $inventory_item["bonus_agility"];
+				$text .= " <tr><td class='success'>Ловкость</td><td class='active'>{$inventory_item["bonus_agility"]}</td></tr>";
 			} 
-            if($inventory_item["bonusph"]){
-				$sr["bonusph"] = $inventory_item["bonusph"];
-				$text .= " <tr><td class='success'>Телосложение</td><td class='active'>{$inventory_item["bonusph"]}</td></tr>";
+            if($inventory_item["bonus_physique"]){
+				$sr["bonus_physique"] = $inventory_item["bonus_physique"];
+				$text .= " <tr><td class='success'>Телосложение</td><td class='active'>{$inventory_item["bonus_physique"]}</td></tr>";
 			} 
-            if($inventory_item["bonusms"]){
-				$sr["bonusms"] = $inventory_item["bonusms"];
-				$text .= " <tr><td class='success'>Мастерство</td><td class='active'>{$inventory_item["bonusms"]}</td></tr>";
-			}
+            if($inventory_item["bonus_mastery"]){
+				$sr["bonus_mastery"] = $inventory_item["bonus_mastery"];
+				$text .= " <tr><td class='success'>Мастерство</td><td class='active'>{$inventory_item["bonus_mastery"]}</td></tr>";
+			} 
 			
 			$text .= "</tbody></table></div>";
         }
@@ -305,11 +313,11 @@ class FrontPageContent extends Modules {
 	
 	private function getCharacteristics(){
 		$dir = "lib";
-		$strengh = $this->user["Strengh"];
-		$defence = $this->user["Defence"];
-		$agility = $this->user["Agility"];
-		$physique = $this->user["Physique"];
-		$mastery = $this->user["Mastery"];
+		$strengh = $this->user_information["Strengh"];
+		$defence = $this->user_information["Defence"];
+		$agility = $this->user_information["Agility"];
+		$physique = $this->user_information["Physique"];
+		$mastery = $this->user_information["Mastery"];
 		$massiv = array ($strengh, $defence, $agility, $physique, $mastery);
 		$sr["percentStrengh"] = $this->getImage($massiv,0);
 		$sr["percentDefence"] = $this->getImage($massiv,1);
@@ -321,7 +329,7 @@ class FrontPageContent extends Modules {
 		$sr["agility"] = $agility;
 		$sr["physique"] = $physique;
 		$sr["mastery"] = $mastery;
-		$sr["power"] = $this->user["power"];
+		$sr["power"] = $this->user_information["power"];
 		$text = $this->getReplaceTemplate($sr, "characteristics");
 		return $text;
 	}
@@ -370,12 +378,12 @@ class FrontPageContent extends Modules {
 			}
 
 			$sr["id"] = $invItem["id"];
-			if($invItem["hash"] == $this->user["secondaryWeapon"] or $invItem["hash"] == $this->user["primaryWeapon"]){
+			if($invItem["hash"] == $this->equipment["secondaryWeapon"] or $invItem["hash"] == $this->equipment["primaryWeapon"]){
 				$sr["onOff"] = "1";
 			}
 			
-			elseif($invItem["hash"] == $this->user["armor"] or $invItem["hash"] == $this->user["helmet"] or $invItem["hash"] == $this->user["leggings"] 
-			or $invItem["hash"] == $this->user["bracers"]){
+			elseif($invItem["hash"] == $this->equipment["armor"] or $invItem["hash"] == $this->equipment["helmet"] or $invItem["hash"] == $this->equipment["leggings"] 
+			or $invItem["hash"] == $this->equipment["bracers"]){
 				$sr["onOff"] = "1";
 			}
 			else

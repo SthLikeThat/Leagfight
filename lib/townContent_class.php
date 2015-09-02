@@ -23,6 +23,14 @@ class townContent extends Modules {
 		return $this->getReplaceTemplate($sr, "town");
 	}
 	
+	protected function getTitle(){
+		return "Клан";
+	}
+	
+	protected function getShortcut_icon(){
+		return "";
+	}
+	
 	private function getTownMenu(){
 		$menu = $this->db->getAll("town_menu", "", "");
 		for ($i=0;$i<count($menu);$i++){

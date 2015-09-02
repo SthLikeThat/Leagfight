@@ -8,22 +8,6 @@ class Ancillary{
         $this->db = $db;
     }
 
-    public function getUserInfo($id){
-        if($this->db->valid->validID($id)){
-            $user = $this->db->getFieldsBetter( "users", "id", $id, array("id", "avatar", "login", "league", "Strengh", "Defence", "Agility", "Mastery", "Physique",
-                "power", "lvl", "helmet", "armor", "bracers", "leggings", "primaryWeapon", "secondaryWeapon", "currentExp", "currentHp"), $sign = "=");
-            return $user[0];
-        }
-        else exit;
-    }
-
-	function inverse($x) {
-    if (!$x) {
-        throw new Exception('Деление на ноль.');
-    }
-    return 1/$x;
-}
-
 	public function getAllInventory($inventory, $potions){
 		try{
 			if(!is_bool($inventory) && !is_array($inventory)){
@@ -54,9 +38,9 @@ class Ancillary{
 				}
 			}
 			if(count($weapons) > 0)
-				$weapons_data = $this->db->selectIN("weapon", "id", $weapons);
+				$weapons_data = $this->db->selectIN("shop_weapon", "id", $weapons);
 			if(count($armors) > 0)
-				$armors_data = $this->db->selectIN("armor", "id", $armors);
+				$armors_data = $this->db->selectIN("shop_armor", "id", $armors);
 			$resultData["inventory"] = array_merge($weapons_data, $armors_data);
 		}
 		//Вытаскивает все вещи находящиеся в $potions из базы
@@ -71,7 +55,7 @@ class Ancillary{
 				}
 			}
 			if(count($potionsData) > 0)
-				$resultData["potions"] = $this->db->selectIN("something", "id", $potionsData);
+				$resultData["potions"] = $this->db->selectIN("shop_something", "id", $potionsData);
 		}
 		
 		return $resultData;
@@ -83,27 +67,21 @@ class Ancillary{
 		foreach($damageInformation as $key => $thing){
 			if($key != "primaryWeapon" && $key != "secondaryWeapon"){
 				$totalArmor += $thing["armor"];
-				if($thing["typeDefence"] != 0)
-					$user["armorTypes"][(int)$thing["typeDefence"]] = 1;
+				if($thing["type_defence"] != 0)
+					$user["armorTypes"][(int)$thing["type_defence"]] = 1;
 			}
 				
-			$user['Strengh'] += $thing["bonusstr"];
-			$user['Defence'] += $thing["bonusdef"];
-			$user['Agility'] += $thing["bonusag"];
-			$user['Physique'] += $thing["bonusph"];
-			$user['Mastery'] += $thing["bonusms"];
+			$user['Strengh'] += $thing["bonus_strengh"];
+			$user['Defence'] += $thing["bonus_defence"];
+			$user['Agility'] += $thing["bonus_agility"];
+			$user['Physique'] += $thing["bonus_physique"];
+			$user['Mastery'] += $thing["bonus_mastery"];
 		}
-		$user["Strengh"] += $this->user["Strengh"];
-		$user["Defence"] += $this->user["Defence"];
-		$user["Agility"] += $this->user["Agility"];
-		$user["Physique"] += $this->user["Physique"];
-		$user["Mastery"] += $this->user["Mastery"];
-		//print_r($user["armorTypes"]);
 		
         $sr["damage"] = round($damageInformation["primaryWeapon"]["damage"] * $user["Strengh"], 0);
-        $sr["damageHeavy"] = round($this->getDamageBonus($damageInformation["primaryWeapon"]["typedamage"], array(1 => 0, 2 => 0, 3 => 1) ) * $sr["damage"], 0);
-        $sr["damageMedium"] = round($this->getDamageBonus($damageInformation["primaryWeapon"]["typedamage"], array(1 => 0, 2 => 1, 3 => 0) ) * $sr["damage"], 0);
-        $sr["damageLight"] = round($this->getDamageBonus($damageInformation["primaryWeapon"]["typedamage"], array(1 => 1, 2 => 0, 3 => 0) ) * $sr["damage"], 0);
+        $sr["damageHeavy"] = round($this->getDamageBonus($damageInformation["primaryWeapon"]["type_damage"], array(1 => 0, 2 => 0, 3 => 1) ) * $sr["damage"], 0);
+        $sr["damageMedium"] = round($this->getDamageBonus($damageInformation["primaryWeapon"]["type_damage"], array(1 => 0, 2 => 1, 3 => 0) ) * $sr["damage"], 0);
+        $sr["damageLight"] = round($this->getDamageBonus($damageInformation["primaryWeapon"]["type_damage"], array(1 => 1, 2 => 0, 3 => 0) ) * $sr["damage"], 0);
 		
         $sr["armor"] = round($totalArmor * $user["Defence"], 0);
         $sr["armorPiercing"] = round($this->getDamageBonus(1, $user["armorTypes"]) * $sr["armor"] , 0);

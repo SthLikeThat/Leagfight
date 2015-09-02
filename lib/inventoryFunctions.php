@@ -14,13 +14,13 @@ class inventoryFunctions extends DataBase{
         parent::__construct();
         $this->db = $this;
         session_start();
-        $this->user = $this->db->selectFromTables(array("users", "user_resources", "user_settings", "user_statistic"), "id", $_SESSION["id"]);
+        $this->account = $this->db->select("accounts", array("*"), "`id_account` =". $_SESSION["id_account"], "id_account")[0];
+		$this->user_information = $this->db->select("user_information", array("*"), "`id_user` =". $_SESSION["id_account"], "id_user")[0];
+		$this->equipment = $this->db->select("user_equipment", array("*"), "`id_user` =". $_SESSION["id_account"], "id_user")[0];
 		
-        $this->inventory = $this->db->getAllOnField("user_inventory", "id", $this->user["id"], "", "");
-		$this->potions = $this->db->getAllOnField("user_inventory_potions", "id", $this->user["id"], "", "");
+        $this->inventory = $this->db->getAllOnField("user_inventory", "id_user", $_SESSION["id_account"], "id_user", "");
+		$this->potions = $this->db->getAllOnField("user_potions", "id_user", $_SESSION["id_account"], "id_user", "");
 		$this->inventories_database = $this->db->ancillary->getAllInventory($this->inventory, $this->potions);
-		
-       
     }
 
     public function query($query){
@@ -37,6 +37,20 @@ class inventoryFunctions extends DataBase{
 			return $length;
 	}
 	
+	final protected function getAuthUser() {
+		if(!$_SESSION["id_account"]){
+            return false;
+		}
+		$user = $this->db->getFieldsBetter("accounts", "id_account", $_SESSION["id_account"], array("id_account", "user_hash"), "=");
+		$user = $user[0];
+		if($_SESSION["hash"] === $user["user_hash"]){
+			return true;
+		}
+		else{
+            return false;
+		}
+	}
+	
 	public function toggle($hash){
 		if(!is_string($hash)){
 			$resultData = array("result" => false, "error" => "Возникла серверная ошибка");
@@ -51,26 +65,28 @@ class inventoryFunctions extends DataBase{
 		if($inventory_item["id"] < 1000){
 			//Ищем пришедшую вещь в инвентаре
 			foreach($this->inventory as $tempthing){
-				if($tempthing != "0" and $tempthing != "999"){
-					$tempthing = (array) json_decode($tempthing);
-					//Находима текущую вещь
-					if($tempthing["hash"] == $hash){
-						$thing = $tempthing;
+					$tempthing = json_decode($tempthing);
+					if(is_object($tempthing)){
+						$tempthing = (array) $tempthing;
+						//Находима текущую вещь
+						if($tempthing["hash"] == $hash){
+							$thing = $tempthing;
+						}
+						//Находим все вещи для изменения статистики
+						if($tempthing["hash"] == $this->equipment["primaryWeapon"])
+							$damageInformation["primaryWeapon"] = $tempthing;
+						if($tempthing["hash"] == $this->equipment["secondaryWeapon"])
+							$damageInformation["secondaryWeapon"] = $tempthing;
+						if($tempthing["hash"] == $this->equipment["helmet"])
+							$damageInformation["helmet"] = $tempthing;
+						if($tempthing["hash"] == $this->equipment["armor"])
+							$damageInformation["armor"] = $tempthing;
+						if($tempthing["hash"] == $this->equipment["bracers"])
+							$damageInformation["bracers"] = $tempthing;
+						if($tempthing["hash"] == $this->equipment["leggings"])
+							$damageInformation["leggings"] = $tempthing;
 					}
-					//Находим все вещи для изменения статистики
-					if($tempthing["hash"] == $this->user["primaryWeapon"])
-						$damageInformation["primaryWeapon"] = $tempthing;
-					if($tempthing["hash"] == $this->user["secondaryWeapon"])
-						$damageInformation["secondaryWeapon"] = $tempthing;
-					if($tempthing["hash"] == $this->user["helmet"])
-						$damageInformation["helmet"] = $tempthing;
-					if($tempthing["hash"] == $this->user["armor"])
-						$damageInformation["armor"] = $tempthing;
-					if($tempthing["hash"] == $this->user["bracers"])
-						$damageInformation["bracers"] = $tempthing;
-					if($tempthing["hash"] == $this->user["leggings"])
-						$damageInformation["leggings"] = $tempthing;
-				}
+					
 			}
 			if(!$thing){
 				$resultData = array("result" => false, "error" => "Нет такой вещи в инвентаре");
@@ -95,27 +111,27 @@ class inventoryFunctions extends DataBase{
 				$resultData["item"] = "secondaryWeapon";
 			
 			//Снимаем если хеш совпадает
-			if($this->user["primaryWeapon"] == $hash){
+			if($this->equipment["primaryWeapon"] == $hash){
 				$resultData["item"] = "primaryWeapon";
 				$resultData["type"] = "off";
 			}
-			if($this->user["secondaryWeapon"] == $hash){
+			if($this->equipment["secondaryWeapon"] == $hash){
 				$resultData["item"] = "secondaryWeapon";
 				$resultData["type"] = "off";
 			}
-			if($this->user["helmet"] == $hash || $this->user["armor"] == $hash || $this->user["bracers"] == $hash || $this->user["leggings"] == $hash)
+			if($this->equipment["helmet"] == $hash || $this->equipment["armor"] == $hash || $this->equipment["bracers"] == $hash || $this->equipment["leggings"] == $hash)
 				$resultData["type"] = "off";
 			
 			//Нет, надо не снять, а нечто другое
 			if(!$resultData["type"]){
 				//Может надеть?
 				if($inventory_item["thing"] == 1){
-					if($this->user["secondaryWeapon"] == "0")
+					if($this->equipment["secondaryWeapon"] == "0")
 						$resultData["item"] = "secondaryWeapon";
 					else
 						$resultData["item"] = "primaryWeapon";
 				}
-				if($this->user[$resultData["item"]] == "0"){
+				if($this->equipment[$resultData["item"]] == "0"){
 					$resultData["type"] = "on";
 				}
 				//Значит надо заменить вещь
@@ -126,8 +142,8 @@ class inventoryFunctions extends DataBase{
 			
 			//Что делать опредились, теперь надо это делать
 			if($resultData["type"] == "change" || $resultData["type"] == "on"){
-				if($inventory_item["lvl"] <= $this->user["lvl"]){
-					$this->db->update("users", array($resultData["item"] => $hash), "`id` = " . $this->user["id"]);
+				if($inventory_item["lvl"] <= $this->user_information["lvl"]){
+					$this->db->update("user_equipment", array($resultData["item"] => $hash), "`id_user` = " . $this->account["id_account"]);
 					$damageInformation[$resultData["item"]] = $thing;
 				}
 				else{
@@ -137,7 +153,7 @@ class inventoryFunctions extends DataBase{
 				}
 			}
 			if($resultData["type"] == "off"){
-				$this->db->update("users", array($resultData["item"] => 0), "`id` = " . $this->user["id"]);
+				$this->db->update("user_equipment", array($resultData["item"] => 0), "`id_user` = " . $this->account["id_account"]);
 				unset($damageInformation[$resultData["item"]]);
 			}
 		}
@@ -186,7 +202,7 @@ class inventoryFunctions extends DataBase{
 					}
 				}
 			}
-			$resultData["statistic"] = $this->db->ancillary->getDamageInformation($this->user, $info, true);
+			$resultData["statistic"] = $this->db->ancillary->getDamageInformation($this->user_information, $info, true);
 		}
 		
 		echo json_encode($resultData);

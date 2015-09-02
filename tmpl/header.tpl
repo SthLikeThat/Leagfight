@@ -1,7 +1,7 @@
 <div class="col-lg-2 col-xs-4 header-col" >
 	<div class="progress leag-progress-money" data-title="%currentExp% / %needExp%" id="exp">
 	   <div class="progress-bar-icon-left">
-			<img src="image_char/image/lvl.png" height="17"> 
+			<img src="images/icons/lvl.png" height="17"> 
 			%lvl%
 		</div>
 		<div class="progress-bar progress-bar-exp" style="min-width: 2%; width:%exp%%;"></div>
@@ -10,7 +10,7 @@
 		<div class="resource-icon">
 			<img src="images/coinBlack.png">
 		</div>
-		<div class="resource-number">
+		<div class="resource-number" id="gold">
 			%gold%
 		</div>
 	</div>
@@ -19,7 +19,7 @@
 <div class="col-lg-2 col-xs-4 header-col">
 	<div class="progress leag-progress-money" data-title="%currentHp% / %maxHp%" id="hp">
 	   <div class="progress-bar-icon-left">
-			<img src="image_char/image/hp.png" height="17"> 
+			<img src="images/icons/hp.png" height="17"> 
 		</div>
 		<div class="progress-bar progress-bar-hp" style="min-width: 2%; width:%hp%%;"></div>
 	</div>
@@ -27,7 +27,7 @@
 		<div class="resource-icon">
 			<img src="images/diamond.png">
 		</div>
-		<div class="resource-number">
+		<div class="resource-number" id="another">
 			%another%
 		</div>
 	</div>
@@ -44,7 +44,7 @@
 		<div class="resource-icon">
 			<img src="images/euro.png">
 		</div>
-		<div class="resource-number">
+		<div class="resource-number" id="donat">
 			%donat%
 		</div>
 	</div>

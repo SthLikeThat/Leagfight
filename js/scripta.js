@@ -127,6 +127,7 @@ $(document).ready(function(){
         change - заменить вещь, on - чисто надеть, off - чисто снять 
         Пример удачной смены вещи: resultData = {"result": true, "item": "armor", "type": "change", errors: "", statistic: {} };*/
         serverResult .done(function( data ) {
+            console.log(data);
             var resultData = JSON.parse(data);
            
             if(resultData.result){
@@ -314,6 +315,30 @@ $(document).ready(function(){
          });
     });
     
+    //Прокачивание характеристик
+    $(".up-char-row .btn").click(function (eventObject) {
+        var value = Number($(this).attr("data-value"));
+        var action = $(eventObject.currentTarget.parentElement).attr("data-action");
+        var target = $(eventObject.currentTarget.parentElement.parentElement).attr("data-target");
+        
+        if(action == "up")
+            var new_value = Number($(target).val()) + Number(value);
+        else 
+            var new_value = Number($(target).val()) - Number(value);
+        if(new_value < 0)
+            new_value = 0;
+        
+        getResultChar(new_value, eventObject.currentTarget.parentElement.parentElement);
+    });
+    
+    $(".training-input").keyup(function (eventObject) {
+        var up_char_row = eventObject.currentTarget.parentElement;
+        var target = $(up_char_row).attr("data-target");
+        var new_value = Number(eventObject.target.value);
+        
+        getResultChar(new_value, up_char_row);
+        return false;
+    });
 });
 
 function getChildrenBLock(childs, children, type){
@@ -330,6 +355,76 @@ function getChildrenBLock(childs, children, type){
         }
     }
     return false;
+}
+
+function checkTotalTrainingSumm(){
+    var spans_with_sum = $(".value-train-summ");
+    var total_Price = 0;
+    for(var i = 0; i < spans_with_sum.length; i++) { 
+        total_Price += Number(spans_with_sum[i].innerHTML);
+    }
+    $("#total-sum").text(total_Price);
+    var discount = Number($("#discount").html());
+    
+    var total_sum_discount = Math.round(total_Price - (total_Price * discount / 100));
+    $("#total-sum-discount").html(total_sum_discount);
+}
+
+function getResultChar(new_value, up_char_row){
+        var action = $(up_char_row).attr("data-action");
+        var price = Number($(up_char_row).attr("data-price"));
+        var target = $(up_char_row).attr("data-target");
+        var current_value = Number($(up_char_row).attr("data-value"));
+        var gold = Number($("#gold").text());
+        var last_bonus = 1;
+        var new_bonus = 1;
+        var total_Price = 0;
+        var input_value = Number($(target).val());
+        var global_summ = Number($("#total-sum-discount").text());
+        var discount = Number($("#discount").html());
+        var train_summ_current =  $(" [data-target='" + target + "'] .value-train-summ").html();
+        
+        //Считаем цену последней уже прокаченной хар-ки 
+        for(var i = 1; i <= current_value; i++){
+            last_bonus *= 1.03;
+        }
+        var last_price = price * last_bonus;
+        
+        console.log(new_value);
+        //Считаем цену новых характеристик
+        for(var i = 1; i <= new_value; i++){
+           // console.log(i);
+           
+            if($("#limit_in_gold").prop("checked")){
+                //Влезет ли текущая сумма в золото пользователя
+                var total_sum_discount = Math.round(total_Price - (total_Price * discount / 100));
+                train_summ_current_discount =  Math.round(train_summ_current - (train_summ_current * discount / 100));
+                var res = global_summ + total_sum_discount - train_summ_current_discount;
+                //Если нет, то останавливаём всё и вставляем как есть
+                if(res > gold){
+                    total_Price = total_Price - last_price ;
+                    new_value = i - 1;
+                    break;
+                }
+            }
+            last_price *= 1.03;
+            total_Price += last_price;
+        }
+        total_Price = Math.round(total_Price);
+    
+        if(new_value < 0)
+            new_value = 0;
+        if(total_Price < 0)
+            total_Price = 0;
+    
+        //Добавляем в ценник справа
+        $(" [data-target='" + target + "'] .value-train-summ").html(total_Price);
+        
+        //Вставляем в инпут
+        $(target).val(new_value);
+        
+        //Пересчитываем всю цену
+        checkTotalTrainingSumm();
 }
 
 function checkLoc(url){
@@ -350,18 +445,6 @@ function checkLoc(url){
         }
         // Предотвращаем дефолтное поведение
         return false;
-}
-
-function setMenuItem(urlArray){
-console.log(urlArray["view"]);
-	if(urlArray["view"] === undefined)
-		id = "menu_user";
-	if(urlArray["view"] === "town" && urlArray["type"] === "clan")
-		id = "menu_clan";
-	else if(urlArray["view"] !== undefined && urlArray["type"] !== "clan")
-		id = "menu_" + urlArray["view"];
-	$("#" + id).addClass("currentMenuItem");
-	console.log(id);
 }
 
 function isLocalStorageAvailable() {

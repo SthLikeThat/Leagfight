@@ -62,7 +62,7 @@ class CheckValid{
 		if(!$this->validEmail($email)) return false;
 		if(!$this->check_sql($email)) return false;
 		if(!$this->checkPassword($password)) return false;
-		$table_name = $this->config->db_prefix."users";
+		$table_name = $this->config->db_prefix."accounts";
 			$query = "SELECT * FROM `$table_name` WHERE `email`='$email'";
 			$result_set = $this->query($query);
 			$num = $result_set->num_rows;
