@@ -188,7 +188,7 @@
                     </div>
               </div>
               <div class="modal-footer">
-                  <button class="btn btn-success" type="button" style="float: left;"> Прокачать </button>
+                  <button class="btn btn-success" type="button" style="float: left;" onclick="up_characteristics()"> Прокачать </button>
                   <button class="btn btn-danger" type="button" data-dismiss="modal"> Отмена </button>
               </div>
           </div>

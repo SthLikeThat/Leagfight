@@ -1,6 +1,5 @@
 <?php
 require_once "database_class.php";
-require_once "auth.php";
 
 class inventoryFunctions extends DataBase{
 
@@ -14,6 +13,7 @@ class inventoryFunctions extends DataBase{
         parent::__construct();
         $this->db = $this;
         session_start();
+		
         $this->account = $this->db->select("accounts", array("*"), "`id_account` =". $_SESSION["id_account"], "id_account")[0];
 		$this->user_information = $this->db->select("user_information", array("*"), "`id_user` =". $_SESSION["id_account"], "id_user")[0];
 		$this->equipment = $this->db->select("user_equipment", array("*"), "`id_user` =". $_SESSION["id_account"], "id_user")[0];
@@ -38,12 +38,11 @@ class inventoryFunctions extends DataBase{
 	}
 	
 	final protected function getAuthUser() {
+		session_start();
 		if(!$_SESSION["id_account"]){
             return false;
 		}
-		$user = $this->db->getFieldsBetter("accounts", "id_account", $_SESSION["id_account"], array("id_account", "user_hash"), "=");
-		$user = $user[0];
-		if($_SESSION["hash"] === $user["user_hash"]){
+		if($_SESSION["hash"] === $this->account["user_hash"]){
 			return true;
 		}
 		else{
@@ -53,7 +52,7 @@ class inventoryFunctions extends DataBase{
 	
 	public function toggle($hash){
 		if(!is_string($hash)){
-			$resultData = array("result" => false, "error" => "Возникла серверная ошибка");
+			$resultData = array("result" => false, "error" => "Возникла серверная ошибка[1]");
 			die(json_encode($resultData));
 		}
 		//  Пример ответа $resultData = array("result" => true, "item" => "armor", "type" => "change", "error" => 0);
@@ -142,14 +141,14 @@ class inventoryFunctions extends DataBase{
 			
 			//Что делать опредились, теперь надо это делать
 			if($resultData["type"] == "change" || $resultData["type"] == "on"){
-				if($inventory_item["lvl"] <= $this->user_information["lvl"]){
+				if($inventory_item["required_lvl"] <= $this->user_information["lvl"]){
 					$this->db->update("user_equipment", array($resultData["item"] => $hash), "`id_user` = " . $this->account["id_account"]);
 					$damageInformation[$resultData["item"]] = $thing;
 				}
 				else{
 					$resultData["error"] = "Ваш уровень слишком низок для этой вещи!";
 					$resultData["result"] = false;
-					$result = false;
+					die(json_encode($resultData));
 				}
 			}
 			if($resultData["type"] == "off"){
@@ -157,15 +156,13 @@ class inventoryFunctions extends DataBase{
 				unset($damageInformation[$resultData["item"]]);
 			}
 		}
-		
-		if(!$resultData["result"])
-			$result = $this->db->mysqli->commit();
+		$result = $this->db->mysqli->commit();
 		
 		if($result)
 			$resultData["result"] = true;
 		else{
 			$resultData["result"] = false;
-			$resultData["error"] = "Возникла серверная ошибка";
+			$resultData["error"] = "Возникла серверная ошибка[3]";
 		}
 		
 		//Вытягиваем новую статистику урона
@@ -210,7 +207,7 @@ class inventoryFunctions extends DataBase{
 	
 	public function delete_thing($hash, $name){
 		if(!is_string($hash) && !is_null($hash) || !is_string($name) && !is_null($name)){
-			$resultData = array("result" => false, "error" => "Возникла серверная ошибка");
+			$resultData = array("result" => false, "error" => "Возникла серверная ошибка[1]");
 			die(json_encode($resultData));
 		}
 		// Если пришел hash - удаляем из инвентаря, name - из зелий
@@ -274,7 +271,7 @@ class inventoryFunctions extends DataBase{
 		}
 		else{
 			$resultData["result"] = false;
-			$resultData["error"] = "Возникла серверная ошибка";
+			$resultData["error"] = "Возникла серверная ошибка[4]";
 		}
 		
 		echo json_encode($resultData);
@@ -282,7 +279,7 @@ class inventoryFunctions extends DataBase{
 
 	public function use_thing($name){
 		if(!is_string($name)){
-			$resultData = array("result" => false, "error" => "Возникла серверная ошибка[0]");
+			$resultData = array("result" => false, "error" => "Возникла серверная ошибка[1]");
 			die(json_encode($resultData));
 		}
 		
@@ -312,7 +309,7 @@ class inventoryFunctions extends DataBase{
 		}
 		
 		if(!$potion_in_db){
-			$resultData = array("result" => false, "error" => "Возникла серверная ошибка[1]");
+			$resultData = array("result" => false, "error" => "Возникла серверная ошибка[2]");
 			die(json_encode($resultData));
 		}
 		
@@ -352,7 +349,7 @@ class inventoryFunctions extends DataBase{
 		}
 		else{
 			$resultData["result"] = false;
-			$resultData["error"] = "Возникла серверная ошибка[2]";
+			$resultData["error"] = "Возникла серверная ошибка[3]";
 		}
 		echo json_encode($resultData);
 	}
@@ -460,155 +457,6 @@ class inventoryFunctions extends DataBase{
         }
     }
 
-    private function generateCode($length = 8) {
-        $chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPRQSTUVWXYZ0123456789";
-        $code = "";
-        $clen = strlen($chars) - 1;
-        while (strlen($code) < $length) {
-            $code .= $chars[mt_rand(0,$clen)];
-        }
-        return $code;
-    }
-
-    public function buy($iden){
-        if(!$this->valid->validID($iden))
-            exit;
-        $hash = $this->generateCode();
-        for($i = 1; $i < count($this->inventory); $i++){
-            if($this->inventory["slot$i"] != "0" and $this->inventory["slot$i"] != "99"){
-                $invItem = unserialize($this->inventory["slot$i"]);
-                if($invItem["hash"] == $hash){
-                    $i = 0;
-                    $hash = $this->generateCode();
-                }
-            }
-        }
-        if($iden < 500){
-            $table_name = "weapon";
-            $newInvItem = array("hash"=>$hash, "id"=>$iden, "crit" => 0, "damage"=>0);
-        }
-        if($iden > 500){
-            $table_name = "armor";
-            $newInvItem = array("hash"=>$hash, "id"=>$iden, "armor" => 0);
-        }
-        if(!$this->valid->validID($iden) or !$this->db->existsID($table_name, $iden)) exit;
-        $thing = $this->db->getAllOnField($table_name, "id", $iden, "", "");
-        if($thing["requiredlvl"] > $this->user["lvl"] + 3)	exit;
-        $price = $thing["price"];
-        if($this->user["Gold"] > $price){
-            $statistic = unserialize($this->user["shopStatistic"]);
-            $statistic["spentGold"] += $price;
-            $statistic["equipment"]++;
-            $this->mysqli->autocommit(FALSE);
-            $this->db->setFieldOnID("user_statistic", $this->user["id"], "shopStatistic", serialize($statistic));
-            $newgold = $this->user["Gold"] - $price;
-            $ready = $this->setFieldInventory($this->user["id"], serialize($newInvItem));
-            if(!$ready){
-                $this->mysqli->rollback();
-                die("Нет места в инвентаре.");
-            }
-            else{
-                $this->db->setField("user_resources", "Gold", $newgold, "id", $this->user["id"]);
-                $result = $this->mysqli->commit();
-                if($result)
-                    die("OK".$newgold);
-                else die("Что-то пошло не так");
-            }
-        }
-        else die("Не хватает денег.");
-    }
-
-    public function buyPotion($id){
-        $allPotions = $this->db->getAll("something", "", "");
-        $exist = false;
-        for($i = 0; $i < count($allPotions); $i++){
-            if($allPotions[$i]["image"] == $id){
-                $exist = true;
-                break;
-            }
-        }
-        if(!$exist) exit;
-        $currentgold = $this->user["Gold"];
-        $thing = $this->db->getAllOnField("something", "image", $id, "", "");
-        if($thing["requiredlvl"] > $this->user["lvl"] + 3) exit;
-        $price = $thing["price"];
-        if($currentgold > $price){
-            $newgold = $currentgold - $price;
-            $field = $this->setFieldInvPotion($id);
-            if($field){
-                $statistic = unserialize($this->user["shopStatistic"]);
-                $statistic["spentGold"] += $price;
-                $statistic["potions"]++;
-                $this->db->setFieldOnID("user_statistic", $this->user["id"], "shopStatistic", serialize($statistic));
-                $this->db->setField("user_resources", "Gold", $newgold, "id", $this->user["id"]);
-                echo $newgold;
-                exit;
-            }
-            else{
-                echo "?";
-                exit;
-            }
-        }
-        else{
-            echo "!";
-            exit;
-        }
-    }
-
-    private function setFieldInvPotion($id){
-        $inventory = $this->inventoryPotions;
-        foreach ($inventory as $key => $value){
-            if($value === $id){
-                $field = $key;
-                break;
-            }
-        }
-        if($field != ""){
-            $newCount = $inventory[$field."_count"] + 1;
-            if($newCount <= 99){
-                $this->db->setFieldOnID("user_inventory_potions", $this->user["id"], $field."_count", $newCount);
-                return true;
-            }
-            else return false;
-        }
-        else{
-            foreach ($inventory as $key => $value){
-                if($value === "0"){
-                    $field = $key;
-                    break;
-                }
-            }
-            $this->db->setFieldOnID("user_inventory_potions", $this->user["id"], $field."_count", 1);
-            $this->db->setFieldOnID("user_inventory_potions", $this->user["id"], $field, $id);
-            return true;
-        }
-    }
-
-    public function useIt($name){
-        if(!$this->valid->check_sql($name)) exit;
-        $exist = false;
-        for($i = 1; $i <= 5; $i++){
-            if($name == $this->inventoryPotions["slot$i"]){
-                $exist = true;
-                $slot = $i;
-                break;
-            }
-        }
-        if(!$exist)		exit;
-        $item = $this->db->getAllOnField("something", "image", $name, "", "");
-        if($item["typeEffect"] == 1){
-            $regenHp = ($this->user["maxHp"] * $item["valueEffect"])/100;
-            $newHp = $this->user["currentHp"] + $regenHp;
-
-            if($newHp > $this->user["maxHp"]) $newHp = $this->user["maxHp"];
-            $this->db->setField("users", "currentHp", $newHp, "id", $this->user["id"]);
-            $newCount = $this->inventoryPotions["slot$i"."_count"] - 1;
-            $this->db->setField("user_inventory_potions", "slot$i"."_count", $newCount, "id", $this->user["id"]);
-            if($newCount == 0)
-                $this->db->setField("user_inventory_potions", "slot$i", 0 , "id", $this->user["id"]);
-        }
-    }
-
     public function upSmith($type, $slot, $damageLvl, $critLvl, $armorLvl){
         $invItem = unserialize($this->inventory["slot$slot"]);
         if($type == "weapon"){
@@ -694,7 +542,7 @@ class inventoryFunctions extends DataBase{
     }
 	
 }
-    $inventoryFunctions = new inventoryFunctions();
+$inventoryFunctions = new inventoryFunctions();
 
 switch ($_POST["WhatIMustDo"]) {
 	case "toggle_thing":
@@ -708,15 +556,6 @@ switch ($_POST["WhatIMustDo"]) {
         break;
     case "getMenuSmith":
         $inventoryFunctions->getMenuSmith($_POST["slot"]);
-        break;
-    case "buyThing":
-        $inventoryFunctions->buy($_POST["iden"]);
-        break;
-    case "useIt":
-        $inventoryFunctions->useIt($_POST["name"]);
-        break;
-    case "buyPotion":
-        $inventoryFunctions->buyPotion($_POST["iden"]);
         break;
     case "upSmith":
         $inventoryFunctions->upSmith($_POST["type"], $_POST["slot"], $_POST["damageLvl"], $_POST["critLvl"], $_POST["armorLvl"]);

@@ -3,12 +3,13 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<title>%title%</title>
 	<link rel="shortcut icon" href="../images/icons/%shortcut_icon%.png" type="image/png">
-	<link href="css/main_style.css" rel="stylesheet">
+	<link href="../css/main_style.css" rel="stylesheet">
 	
-	<link href="css/bootstrap.css" rel="stylesheet">
-	<link href="css/bootstrap_my.css" rel="stylesheet">
-	<link href="css/font-awesome.css" rel="stylesheet">
-	<link href="css/style.css" rel="stylesheet">
+	<link href="../css/bootstrap.css" rel="stylesheet">
+	<link href="../css/bootstrap_my.css" rel="stylesheet">
+	<link href="../css/font-awesome.css" rel="stylesheet">
+	<link href="../css/style.css" rel="stylesheet">
+	<script src="../js/jquery-2.1.3.min.js"></script>
 
 </head>
 
@@ -50,9 +51,9 @@
           </div>
       </div>
     </div>
-    <script src="js/jquery-2.1.3.min.js"></script>
-    <script src="js/bootstrap.js"></script>
-    <script src="js/scripta.js"></script>
+    <div class="system-messages-container"></div>
+    <script src="../js/bootstrap.js"></script>
+    <script src="../js/scripta.js"></script>
 </body>
 
 </html>

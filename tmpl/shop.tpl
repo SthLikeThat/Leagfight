@@ -1,7 +1,2 @@
-<div class="mainSort">	
-	<ul class="shopUl">
-	%menuItem%
-	</ul>
-%content%
-
+%menuItem%
 <div class="footerCorrect"></div>

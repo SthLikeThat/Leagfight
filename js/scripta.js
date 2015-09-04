@@ -1,5 +1,6 @@
 $(document).ready(function(){	
     var timeout;
+    var sorts = {"sort-weapon" : {}, "sort-armor": {}};
 	var doc_w = $(window).width();
     //Всплывающая инфа текст
 	if(doc_w > 768){
@@ -127,7 +128,6 @@ $(document).ready(function(){
         change - заменить вещь, on - чисто надеть, off - чисто снять 
         Пример удачной смены вещи: resultData = {"result": true, "item": "armor", "type": "change", errors: "", statistic: {} };*/
         serverResult .done(function( data ) {
-            console.log(data);
             var resultData = JSON.parse(data);
            
             if(resultData.result){
@@ -331,6 +331,7 @@ $(document).ready(function(){
         getResultChar(new_value, eventObject.currentTarget.parentElement.parentElement);
     });
     
+    //Ввод характеристик с клавиатуры
     $(".training-input").keyup(function (eventObject) {
         var up_char_row = eventObject.currentTarget.parentElement;
         var target = $(up_char_row).attr("data-target");
@@ -339,6 +340,55 @@ $(document).ready(function(){
         getResultChar(new_value, up_char_row);
         return false;
     });
+    
+    //Сортировка в магазине
+    $(".sort-shop").click(function(eventObject){
+        var type = $(this).attr("id");
+        $(".btn-group li").click(function(eventObject2){
+            var value = $(this).attr("data-value"); 
+            var sort = $(eventObject2.currentTarget.parentElement.parentElement).attr("data-sort");
+            sorts[type][sort] = value;
+            sort_shop(type, sorts);
+        });
+    });
+    
+    //Динамическая догрузка в магазине
+    $(".nav-shop a").click(function(eventObject){
+        var tab = $(this).attr("href");
+        var thing = $(this).attr("data-thing");
+        var sort = $(this).attr("data-sort");
+        
+        if($(tab).html() == ""){
+            var serverResult = $.post( "../shop/shop_functions.php", { 'WhatIMustDo': "get_things", 'thing': thing });
+
+            serverResult .done(function( data ) {
+                $(tab).html(data);
+                $(".sort-shop").hide();
+                $(sort).show();
+
+                var type = $(sort).attr("id");
+                sort_shop(type, sorts);
+            });
+
+             serverResult .fail(function() {
+                    $("#alert_danger .modal-body").html("Возникла серверная ошибка");
+                    $("#alert_danger").show();
+             });
+        }
+        else{
+            $(".sort-shop").hide();
+            $(sort).show();
+
+            var type = $(sort).attr("id");
+            sort_shop(type, sorts);   
+        }
+    });
+    
+    //Закрытие системных сообщений
+    $(".system-messages-container").delegate(".close", "click",function(eventObject){
+        $(eventObject.currentTarget.parentElement.parentElement).hide();
+    });
+    
 });
 
 function getChildrenBLock(childs, children, type){
@@ -390,11 +440,8 @@ function getResultChar(new_value, up_char_row){
         }
         var last_price = price * last_bonus;
         
-        console.log(new_value);
         //Считаем цену новых характеристик
         for(var i = 1; i <= new_value; i++){
-           // console.log(i);
-           
             if($("#limit_in_gold").prop("checked")){
                 //Влезет ли текущая сумма в золото пользователя
                 var total_sum_discount = Math.round(total_Price - (total_Price * discount / 100));
@@ -427,45 +474,94 @@ function getResultChar(new_value, up_char_row){
         checkTotalTrainingSumm();
 }
 
-function checkLoc(url){
-	 $.ajax({
-            url: url + '&ajax=1',
-            success: function(data){
-                $('.wrapper').html(data);
-				checkThisHeader();
-				checkThis();
-				jobTime();
-				var urlArray = parseUrlQuery();
-				setMenuItem(urlArray);
-            }
-        });
-        // А вот так просто меняется ссылка
-        if(url != window.location){
-            window.history.pushState(null, null, url);
+function up_characteristics(){
+    var Strengh = $("#input-strengh").val();
+    var Defence = $("#input-defence").val();
+    var Agility = $("#input-agility").val();
+    var Physique = $("#input-physique").val();
+    var Mastery = $("#input-mastery").val();
+    
+    var serverResult = $.post( "../lib/allFunctions.php", { 'WhatIMustDo': "pump_characteristics",                                              'Strengh': Strengh, 'Defence': Defence, 'Agility': Agility, 'Physique': Physique, 'Mastery': Mastery });
+    
+    serverResult.done( function(data){
+        var resultData = JSON.parse(data);
+         
+        if(resultData.result){
+            window.location.reload();
         }
-        // Предотвращаем дефолтное поведение
-        return false;
+        else{
+            $("#alert_danger .modal-body").html(resultData.error);
+            $("#alert_danger").show();
+        }
+    });
+    
+    serverResult .fail(function( data ) {
+        $("#alert_danger .modal-body").html("Возникла серверная ошибка");
+        $("#alert_danger").show();
+     });
 }
 
-function isLocalStorageAvailable() {
-	//return false;
-	try {
-		return 'localStorage' in window && window['localStorage'] !== null;
-	} 
-	catch (e) {
-		return false;
-	}
+function sort_shop(type, sorts){
+    var items = $(".shop-item");
+    var count = items.length;
+    var sort_array_accord = {};
+
+    for(var i = 0; i < count; i++){
+        //Сначала проверяем соответствует ли вещь всем сортировками заносим результаты в массив
+         for(key in sorts[type]){
+             if(sorts[type][key] != "0")
+                 sorting = sorts[type][key];
+             else
+                 sorting = $(items[i]).attr("data-" + key);
+
+             if( $(items[i]).attr("data-" + key) != sorting )
+                sort_array_accord[key] = false;
+             else
+                sort_array_accord[key] = true;
+         }
+
+         //Проходим по массиву и если всё сходится, то отображаем вещь
+         var ready_to_show = true;
+         for(sort_accord in sort_array_accord){
+             if(!sort_array_accord[sort_accord]){
+                 ready_to_show = false;  
+             }
+         }
+
+        if(ready_to_show)
+            $(items[i]).show();
+        else
+            $(items[i]).hide();
+    }
 }
 
-function arraysEqual(a, b) {
-  if (a === b) return true;
-  if (a == null || b == null) return false;
-  if (a.length != b.length) return false;
+function buyThing(id){
+    var serverResult = $.post( "../shop/shop_functions.php", { 'WhatIMustDo': "buy_thing", 'id': id });
+    
+    serverResult.done( function(data){
+        var resultData = JSON.parse(data);
+         
+        if(resultData.result){
+            $("#" + resultData.resource).html(resultData.money);
+            addSystemMessage("Вещь приобретена");
+        }
+        else{
+            $("#alert_danger .modal-body").html(resultData.error);
+            $("#alert_danger").show();
+        }
+    });
+    
+    serverResult .fail(function( data ) {
+        $("#alert_danger .modal-body").html("Возникла серверная ошибка");
+        $("#alert_danger").show();
+     });
+}
 
-  for (var i = 0; i < a.length; ++i) {
-    if (a[i] !== b[i]) return false;
-  }
-  return true;
+function addSystemMessage(text){
+    var html = '<div class="system-message"><div class="system-message-header"><button class="close" type="button">';
+    html += '<i class="glyphicon glyphicon-remove"></i></button></div><div class="system-message-body">';
+    html += text + '</div></div>';
+    $(".system-messages-container").append(html);
 }
 
 function setSpawn(league){
@@ -526,23 +622,6 @@ function exituser(){
 			}
 		 });
 	});
-}
-
-function buyThing(id){
-	$.ajax({
-          type: 'POST',
-          url: 'lib/inventoryFunctions.php',
-          data: {'iden':id , 'WhatIMustDo':'buyThing'},
-          success: function(data) {
-			if(data.substr(0,2) == "OK"){
-				$("#gold").html(data.substr(2)); 
-				message("Куплено!");
-			}
-			else message(data);
-             
-          }
-        });
-
 }
 
 function buyPotion(id){

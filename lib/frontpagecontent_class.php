@@ -35,17 +35,14 @@ class FrontPageContent extends Modules {
 	}
 	
 	protected function getTitle(){
-		return "Персонаж";
+		return "Персонаж - LF";
 	}
 	protected function getShortcut_icon(){
 		return "profile";
 	}
 	
 	private function getModales(){
-		$discount = 100;
-		for($i = 1; $i <= $this->user_information["lvl"]; $i++) 
-			$discount = $discount -($discount * 0.02);
-		$modal["discount"] = round(100 - $discount."%", 3);
+		$modal["discount"] = $this->db->ancillary->getDiscount($this->user_information);
 		$modal["strengh"] = $this->user_information["Strengh"];
 		$modal["defence"] = $this->user_information["Defence"];
 		$modal["agility"] = $this->user_information["Agility"];
@@ -274,9 +271,9 @@ class FrontPageContent extends Modules {
 			if($inventory_item["id"] == $potion["id"])
 				break;
 		}
-		if($inventory_item["typeEffect"] == "healPercent"){
+		if($inventory_item["type_effect"] == "healPercent"){
 			$sr["effect"] = "Лечебный";
-			$sr["description"] = "Исцеляет {$inventory_item["valueEffect"]}% от максимального здоровья";
+			$sr["description"] = "Исцеляет {$inventory_item["value_effect"]}% от максимального здоровья";
 		}
 		$sr["name"] = $inventory_item["title"];
 		$sr["price"] = $inventory_item["price"];
@@ -358,7 +355,7 @@ class FrontPageContent extends Modules {
 				$newInv .= "`slot$i` = '".$inventory["slot$i"]."',";
 			}
 			$newInv = substr($newInv, 0, -1);
-			$newInv .= " WHERE `id` = '".$this->user["id"]."'";
+			$newInv .= " WHERE `id_user` = '".$this->account["id_account"]."'";
 			$this->db->query($newInv);
 		}
 		

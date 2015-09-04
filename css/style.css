@@ -211,40 +211,6 @@ a:active { background: rgb(119, 136, 153); }
 	border:1px solid black;
 }
 
-#rangeSleep{
-	position:absolute;
-	left:0;
-	margin-left:28px;
-	height:100%;
-	display:none;
-}
-
-#sleepHours{
-	position:absolute;
-	right:0;
-	margin-top:1px;
-	padding-top:1.5%;
-	padding-bottom:2%;
-	margin-right:12%;
-	width:25px;
-	display:none;
-}
-
-#sleepGo{
-	position:absolute;
-	padding-left:2.5%;
-	right:0;
-	padding-top:1.5%;
-	border-radius: 0 10px 10px 0;
-	padding-right:2%;
-	margin-right:-1px;
-	margin-top:1px;
-	display:none;
-}
-
-#sleepGo:hover{	background-color:rgb(193,193,193);	}
-#sleep:hover{	background-color:rgb(193,193,193);	}
-
 .lvl{
 	font-size:19px;
 	margin-top:2%;
@@ -779,17 +745,6 @@ input[type="radio"]:checked + label span {
     position: relative; /* Относительное позиционирование */
 	width:7%;
 	font-size: 16px;
-}
-
-.mainSort a{
-	width:100%;
-	display:block;
-	color: #fff; 
-	text-decoration: none; 
-	background: rgba(190, 190, 190, 0.8); 
-	padding: .3em 1em;
-	padding-right: 2.25em;
-	outline: none; 
 }
 
 .shopPhoto a:hover { background: rgba(255,255,255,0.5); } 

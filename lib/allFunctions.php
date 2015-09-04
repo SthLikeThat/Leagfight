@@ -12,9 +12,11 @@ class allFunctions extends DataBase{
 		$this->db = $this;
 		$this->auth = new Auth($this->db);
 		session_start();
-		$this->user = $this->db->selectFromTables(array("users", "user_resources", "user_settings", "user_statistic"), "id", $_SESSION["id"]);
-		$this->inventory = $this->db->getAllOnField("user_inventory", "id", $this->user["id"], "", "");
-		$this->inventoryPotions = $this->db->getAllOnField("user_inventory_potions", "id", $this->user["id"], "", ""); 
+		
+		$this->account = $this->db->select("accounts", array("*"), "`id_account` =". $_SESSION["id_account"], "id_account")[0];
+		$this->user_information = $this->db->select("user_information", array("*"), "`id_user` =". $_SESSION["id_account"], "id_user")[0];
+		$this->equipment = $this->db->select("user_equipment", array("*"), "`id_user` =". $_SESSION["id_account"], "id_user")[0];
+		$this->resources = $this->db->select("user_resources", array("*"), "`id_user` =". $_SESSION["id_account"], "id_user")[0];
 	}
 	
 	public function query($query){
@@ -43,6 +45,65 @@ class allFunctions extends DataBase{
 			die("OK");
 		}
 		else exit;
+	}
+	
+	public function pump_characteristics($strengh, $defence, $agility, $physique, $mastery){
+		$array_prices = array("Strengh" => 15, "Defence" => 10, "Agility" => 8, "Physique" => 12, "Mastery" => 13);
+		$array_chars = array("Strengh" => (int) $strengh, "Defence" => (int) $defence, "Agility" => (int) $agility,
+		"Physique" => (int) $physique, "Mastery" => (int) $mastery);
+		$resultData = array();
+		
+		//Проходим по массиву пришедших на водокачку характеристик и если она больше 0, то считаем её цену и добавляем в общую копилку
+		foreach($array_chars as $key => $char){
+			if($char > 0){
+				$last_bonus = 1;
+				for($i = 1; $i <= $this->user_information[$key]; $i++){
+					$last_bonus *= 1.03;
+				}
+				$last_price = $array_prices[$key] * $last_bonus;
+				
+				for($i = 1; $i <= $char; $i++){
+					$last_price *= 1.03;
+					$total_Price += $last_price;
+				}
+				$total_Price = round($total_Price, 0);
+			}
+		}
+		$discount = $this->db->ancillary->getDiscount($this->user_information);
+		$total_Price_discount = round($total_Price - ($total_Price * $discount / 100), 0);
+		
+		if($this->resources["Gold"] >= $total_Price_discount){
+			//Пересчитываем новую мощь
+			$user["Strengh"] = $this->user_information["Strengh"] + $strengh;
+			$user["Defence"] = $this->user_information["Defence"] + $defence;
+			$user["Agility"] = $this->user_information["Agility"] + $agility;
+			$user["Physique"] = $this->user_information["Physique"] + $physique;
+			$user["Mastery"] = $this->user_information["Mastery"] + $mastery;
+			$power = round($user["Strengh"] * 2 + $user["Defence"] * 1.7 + $user["Agility"] * 1.6 + $user["Physique"] * 1.85 + $user["Mastery"] * 1.9, 0);
+			
+			$this->db->mysqli->autocommit(false);
+			$this->db->update("user_information", array("Strengh" => $user["Strengh"],"Defence" => $user["Defence"], 
+			"Agility" => $user["Agility"],"Physique" => $user["Physique"], "Mastery" => $user["Mastery"], "power" => $power),
+			"`id_user` = " . $this->account["id_account"]);
+			
+			$this->db->update("user_resources", array("Gold" => $this->resources["Gold"] - $total_Price), "`id_user` = " . $this->account["id_account"]);
+			$result = $this->db->mysqli->rollback();
+			
+			if($result){
+				$resultData["result"] = true;
+				die(json_encode($resultData));
+			}
+			else{
+				$resultData["result"] = false;
+				$resultData["error"] = "Возникла серверная ошибка";
+				die(json_encode($resultData));
+			}
+		}
+		else{
+			$resultData["result"] = false;
+			$resultData["error"] = "Вам нужно {$total_Price_discount} золота, а у вас только {$this->resources["Gold"]}";
+			die(json_encode($resultData));
+		}
 	}
 	
 	public function pump($strengh, $defence, $agility, $physique, $mastery, $pump, $total){
@@ -552,6 +613,9 @@ else{
 			break;
 		case "sendChar":
 			$allFunctions->pump($_REQUEST["strengh"], $_REQUEST["defence"], $_REQUEST["agility"], $_REQUEST["physique"], $_REQUEST["mastery"], $_REQUEST["pump"], $_REQUEST["total"]);
+			break;
+		case "pump_characteristics":
+			$allFunctions->pump_characteristics($_REQUEST["Strengh"], $_REQUEST["Defence"], $_REQUEST["Agility"], $_REQUEST["Physique"], $_REQUEST["Mastery"]);
 			break;
 		case "loadAllMessages":
 			$allFunctions->loadAllMessages($_REQUEST["idSender"]);

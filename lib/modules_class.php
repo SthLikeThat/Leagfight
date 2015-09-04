@@ -27,6 +27,7 @@ abstract class Modules extends Template{
 		$this->account = $this->db->select("accounts", array("*"), "`id_account` =". $_SESSION["id_account"], "id_account")[0];
 		$this->user_information = $this->db->select("user_information", array("*"), "`id_user` =". $_SESSION["id_account"], "id_user")[0];
 		$this->resources = $this->db->select("user_resources", array("*"), "`id_user` =". $_SESSION["id_account"], "id_user")[0];
+		
 	}
 	
 	private function secureData($data) {

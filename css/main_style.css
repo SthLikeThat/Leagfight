@@ -59,6 +59,10 @@ li{
     }
 }
 
+.footer{
+    display: none;    
+}
+
 .name-user{
     width: 100%;
     text-align: center;
@@ -136,7 +140,6 @@ li{
     top: 0;
     background-color: rgba( 0, 0, 0, 0);
     color: white;
-    #padding: 3px;
     border-top-left-radius: 5px;
     border-bottom-left-radius: 0;
     width: 33%;
@@ -146,4 +149,87 @@ li{
 .count-potion:hover{
     background-color: rgba( 21, 21, 21, .6);
     color: white;
+}
+
+/*    SHOP START     */
+
+.shop-item{
+    margin-left:20px;
+	margin-top:10px;
+	list-style:none;
+	width: 23%;
+    display: inline-block;
+}
+
+.shop-item-image, .shop-item-right-info {
+    width: 48%;
+    height: auto;
+    display: inline-block;
+    float: left;
+}
+
+.shop-item-image img{
+    max-width: 100%;
+    height: auto;
+}
+
+.shop-item-right-info-block img, .price-shop img{
+    width: 20px;
+    height: auto;
+}
+
+.shop-item-right-info-block{
+     padding-top: 5px;
+     padding-bottom: 5px;   
+     text-align: center;
+}
+
+.price-shop{
+    width: 48%;
+    display: inline-block;
+}
+
+.btn-buyThing{
+    width: 48%;
+}
+
+.shop-item-bottom-info{
+    width: 100%;
+    display: inline-block;
+    border-top: 1px solid #ddd;
+    padding-top: 5px;
+}
+
+.bottom-char-shop{
+     width: 18%;
+     display: inline-block;
+}
+
+.bottom-char-shop img{
+     width: 20px;
+     height: auto;
+}
+
+.right-sort{
+     float: right;   
+}
+
+.system-messages-container{
+    z-index: 9999;
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    width: auto;
+    height: auto;
+    padding: 5px;
+}
+
+.system-message{
+    width: 100%;
+    background-color: white;
+    padding: 5px;
+    border-radius: 4px;
+    min-width: 200px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, .5);
+    margin-bottom: 5px;
 }

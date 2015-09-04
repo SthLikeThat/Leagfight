@@ -1,26 +1,37 @@
-<li class="shop"> 
-	<div class="topThings">
-		<div class="name">%name%</div>	
-		<div class="type">%type%</div>
-	</div>
-	
-	<div class="centerThing">
-		<div class="imgThing"><img src="images/cloth/%id%.png" height="140" /></div>	
-		<div class="centerRight">
-			<div class="rightchar"> %typedamage% </div>
-			<div class="rightchar"><img src="image_char/image/lvl.png" height="15"> %requiredlvl% </div>
-			<div class="rightchar"><img src="image_char/image/damage.png" height="15"> %damage% </div>
-			<div class="rightchar"><img src="image_char/image/crit.png" height="15"> %crit% </div>
-		</div>
-	</div>
-	
-	<div class="bottomThing">
-		<div class="bottomchar"><img src="image_char/image/strengh.png" height="15"> %bonusstr%</div>	
-		<div class="bottomchar"><img src="image_char/image/defence.png" height="15"> %bonusdef%</div>	
-		<div class="bottomchar"><img src="image_char/image/agility.png" height="15"> %bonusag%</div>
-		<div class="bottomchar"><img src="image_char/image/physique.png" height="15"> %bonusph%</div>	
-		<div class="bottomchar"><img src="image_char/image/mastery.png" height="15"> %bonusms%</div>
-	</div>
-	
-	<div class="buyThing"><div class="price" id="%id%">%price% <img src="images/coinBlack.png" height="18"/></div><a href="#" onclick="buyThing(%id%)" >Купить</a></div>
-</li>
+<div class="panel panel-default shop-item" data-typedamage="%type_damage%" data-type="%type%">
+  <div class="panel-heading">
+      <h4 class="panel-title">
+          <div>%name% <h5 style="float: right; margin-top: 0;"> [%type_word%]</h5></div>
+      </h4>
+  </div>
+  <div class="panel-body">
+    <div class="shop-item-image">
+        <img src="../images/cloth/%id%.png"/>
+    </div>	
+    <div class="shop-item-right-info">
+        <div class="shop-item-right-info-block"> %type_damage_word%</div>
+        <div class="shop-item-right-info-block">
+            <img src="../images/icons/lvl.png"> %required_lvl%
+        </div>
+        <div class="shop-item-right-info-block"> 
+            <img src="../images/icons/damage.png"> %damage%
+        </div>
+        <div class="shop-item-right-info-block">
+            <img src="../images/icons/crit.png"> %crit%
+        </div>
+    </div>	
+     <div class="shop-item-bottom-info">
+        <div class="bottom-char-shop"><img src="../images/icons/strengh.png" > %bonus_strengh%</div>	
+        <div class="bottom-char-shop"><img src="../images/icons/defence.png" > %bonus_defence%</div>	
+        <div class="bottom-char-shop"><img src="../images/icons/agility.png" > %bonus_agility%</div>
+        <div class="bottom-char-shop"><img src="../images/icons/physique.png" > %bonus_physique%</div>	
+        <div class="bottom-char-shop"><img src="../images/icons/mastery.png" > %bonus_mastery%</div>
+      </div>
+  </div>
+  <div class="panel-footer">
+      <div class="price-shop">
+          %price% <img src="../images/coinBlack.png" />
+      </div>
+      <button class="btn btn-success btn-buyThing" onclick="buyThing(%id%)">Купить</button>
+  </div>
+</div>

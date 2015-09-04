@@ -8,6 +8,13 @@ class Ancillary{
         $this->db = $db;
     }
 
+	public function getDiscount(array $user_information){
+		$discount = 100;
+		for($i = 1; $i <= $user_information["lvl"]; $i++) 
+			$discount = $discount -($discount * 0.02);
+		return round(100 - $discount, 3);
+	}
+	
 	public function getAllInventory($inventory, $potions){
 		try{
 			if(!is_bool($inventory) && !is_array($inventory)){

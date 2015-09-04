@@ -16,10 +16,6 @@
 			require_once "lib/clientContent_class.php";
 			$content = new clientContent($db);
 			break;
-		case "shop":
-			require_once "lib/shopContent_class.php";
-			$content = new shopContent($db);
-			break;
 		case "arena":
 			require_once "lib/arenaContent_class.php";
 			$content = new arenaContent($db);
