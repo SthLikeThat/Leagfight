@@ -1,9 +1,9 @@
-<li class="houseItem">
-	<div class="imageHouseItem"> <img src="images/menu_items/%image%.png" height="50"/> </div>
-	<div class="nameHouseItem"> %name% </div>
-	<div class="littleHouseItem"> %percent%%prefix% </div>
-	<div class="textHouseItem"> %text% </div>
-	<div class="littleHouseItem"> %lvl% </div>
-	<div class="nameHouseItem"> %price% <img src="images/coinBlack.png" height="15"/> </div>
-	<div class="lastHouseItem"> <a href="#" onclick="upHouse('%nameEng%')"> <img src="images/menu_items/improve.png" height="50"/> </a> </div>
-</li>
+<tr id="%name%">
+     <td class=""><img src="../images/menu_items/%image%.png" height="50"/></td>
+     <td class="">%title%</td>
+     <td class="value_house">%percent%%prefix%</td>
+     <td class="">%text%</td>
+     <td class="lvl_house">%lvl%</td>
+     <td class=""> <span class="price_house">%price%</span> <img src="../images/coinBlack.png" height="15"/></td>
+     <td class="" style="padding: 0;"> <div onclick="upHouse('%id%')" class="house-up-button"> <img src="../images/icons/up.png"/> </div></td>
+</tr>

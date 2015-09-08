@@ -1,21 +1,29 @@
 <?php
 require_once "../lib/database_class.php";
 
-class shopFunctions extends DataBase{
+class shopFunctions{
 
     private $db;
 
-    public function __construct() {
-        parent::__construct();
-        $this->db = $this;
-        session_start();
-        $this->account = $this->db->select("accounts", array("*"), "`id_account` =". $_SESSION["id_account"], "id_account")[0];
-		$this->user_information = $this->db->select("user_information", array("lvl"), "`id_user` =". $_SESSION["id_account"], "id_user")[0];
+    public function __construct($db = false, $acc = false, $info = false) {
+		if(!$db){
+			$this->db = new DataBase();
+			session_start();
+			$this->account = $this->db->select("accounts", array("*"), "`id_account` =". $_SESSION["id_account"], "id_account", true, 1)[0];
+			$this->user_information = $this->db->select("user_information", array("lvl"), "`id_user` =". $_SESSION["id_account"], "id_user", true, 1)[0];
+		}
+		else{
+			$this->db = $db;
+			session_start();
+			$this->account = $acc;
+			$this->user_information = $info;
+		}
+        
     }
 
     public function query($query){
-        if (!$result = $this->mysqli->query($query)) {
-            return $query." Ошибка: ".$this->mysqli->error;
+        if (!$result = $this->db->mysqli->query($query)) {
+            return $query." Ошибка: ".$this->db->mysqli->error;
         }
         return $result;
     }
@@ -73,7 +81,7 @@ class shopFunctions extends DataBase{
 		if($weapon["type_damage"] == 1) $weapon["type_damage_word"]="Колющее";
 		if($weapon["type_damage"] == 2) $weapon["type_damage_word"]="Режущее";
 		if($weapon["type_damage"] == 3) $weapon["type_damage_word"]="Дробящее";
-		$text = $this->getReplaceTemplate($weapon, "weapon");
+		$text = $this->db->getReplaceTemplate($weapon, "weapon");
 		return $text;
 	}
 	
@@ -81,14 +89,14 @@ class shopFunctions extends DataBase{
 		if($armor["type_defence"] == 1) $armor["type"]="Лёгкая";
 		if($armor["type_defence"] == 2) $armor["type"]="Средняя";
 		if($armor["type_defence"] == 3) $armor["type"]="Тяжелая";
-		$text = $this->getReplaceTemplate($armor, "armor");
+		$text = $this->db->getReplaceTemplate($armor, "armor");
 		return $text;
 	}
 	
 	private function getPageSmth($something){
 		if($something["type_effect"] == "healPercent")
 			$something["description"] = "Исцеляет {$something["value_effect"]}% от максимального здоровья";
-		$text .= $this->getReplaceTemplate($something, "food");
+		$text .= $this->db->getReplaceTemplate($something, "food");
 		return $text;
 	}
 	
@@ -104,7 +112,7 @@ class shopFunctions extends DataBase{
 		
 		//Проверяем есть ли вещь с подобным хешем и есть ли вообще свободный слот
 		if($id < 1000){
-			$this->inventory = $this->db->getAllOnField("user_inventory", "id_user", $_SESSION["id_account"], "id_user", "");
+			$this->inventory = $this->db->getAllOnField("user_inventory", "id_user", $_SESSION["id_account"], "id_user", true, 1);
 			$count = count($this->inventory);
 			for($i = 1; $i < $count; $i++){
 				if($this->inventory["slot$i"] != "0" and $this->inventory["slot$i"] != "999"){
@@ -119,7 +127,7 @@ class shopFunctions extends DataBase{
 			}
 		}
 		else{
-			$this->potions = $this->db->getAllOnField("user_potions", "id_user", $_SESSION["id_account"], "id_user", "");
+			$this->potions = $this->db->getAllOnField("user_potions", "id_user", $_SESSION["id_account"], "id_user", true, 1);
 			$count = count($this->potions);
 			for($i = 1; $i < $count; $i++){
 				if($this->potions["potion$i"] != "0" and $this->potions["potion$i"] != "999"){
@@ -155,7 +163,7 @@ class shopFunctions extends DataBase{
 			if(!$potion_in_inventory)
 				$newInvItem = array( "id"=> $id, "image" => false, "count" => 1);
 		}
-		$thing = $this->db->getAllOnField($table_name, "id", $id, "", "");
+		$thing = $this->db->getAllOnField($table_name, "id", $id, "id", true, 1);
 		
 		if( $id > 1000 && !$potion_in_inventory){
 			$newInvItem["image"] = $thing["name"];
@@ -172,12 +180,12 @@ class shopFunctions extends DataBase{
 		}
 		
 		//Проверяем на наличие золота
-		$this->resources = $this->db->select("user_resources", array("*"), "`id_user` =". $_SESSION["id_account"], "id_user")[0];
+		$this->resources = $this->db->select("user_resources", array("*"), "`id_user` =". $_SESSION["id_account"], "id_user", true, 1)[0];
 		
 		
 		if($this->resources[$valuta] > $thing["price"]){
 			$statistic_array = array("Gold" => 0, "Another" => 0, "equipment" => 0, "potions" => 0);
-			$this->statistic = $this->db->select("user_statistic", array("shop_statistic"), "`id_user` =". $_SESSION["id_account"], "id_user")[0];
+			$this->statistic = $this->db->select("user_statistic", array("shop_statistic"), "`id_user` =". $_SESSION["id_account"], "id_user", true, 1)[0];
 			
 			//Создаём новую статистику, если её еще нет
 			if(is_null($this->statistic["shop_statistic"])){
@@ -228,43 +236,6 @@ class shopFunctions extends DataBase{
 			die(json_encode($resultData));
 		}
     }
-
-    public function buyPotion($id){
-        $allPotions = $this->db->getAll("something", "", "");
-        $exist = false;
-        for($i = 0; $i < count($allPotions); $i++){
-            if($allPotions[$i]["image"] == $id){
-                $exist = true;
-                break;
-            }
-        }
-        if(!$exist) exit;
-        $currentgold = $this->user["Gold"];
-        $thing = $this->db->getAllOnField("something", "image", $id, "", "");
-        if($thing["requiredlvl"] > $this->user["lvl"] + 3) exit;
-        $price = $thing["price"];
-        if($currentgold > $price){
-            $newgold = $currentgold - $price;
-            $field = $this->setFieldInvPotion($id);
-            if($field){
-                $statistic = unserialize($this->user["shopStatistic"]);
-                $statistic["spentGold"] += $price;
-                $statistic["potions"]++;
-                $this->db->setFieldOnID("user_statistic", $this->user["id"], "shopStatistic", serialize($statistic));
-                $this->db->setField("user_resources", "Gold", $newgold, "id", $this->user["id"]);
-                echo $newgold;
-                exit;
-            }
-            else{
-                echo "?";
-                exit;
-            }
-        }
-        else{
-            echo "!";
-            exit;
-        }
-    }
 	
 	private function generateCode($length = 8) {
         $chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPRQSTUVWXYZ0123456789";
@@ -277,14 +248,16 @@ class shopFunctions extends DataBase{
     }
 	
 }
-$shopFunctions = new shopFunctions();
+if($_POST["WhatIMustDo"]){
+	$shopFunctions = new shopFunctions();
 
-switch ($_POST["WhatIMustDo"]) {
-	case "get_things":
-		$shopFunctions->get_things($_POST["thing"], true);
-		break;
-	case "buy_thing":
-        $shopFunctions->buy($_POST["id"]);
-        break;
+	switch ($_POST["WhatIMustDo"]) {
+		case "get_things":
+			$shopFunctions->get_things($_POST["thing"], true);
+			break;
+		case "buy_thing":
+			$shopFunctions->buy($_POST["id"]);
+			break;
+	}
 }
 ?>

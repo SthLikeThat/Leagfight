@@ -45,8 +45,8 @@ class DataBase extends Template{
 		else $order = "ORDER BY $order";
 		}
 		if ($limit) $limit = "LIMIT $limit";
-		if ($where) $query = "SELECT $fields FROM $table_name WHERE $where $order $limit";
-		else $query = "SELECT $fields FROM $table_name $order $limit";
+		if ($where) $query = "SELECT $fields FROM `$table_name` WHERE $where $order $limit";
+		else $query = "SELECT $fields FROM `$table_name` $order $limit";
 		$result_set = $this->query($query);
 		if (!$result_set) return false;
 		$i = 0;
@@ -127,8 +127,8 @@ class DataBase extends Template{
 		return $arr;
 	}
 		
-	public function getAllOnField($table_name, $field, $value, $order, $up) {
-		$result = $this->select($table_name, array("*"),  "`$field`='".addslashes($value)."'", $order, $up, "");
+	public function getAllOnField($table_name, $field, $value, $order, $up, $limit = "") {
+		$result = $this->select($table_name, array("*"),  "`$field`='".addslashes($value)."'", $order, $up, $limit);
 		return $result[0];
 	}
 	

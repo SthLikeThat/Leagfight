@@ -13,6 +13,6 @@
              <td class="active">%requiredlvl%</td>
          </tr>
          <tr>
-             <td class="success">Броня[%armorLvl%]</td>
-             <td class="active">%armor%</td>
+             <td class="success" >Броня[%armorLvl%]</td>
+             <td class="active" id="armor_value">%armor%</td>
          </tr>

@@ -265,5 +265,103 @@ class Ancillary{
         }
         return $damageBonus;
     }
+	
+	public function getTableInfo($thing, $inventory_database, $return_array = false){
+		// $return_array нужна для отображения информации об уроне в getDamageInformation
+
+		foreach($inventory_database as $inventory_item){
+			if($inventory_item["id"] == $thing["id"])
+				break;
+		}
+        if($inventory_item["id"] < 500){
+			
+            if($inventory_item["type"] == 1)
+				$typeName="Одноручное";
+            if($inventory_item["type"] == 2)
+				$typeName="Двуручное";
+            if($inventory_item["type"] == 3)
+				$typeName="Древковое";
+            if($inventory_item["type_damage"] == 1)
+				$typedamageName="Колющее";
+            if($inventory_item["type_damage"] == 2)
+				$typedamageName="Режущее";
+            if($inventory_item["type_damage"] == 3)
+				$typedamageName="Дробящее";
+			
+            $damage[0] = $inventory_item["damage"];
+            $crit[0] = $inventory_item["crit"];
+            $modificator = 1;
+            for($i = 1; $i <=5; $i++){
+                $modificator += 0.05;
+                $damage[$i] = round($damage[0] * $modificator,2);
+                $crit[$i] = round($crit[0] * $modificator,2);
+            }
+			
+            $sr["name"] = $inventory_item["name"];
+            $sr["typeName"] = $typeName;
+			$sr["typedamageName"] = $typedamageName;
+			$sr["type_damage"] = $inventory_item["type_damage"];
+			$sr["price"] = $inventory_item["price"];
+            $sr["damageLvl"] = $thing["damage"];
+            $sr["critLvl"] = $thing["crit"];
+            $sr["requiredlvl"] = $inventory_item["required_lvl"];
+            $sr["damage"] = $damage[$thing["damage"]];
+            $sr["crit"] = $crit[$thing["crit"]];
+
+            $text = $this->db->getReplaceTemplate($sr, "weaponView");
+        }
+
+        if($inventory_item["id"] > 500 && $inventory_item["id"] < 1000){
+
+            if($inventory_item["type_defence"] == 1)
+				$typeName="Лёгкая";
+            if($inventory_item["type_defence"] == 2)
+				$typeName="Средняя";
+            if($inventory_item["type_defence"] == 3)
+				$typeName="Тяжелая";
+
+            $defence[0] = $inventory_item["armor"];
+            $modificator = 1;
+            for($i = 1; $i <=5; $i++){
+                $modificator += 0.05;
+                $defence[$i] = round($defence[0] * $modificator,2);
+            }
+            $sr["type_defence"] = $inventory_item["type_defence"];
+            $sr["typeName"] = $typeName;
+            $sr["name"] = $inventory_item["name"];
+			$sr["price"] = $inventory_item["price"];
+            $sr["requiredlvl"] = $inventory_item["required_lvl"];
+            $sr["armor"] = $defence[$thing["armor"]];
+            $sr["armorLvl"] = $thing["armor"];
+			
+            $text = $this->db->getReplaceTemplate($sr, "armorView");
+        }
+		
+		if($inventory_item["bonus_strengh"]){
+			$sr["bonus_strengh"] = $inventory_item["bonus_strengh"];
+			$text .= " <tr><td class='success'>Сила</td><td class='active'>{$inventory_item["bonus_strengh"]}</td></tr>";
+		}
+		if($inventory_item["bonus_defence"]){
+			$sr["bonus_defence"] = $inventory_item["bonus_defence"];
+			$text .= " <tr><td class='success'>Защита</td><td class='active'>{$inventory_item["bonus_defence"]}</td></tr>";
+		} 
+		if($inventory_item["bonus_agility"]){
+			$sr["bonus_agility"] = $inventory_item["bonus_agility"];
+			$text .= " <tr><td class='success'>Ловкость</td><td class='active'>{$inventory_item["bonus_agility"]}</td></tr>";
+		} 
+		if($inventory_item["bonus_physique"]){
+			$sr["bonus_physique"] = $inventory_item["bonus_physique"];
+			$text .= " <tr><td class='success'>Телосложение</td><td class='active'>{$inventory_item["bonus_physique"]}</td></tr>";
+		} 
+		if($inventory_item["bonus_mastery"]){
+			$sr["bonus_mastery"] = $inventory_item["bonus_mastery"];
+			$text .= " <tr><td class='success'>Мастерство</td><td class='active'>{$inventory_item["bonus_mastery"]}</td></tr>";
+		} 
+		
+		$text .= "</tbody></table></div>";
+		if($return_array)
+			return array("html" => $text, "array" => $sr);
+		return $text;
+    }
 }
 ?>

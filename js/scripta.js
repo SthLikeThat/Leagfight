@@ -384,9 +384,128 @@ $(document).ready(function(){
         }
     });
     
+     //Динамическая догрузка в городе
+    $(".nav-town a").click(function(eventObject){
+        var thing = $(this).attr("data-thing");
+        var tab = $(this).attr("href");
+        
+        if($(tab).html() == ""){
+            var serverResult = $.post( "../town/town_functions.php", { 'WhatIMustDo': "get_town_item", 'thing': thing });
+
+            serverResult .done(function( data ) {
+                console.log(data);
+                $(tab).html(data);
+            });
+
+             serverResult .fail(function() {
+                    $("#alert_danger .modal-body").html("Возникла серверная ошибка");
+                    $("#alert_danger").show();
+             });
+        }
+        else{
+            $(".sort-shop").hide();
+            $(sort).show();
+
+            var type = $(sort).attr("id");
+            sort_shop(type, sorts);   
+        }
+    });
+    
     //Закрытие системных сообщений
     $(".system-messages-container").delegate(".close", "click",function(eventObject){
         $(eventObject.currentTarget.parentElement.parentElement).hide();
+    });
+    
+    //Вывод меню у кузнеца
+    $(".inventory-smith .inventory-item").click(function(eventObject){
+        var info = getChildrenBLock(eventObject.currentTarget.children, "pop-info", "class").innerHTML;
+        var image = getChildrenBLock(eventObject.currentTarget.children, "inventory-item-image", "class").innerHTML;
+        var type = $(this).attr("data-type"); //оружие или броня
+        var armor = $(this).attr("data-armor");
+        var damage = $(this).attr("data-damage");
+        var crit = $(this).attr("data-crit");
+        var price = $(this).attr("data-price");
+        
+        $(".smith-info").html(info);
+        $(".item_to_upgrade").html(image);
+        $(".smith-up").hide();
+        //Показываем нужное меню прокачки
+        $(".smith-menu [data-type=" + type + "]").show();
+        
+        //Подставляем в него все нужные значения
+        $(".smith-menu #input-damage").val(damage);
+        $(".smith-menu #input-damage").attr("data-start", damage);
+        $(".smith-menu #input-damage").attr("data-price", price);
+        $(".smith-menu #input-crit").val(crit);
+        $(".smith-menu #input-crit").attr("data-start", crit);
+        $(".smith-menu #input-crit").attr("data-price", price);
+        $(".smith-menu #input-armor").val(armor);
+        $(".smith-menu #input-armor").attr("data-start", armor);
+        $(".smith-menu #input-armor").attr("data-price", price);
+        
+        //Вставляем чистые значения
+        $(".smith-menu #input-armor").attr("data-armor",  $(this).attr("data-armor-value"));
+        $(".smith-menu #input-damage").attr("data-damage",  $(this).attr("data-damage-value"));
+        $(".smith-menu #input-crit").attr("data-crit",  $(this).attr("data-crit-value"));
+        
+        //Вставляем нужные значение поле урона/крита/брони
+        $("#value-smith-armor").html($(".smith-info #armor_value").html());
+        $("#value-smith-damage").html($(".smith-info #damage_value").html());
+        $("#value-smith-crit").html($(".smith-info #crit_value").html());
+        
+        //Обнуляем цены прокачек
+        $(".train-summ").html(0);
+    });
+    
+    // Увелечение значений у кузнеца
+    $(".smith-up button").click(function(eventObject){
+        var factors = {"input-armor": 1.9, "input-damage": 1.75, "input-crit": 1.5};
+        var make = $(this).attr("data-make");
+        var target = $(this).attr("data-target");
+        var input =  $("#input-" + target);
+        var price_block =  $("#train-summ-" + target);
+        var start = Number($(input).attr("data-start"));
+        var price = Math.round( Number( $(input).attr("data-price") )/ 25 );
+        var current_value = $("#value-smith" + target).html();
+        
+        //Определяемся с будущим значением инпута
+        if(make == "up"){
+            var value = Number($(input).val()) + 1;
+            if(value > 5)
+                value = 5;
+        }
+         if(make == "del"){
+            var value = Number($(input).val()) - 1;
+            if(value < start)
+                value = start;
+        }
+        
+        //Будущее значение хар-ки
+        var values_arr =  [Number($(input).attr("data-" + target))];
+        
+        //Вычисляем стоимость каждого уровня отдельно
+        var prices_arr = [price];
+        var total_price = 0;
+        for( var i = 1; i <= 5; i++){
+            prices_arr[i] = Math.round( prices_arr[i - 1] * Number( factors["input-" + target] ) );
+            values_arr[i] = (values_arr[i - 1] * 1.05).toFixed(2);
+        }
+        
+        //Суммируем стоимость нужных нам уровней
+        for( var i = start; i <= value; i++){
+            total_price += prices_arr[i];
+        }
+        if (start == value)
+            total_price = 0;
+        
+        $(input).val(value);
+        $(price_block).html(total_price);
+        
+        //Вставляем новые значения хар-ик
+        $("#value-smith-" + target).html( values_arr[value] );
+        
+        //Проверяем тотальную сумму по текущему типу прокачки
+        checkTotalUpgradingSumm_Smith();
     });
     
 });
@@ -420,6 +539,16 @@ function checkTotalTrainingSumm(){
     $("#total-sum-discount").html(total_sum_discount);
 }
 
+function checkTotalUpgradingSumm_Smith(){
+    var blocks = $(".train-summ");
+    var total = 0;
+    for( var i = 0; i < blocks.length; i++){
+        total += Number(blocks[i].innerHTML);
+    }
+    $("#total-sum-discount").html(total);
+}
+
+//Считает цену характеристик
 function getResultChar(new_value, up_char_row){
         var action = $(up_char_row).attr("data-action");
         var price = Number($(up_char_row).attr("data-price"));
@@ -562,6 +691,33 @@ function addSystemMessage(text){
     html += '<i class="glyphicon glyphicon-remove"></i></button></div><div class="system-message-body">';
     html += text + '</div></div>';
     $(".system-messages-container").append(html);
+}
+
+function upHouse(id){
+	var serverResult = $.post( "../town/town_functions.php", { 'WhatIMustDo': "up_house", 'id': id });
+    
+    serverResult .done(function( data ) {
+        
+        var resultData = JSON.parse(data);
+        
+        if(resultData.result){
+            $("#gold").html(resultData.gold);
+            $("#" + resultData.name + " .value_house").html(resultData.value);
+            $("#" + resultData.name + " .lvl_house").html(resultData.lvl);
+            $("#" + resultData.name + " .price_house").html(resultData.price);
+        }
+        else{
+            $("#alert_danger .modal-body").html(resultData.error);
+            $("#alert_danger").show();
+        }
+        delete resultData;
+        delete data;
+     });
+    
+    serverResult .fail(function() {
+        $("#alert_danger .modal-body").html("Возникла серверная ошибка");
+        $("#alert_danger").show();
+     });
 }
 
 function setSpawn(league){
@@ -1157,23 +1313,6 @@ function changeSettings(){
 					document.location.href = "?view=options";
 				  }
 				});
-	}
-
-function upHouse(name){
-	$.ajax({
-		type: 'POST',
-		url: 'lib/allFunctions.php',
-		data: {"WhatIMustDo":"upHouse", "name":name},
-		success: function(data) {
-			if(data == "house")
-				document.location.reload();
-			if(data == "workShop")
-				clanMenu("workshop");
-			if(data != "house" && data != "workShop")
-				message(data);
-		 }
-		 
-	});
 }
 
 function goSleep(value){

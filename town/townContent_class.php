@@ -1,45 +1,28 @@
 <?php
-require_once "modules_class.php";
+require_once "../lib/modules_class.php";
+require_once "town_functions.php";
 
 class townContent extends Modules {
 
-	protected $data;
+	private $unctions;
 	
 	public function __construct($db) {
 		parent::__construct($db);
+		$this->functions = new townFunctions($db, $this->account, $this->user_information);
 	}
 	
 	protected function getCenter() {
-		$sr["menuItem"] = $this->getFileContent("townMenu");
-		if($this->data["type"] == "house") $sr["content"] = $this->getHouse();
-		if($this->data["type"] == "advertising") $sr["content"] = $this->getAdvertising();
-		if($this->data["type"] == "leagues") $sr["content"] = $this->getLeagues();
-		if($this->data["type"] == "addAdvertising") $sr["content"] = $this->addAdvertising();
-		if($this->data["type"] == "clan") $sr["content"] = $this->getClan();
-		if($this->data["type"] == "smith") $sr["content"] = $this->getSmith();
-		if($this->data["type"] == "work") $sr["content"] = $this->getWork();
-		if($this->data["type"] == "mass_battle") $sr["content"] = $this->getBattle();
-		if($this->data["type"] == null) header("Location: ?view=notfound");
+		$sr["house"] = $this->functions->get_town_item(3);
+		$sr["menuItem"] = $this->getReplaceTemplate($sr, "townMenu");
 		return $this->getReplaceTemplate($sr, "town");
 	}
 	
 	protected function getTitle(){
-		return "Клан";
+		return "Город - LF";
 	}
 	
 	protected function getShortcut_icon(){
-		return "";
-	}
-	
-	private function getTownMenu(){
-		$menu = $this->db->getAll("town_menu", "", "");
-		for ($i=0;$i<count($menu);$i++){
-			$sr["image"] = $menu[$i]["image"];
-			$sr["title"] = $menu[$i]["title"];
-			$sr["link"] = $menu[$i]["link"];
-			$text .= $this->getReplaceTemplate($sr, "shopMenuItem");
-		}
-		return $text;
+		return "town_title";
 	}
 	
 	private function getBattle(){
@@ -87,55 +70,6 @@ class townContent extends Modules {
 		return $text;
 	}
 	
-	private function getSmith(){
-		$sr["inventory"] = $this->getInventory();
-		$text .= $this->getReplaceTemplate($sr, "smith");
-		return $text;
-	}
-	
-	private function getInventory(){
-		for($i = 1; $i < count($this->inventory); $i++){
-			if($this->inventory["slot$i"] == "999") break;
-			if($this->inventory["slot$i"] != "0"){
-				$invItem = unserialize($this->inventory["slot$i"]);
-				$sr["show"] = 1;
-				$sr["id"] = $invItem["id"];
-				$sr["slot"] = $i;
-				if($invItem["hash"] == $this->user["secondaryWeapon"] or $invItem["hash"] == $this->user["primaryWeapon"]){
-					$sr["onOff"] = "1";
-				}
-				elseif($invItem["hash"] == $this->user["armor"] or $invItem["hash"] == $this->user["helmet"] or $invItem["hash"] == $this->user["leggings"] or $invItem["hash"] == $this->user["bracers"]){
-					$sr["onOff"] = "1";
-				}
-				else $sr["onOff"] = "0";
-				$text .= $this->getReplaceTemplate($sr, "inventoryItemSmith");
-			}
-		}
-		$sd["inventoryItem"] = $text;
-		$textInv = $this->getReplaceTemplate($sd, "inventory");
-		return $textInv;
-	}
-	
-	private function getHouse(){
-		$house = $this->db->getAllOnField("user_house", "id", $this->user["id"], "", "");
-		$houseItems = $this->db->getAll("house_items", "", ""); 
-		for($i=0;$i<count($houseItems);$i++){
-			$sr["name"] = $houseItems[$i]["title"];
-			$sr["prefix"] = $houseItems[$i]["prefix"];
-			$sr["nameEng"] = $houseItems[$i]["name"];
-			$sr["image"] = $houseItems[$i]["image"];
-			$sr["text"] = $houseItems[$i]["text"];
-			$name = $houseItems[$i]["name"];
-			$sr["lvl"] = $house["$name"];
-			$price = 1;
-			$price 	= $house["$name"] * $houseItems[$i]["startPrice"] * 1.5;
-			$sr["price"] = $price;
-			$sr["percent"] = $houseItems[$i]["percent"] * $house["$name"];
-			$text .= $this->getReplaceTemplate($sr, "house");
-		}
-		return $text;
-	}
-	
 	private function getAdvertising(){
 		$section = $this->data["section"];
 		$allADV = $this->db->getAll("advertisings", "time", "");	
@@ -167,11 +101,6 @@ class townContent extends Modules {
 		}
 		$srAll["contentAdv"] = $text;
 		return $this->getReplaceTemplate($srAll, "advertising");
-	}
-	
-	private function getLeagues(){
-		$srAll["contentAdv"] = $text;
-		return $this->getReplaceTemplate($srAll, "league");
 	}
 	
 	private function addAdvertising(){

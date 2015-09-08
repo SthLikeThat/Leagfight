@@ -18,15 +18,15 @@ abstract class Modules extends Template{
 		
 		$this->valid = new CheckValid($db);
 		$this->data = $this->secureData(array_merge($_POST, $_GET));
+		$this->account = $this->db->select("accounts", array("*"), "`id_account` =". $_SESSION["id_account"], "id_account", true, 1)[0];
 		if(!$this->getAuthUser()){
             unset($_SESSION);
             header("Location: auth.html");
             return false;
         }
 		
-		$this->account = $this->db->select("accounts", array("*"), "`id_account` =". $_SESSION["id_account"], "id_account")[0];
-		$this->user_information = $this->db->select("user_information", array("*"), "`id_user` =". $_SESSION["id_account"], "id_user")[0];
-		$this->resources = $this->db->select("user_resources", array("*"), "`id_user` =". $_SESSION["id_account"], "id_user")[0];
+		$this->user_information = $this->db->select("user_information", array("*"), "`id_user` =". $_SESSION["id_account"], "id_user", true, 1)[0];
+		$this->resources = $this->db->select("user_resources", array("*"), "`id_user` =". $_SESSION["id_account"], "id_user", true, 1)[0];
 		
 	}
 	
@@ -145,8 +145,6 @@ abstract class Modules extends Template{
 		if(!$_SESSION["id_account"]){
             return false;
 		}
-		$user = $this->db->getFieldsBetter("accounts", "id_account", $_SESSION["id_account"], array("id_account", "user_hash"), "=");
-		$user = $user[0];
         /*$time = time();
 		if($user["lastRegen"] + 3600 < $time and $user["currentHp"] < $user["maxHp"]){
 			$maxCycle = round(($time - $user["lastRegen"])/3600,0);
@@ -161,7 +159,7 @@ abstract class Modules extends Template{
 			else $this->db->setFieldOnID("users", $user["id"], "currentHp", $user["currentHp"] + $bonusHP);
 			$this->db->setFieldOnID("users", $user["id"], "lastRegen", $time);
 		}*/
-		if($_SESSION["hash"] === $user["user_hash"]){
+		if($_SESSION["hash"] === $this->account["user_hash"]){
 			return true;
 		}
 		else{

@@ -34,7 +34,7 @@
 						</a>
 					</li>
 					<li data-title="Город">
-						<a href="/?view=town&amp;type=house">
+						<a href="/town/">
 							<img src="../images/menu_items/town.png">
 						</a>
 					</li>

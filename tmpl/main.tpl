@@ -23,7 +23,7 @@
 	</div>
 	
 	<div class="main-content">
-        <div class="full-container navbar navbar-default" style="background: #A0C9A0;">
+        <div class="full-container navbar navbar-default my-color">
 			%header%
 		</div>
 		

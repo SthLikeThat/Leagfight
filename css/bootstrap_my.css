@@ -187,7 +187,6 @@
 .main-content{
     width: 100%;
     box-sizing: border-box;
-    padding-bottom: 60px;
     min-height: 100%;
     height: auto;
 }
@@ -310,6 +309,7 @@
 .up-char-row{
     width: 100%;
     height: auto;
+    padding-bottom: 2px;
 }
 
 .up-char-row > *{
@@ -354,4 +354,16 @@
 
 .leag-alert{
      display: block;   
+}
+
+.btn-black {
+    color: #fff;
+    background-color: #383838;
+    border-color: #222222;
+}
+
+.btn-black:hover{
+    color: #fff;
+    background-color: #5F5F5F;
+    border-color: #494949;
 }

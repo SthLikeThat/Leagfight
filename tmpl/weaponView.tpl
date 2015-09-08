@@ -18,10 +18,10 @@
          </tr>
          <tr>
              <td class="success">Урон[%damageLvl%]</td>
-             <td class="active">%damage%</td>
+             <td class="active" id="damage_value">%damage%</td>
          </tr>
          <tr>
              <td class="success">Крит[%critLvl%]</td>
-             <td class="active">%crit%</td>
+             <td class="active" id="crit_value">%crit%</td>
          </tr>
  

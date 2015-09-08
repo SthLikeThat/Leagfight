@@ -1687,31 +1687,6 @@ width:60px;
 }
 
 /*	advertisings END	*/
-/*	league START	*/
-
-.leagues{
-	width:80%;
-	margin:auto;
-	position:relative;
-	background-color: rgb(242,242,242);
-}
-
-.leagueOne{
-	display:inline-block;
-	position:relative;
-	margin-left:10px;
-}
-
-.leagueOne{
-	border-radius:10px;
-	padding:5px;
-}
-
-.leagueOne:hover{
-	background-color: rgb(202,202,202);
-}
-
-/*	league END	*/
 /*	clan START	*/
 
 .createClan{

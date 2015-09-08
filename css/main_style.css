@@ -34,6 +34,10 @@ li{
     .footer{
         width: calc(100% - 50px);
     }
+    
+    .shop-item{
+        width: 23%;
+    }
 }
 
 @media  (max-width: 768px) {
@@ -56,6 +60,17 @@ li{
     .inventory-item img, .inventory-item-potion img{
         width: 70px;
         height: 70px;
+    }
+    
+    .shop-item{
+        width: 45%;
+    }
+}
+
+@media  (max-width: 1024px) and (min-width: 769px){
+    
+    .shop-item{
+        width: 30%;
     }
 }
 
@@ -157,7 +172,6 @@ li{
     margin-left:20px;
 	margin-top:10px;
 	list-style:none;
-	width: 23%;
     display: inline-block;
 }
 
@@ -214,6 +228,8 @@ li{
      float: right;   
 }
 
+/*    SHOP END   */
+
 .system-messages-container{
     z-index: 9999;
     position: fixed;
@@ -232,4 +248,96 @@ li{
     min-width: 200px;
     box-shadow: 0 5px 15px rgba(0, 0, 0, .5);
     margin-bottom: 5px;
+}
+
+.house-up-button{
+    width: 100%;
+    height: 67px;
+    padding-top: 15px;
+    box-sizing: border-box;
+}
+
+.house-up-button img{
+    height: 70%;
+    width: auto;
+    padding: 5px;
+    border-radius: 4px;
+}
+
+.house-up-button img:hover{
+     background-color: lightgrey;   
+}
+
+.my-color{
+    background-color: #A0C9A0!important;
+}
+
+.leagues{
+	background-color: rgb(242,242,242);
+    text-align: center;
+    margin-top: 5px;
+    padding: 5px;
+}
+
+.league_item{
+    display: inline-block;
+    padding: 5px;
+}
+
+.league_name{
+     font-size: 1.2em;   
+}
+
+.league_item:hover{
+     background-color: white;
+}
+
+.smith{
+     margin-top: 5px;   
+}
+
+.title-smith{
+    text-align: center;
+    border-bottom: 1px solid #e7e7e7;
+}
+
+.smith-info{
+     padding-top: 15px;   
+     padding-bottom: 15px;   
+}
+
+.smith-info .pop-info{
+    display: inline-block!important; 
+    width: 100%;
+}
+
+.smith-info .Info{
+    border: 0;
+}
+
+.smith-up{
+    border-top: 1px solid #e7e7e7;
+    padding-top: 5px;
+    #display: none;
+}
+
+.type_up img{
+     width: 36px;   
+}
+
+.result-sum-row-smith .result-sum:last-child{
+    font-weight: 600;
+}
+
+.result-sum-row-smith .result-sum{
+    width: auto;
+    padding: 2px;
+}
+
+input:disabled:hover{
+     cursor: default;   
+}
+
+.value-smith{
+     float: left;   
 }

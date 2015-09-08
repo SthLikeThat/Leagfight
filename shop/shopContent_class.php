@@ -1,14 +1,14 @@
 <?php
 require_once "../lib/modules_class.php";
-require_once "shop_class.php";
 require_once "shop_functions.php";
 
 class shopContent extends Modules {
 	
+	private $functions;
+	
 	public function __construct($db) {
 		parent::__construct($db);
-		$this->shop = new Shop($db);
-		$this->functions = new shopFunctions();
+		$this->functions = new shopFunctions($db, $this->account, $this->user_information);
 	}
 	
 	protected function getCenter() {
